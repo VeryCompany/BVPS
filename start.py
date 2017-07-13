@@ -8,3 +8,4 @@ camera2 = asys.createActor('camera.Camera',globalName ='camera1')
 asys.tell(camera1, CMD(1, ts=(0,"b")))
 
 #asys.shutdown()
+  
