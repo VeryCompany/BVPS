@@ -19,7 +19,7 @@ cameras = {
 for camId,params in cameras.items():
     cama = sys.createActor('camera.Camera',globalName=camId)
     if params.type == 1:
-        asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE_FOR_POSITION,camId,params))
+        asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE,camId,params))
     elif params.type == 2:
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE_FOR_COLLECTION,camId,params))
 
