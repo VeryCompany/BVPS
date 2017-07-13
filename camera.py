@@ -5,14 +5,12 @@ import cv2
 import threading
 #需要支持网络摄像头和本地USB摄像头
 class Camera(ActorTypeDispatcher):
-    def init(self,url,user,password):
-        self.url = url
-        self.user = user
-        self.password = password
+    def __init__(self, *args, **kw):
+        super(Camera, self).__init__(*args, **kw)
     def receiveMsg_CMD(self, cmd, sender):
-
         detector = self.createActor(HumanDetector)
         VideoCapture("1", "3",self,detector,cmd).start()
+
 #需要支持网络摄像头和本地USB摄像头
 class VideoCapture (threading.Thread):
     def __init__(self,threadID,name,camera,detector,cmd):
