@@ -151,12 +151,12 @@ class HumanDetector(ActorTypeDispatcher):
         return self.cropImage(image, found)
 
     def upperBodyDetector(self,image):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
         t = clock()
         rects = detect(gray, self.upperBodyClassifier)
         uppers = []
-        self.draw_detections(img, rects, thickness = 1)
+        self.draw_detections(image, rects, thickness = 1)
         for x1, y1, x2, y2 in rects:
             roi = img[y1:y2, x1:x2]
             uppers.append(roi)
