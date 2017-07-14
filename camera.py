@@ -121,9 +121,9 @@ class HumanDetector(ActorTypeDispatcher):
         super(HumanDetector, self).__init__(*args, **kw)
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector( cv2.HOGDescriptor_getDefaultPeopleDetector() )
-        faceClassifier = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
-        eyeClassifier = cv2.CascadeClassifier("haarcascade_eye.xml")
-        upperBodyClassifier = cv2.CascadeClassifier("haarcascade_upperbody.xml")
+        self.faceClassifier = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
+        self.eyeClassifier = cv2.CascadeClassifier("haarcascade_eye.xml")
+        self.upperBodyClassifier = cv2.CascadeClassifier("haarcascade_upperbody.xml")
         self.HumanRecognizerProcessors = []
         print "init OK!"
 
@@ -154,7 +154,7 @@ class HumanDetector(ActorTypeDispatcher):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
         t = clock()
-        rects = detect(gray, self.upperBodyClassifier)
+        rects = self.detect(gray, self.upperBodyClassifier)
         uppers = []
         self.draw_detections(image, rects, thickness = 1)
         for x1, y1, x2, y2 in rects:
@@ -168,13 +168,13 @@ class HumanDetector(ActorTypeDispatcher):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
         t = clock()
-        rects = detect(gray, self.faceClassifier)
+        rects = self.detect(gray, self.faceClassifier)
         faces = []
         self.draw_detections(img, rects, thickness = 1)
         if not nested.empty():
             for x1, y1, x2, y2 in rects:
                 roi = img[y1:y2, x1:x2]
-                subrects = detect(roi.copy(), self.eyeClassifier)
+                subrects = self.detect(roi.copy(), self.eyeClassifier)
                 if len(subrects) > 0:
                     faces.append(roi)
                     continue
