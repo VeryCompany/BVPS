@@ -160,7 +160,7 @@ class HumanDetector(ActorTypeDispatcher):
         self.draw_detections(image, rects, thickness = 1)
         print "found {} upper body".format(len(rects))
         for x1, y1, x2, y2 in rects:
-            roi = img[y1:y2, x1:x2]
+            roi = image[y1:y2, x1:x2]
             uppers.append(roi)
             continue
         dt = clock() - t
