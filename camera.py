@@ -124,6 +124,7 @@ class HumanDetector(ActorTypeDispatcher):
         super(HumanDetector, self).__init__(*args, **kw)
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector( cv2.HOGDescriptor_getDefaultPeopleDetector() )
+        self.bodyClassifier = cv2.CascadeClassifier("haarcascade_upperbody.xml")
         self.faceClassifier = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
         self.eyeClassifier = cv2.CascadeClassifier("haarcascade_eye.xml")
         self.upperBodyClassifier = cv2.CascadeClassifier("haarcascade_upperbody.xml")
@@ -135,13 +136,16 @@ class HumanDetector(ActorTypeDispatcher):
         cameraName = message[0]
         image = message[2]
         validHuman = []
+        self.num += 1
         if len(self.HumanRecognizerProcessors) == 0:
             self.HumanRecognizerProcessors = [self.createActor(HumanRecognizer,globalName="{}-human-recognizer".format(cameraName))]
-        for body in self.fullBodyDetector(image):
-            for upb in self.upperBodyDetector(body):
-                for face in self.faceDetector(upb):
-                    validHuman.append((body,upb,face))
-                    continue
+        for body in self.fullBodyHaarDetector(image):
+            cv2.imwrite('images/{}.jpg'.format(self.num),body)
+            #for upb in self.upperBodyDetector(body):
+            #    for face in self.faceDetector(upb):
+            validHuman.append(body)
+            #        continue
+        #cv2.imwrite('images/old-{}.jpg'.format(self.num),image)
         for person in validHuman:
             for recognizer in self.HumanRecognizerProcessors:
                 self.send(recognizer,person)
@@ -152,6 +156,20 @@ class HumanDetector(ActorTypeDispatcher):
         print "found {} person".format(len(found))
         return self.cropImage(image, found)
 
+    def fullBodyHaarDetector(self,image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.equalizeHist(gray)
+        #t = clock()
+        rects = self.detect(gray, self.bodyClassifier)
+        bodys = []
+        #self.draw_detections(image, rects, thickness = 1)
+        print "found {}  bodys".format(len(rects))
+        for x1, y1, x2, y2 in rects:
+            roi = image.copy()[y1:y2, x1:x2]
+            bodys.append(roi)
+        #dt = clock() - t
+        #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
+        return bodys
     def upperBodyDetector(self,image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
@@ -197,11 +215,11 @@ class HumanDetector(ActorTypeDispatcher):
     def cropImage(self,image,rects):
         crops = []
         for x, y, w, h in rects:
-            crops.append(image[y:y+h,x:x+w])
+            crops.append(image.copy()[y:y+h,x:x+w])
         return crops
 
     def detect(self,img, cascade):
-        rects = cascade.detectMultiScale(img, scaleFactor=1.3, minNeighbors=4, minSize=(30, 30),
+        rects = cascade.detectMultiScale(img, scaleFactor=3, minNeighbors=1, minSize=(100, 100),
                                          flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []
