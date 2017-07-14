@@ -162,7 +162,7 @@ class HumanDetector(ActorTypeDispatcher):
             uppers.append(roi)
             continue
         dt = clock() - t
-        draw_str(img, (20, 20), 'time: %.1f ms' % (dt*1000))
+        draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
         return uppers
     def faceDetector(self,img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
