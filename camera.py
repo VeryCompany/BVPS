@@ -61,6 +61,8 @@ class CameraCaptureThread(threading.Thread):
             for processor in self.processors:
                 if success :
                     self.camera.send(processor,(self.cameraName,success,image))
+                else:
+                    print "read frame fail!"
     def run(self):
         self.startCapture()
     def stop(self):
@@ -128,12 +130,11 @@ class HumanDetector(ActorTypeDispatcher):
         self.HumanRecognizerProcessors = []
         print "init OK!"
 
+
     def receiveMsg_tuple(self, message, sender):
         cameraName = message[0]
         image = message[2]
         validHuman = []
-
-        self.num += 1
         if len(self.HumanRecognizerProcessors) == 0:
             self.HumanRecognizerProcessors = [self.createActor(HumanRecognizer,globalName="{}-human-recognizer".format(cameraName))]
         for body in self.fullBodyDetector(image):
