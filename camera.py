@@ -196,7 +196,7 @@ class HumanDetector(ActorTypeDispatcher):
             crops.append(image[y:y+h,x:x+w])
         return crops
 
-    def detect(img, cascade):
+    def detect(self,img, cascade):
         rects = cascade.detectMultiScale(img, scaleFactor=1.3, minNeighbors=4, minSize=(30, 30),
                                          flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
