@@ -59,7 +59,8 @@ class CameraCaptureThread(threading.Thread):
                 break
             success, image = video.read()
             for processor in self.processors:
-                self.camera.send(processor,(self.cameraName,success,image))
+                if success :
+                    self.camera.send(processor,(self.cameraName,success,image))
     def run(self):
         self.startCapture()
     def stop(self):
@@ -131,7 +132,7 @@ class HumanDetector(ActorTypeDispatcher):
         cameraName = message[0]
         image = message[2]
         validHuman = []
-        cv2.imwrite('images/received-image-{}.png'.format(self.num),image)
+
         self.num += 1
         if len(self.HumanRecognizerProcessors) == 0:
             self.HumanRecognizerProcessors = [self.createActor(HumanRecognizer,globalName="{}-human-recognizer".format(cameraName))]
@@ -157,6 +158,7 @@ class HumanDetector(ActorTypeDispatcher):
         rects = self.detect(gray, self.upperBodyClassifier)
         uppers = []
         self.draw_detections(image, rects, thickness = 1)
+        print "found {} upper body".format(len(rects))
         for x1, y1, x2, y2 in rects:
             roi = img[y1:y2, x1:x2]
             uppers.append(roi)
@@ -174,12 +176,13 @@ class HumanDetector(ActorTypeDispatcher):
         if not nested.empty():
             for x1, y1, x2, y2 in rects:
                 roi = img[y1:y2, x1:x2]
-                subrects = self.detect(roi.copy(), self.eyeClassifier)
+                subrects = self.detect(roi, self.eyeClassifier)
                 if len(subrects) > 0:
                     faces.append(roi)
                     continue
         dt = clock() - t
         draw_str(img, (20, 20), 'time: %.1f ms' % (dt*1000))
+        print "found {} faces".format(len(faces))
         return faces
 
     def faceDetector_2(self,image):
