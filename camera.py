@@ -4,8 +4,8 @@ import numpy as np
 import cv2
 import threading
 from enum import Enum
-from common import clock, draw_str
-
+from common import clock, draw_str, StatValue
+from thespian.troupe import troupe
 #需要支持网络摄像头和本地USB摄像头
 class Camera(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
@@ -43,6 +43,8 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_HumanMsg(self, cmd, sender):
         pass
 
+from multiprocessing.pool import ThreadPool
+from collections import deque
 
 class CameraCaptureThread(threading.Thread):
     def __init__(self,camera,cameraName,cameraDevice,processors=[]):
@@ -52,24 +54,46 @@ class CameraCaptureThread(threading.Thread):
         self.cameraName = cameraName
         self.cameraDevice = cameraDevice
         self.processors = processors
+    def process_frame(self,ret,frame, t0):
+        # some intensive computation...
+        #frame = cv2.medianBlur(frame, 19)
+        #frame = cv2.medianBlur(frame, 19)
+        for processor in self.processors:
+            if ret :
+                self.camera.send(processor,(self.cameraName, ret, frame))
+        return ret,frame, t0
     def startCapture(self):
         video = cv2.VideoCapture(self.cameraDevice)
+        threadn = cv2.getNumberOfCPUs()*2
+        pool = ThreadPool(processes = threadn)
+        pending = deque()
+        threaded_mode = True
+        latency = StatValue()
+        frame_interval = StatValue()
+        last_frame_time = clock()
         while True:
             if self.stopped():
                 break
-            success, image = video.read()
-            for processor in self.processors:
-                if success :
-                    self.camera.send(processor,(self.cameraName,success,image))
-                else:
-                    print "read frame fail!"
+            while len(pending) > 0 and pending[0].ready():
+                ret, res, t0 = pending.popleft().get()
+                latency.update(clock() - t0)
+                #print "threaded      :  " + str(threaded_mode)
+                #print "latency        :  %.1f ms" % (latency.value*1000)
+                #print "frame interval :  %.1f ms" % (frame_interval.value*1000)
+                latency.update(clock() - t0)
+            if len(pending) < threadn:
+                ret, frame = video.read()
+                t = clock()
+                frame_interval.update(t - last_frame_time)
+                last_frame_time = t
+                task = pool.apply_async(self.process_frame, (ret, frame.copy(), t))
+                pending.append(task)
     def run(self):
         self.startCapture()
     def stop(self):
         self._stop_event.set()
     def stopped(self):
         return self._stop_event.is_set()
-
 
 class HumanMsg(object):
 
@@ -93,6 +117,7 @@ class CameraCmd(object):
 
 
 #训练模型
+@troupe(max_count=2,idle_count=1)
 class HumanModelTrainer(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         super(HumanModelTrainer, self).__init__(*args, **kw)
@@ -101,6 +126,7 @@ class HumanModelTrainer(ActorTypeDispatcher):
     def receiveMsg_Image(self, message, sender):
         pass
 #识别人
+@troupe(max_count=2,idle_count=1)
 class HumanRecognizer(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         super(HumanRecognizer, self).__init__(*args, **kw)
@@ -108,7 +134,7 @@ class HumanRecognizer(ActorTypeDispatcher):
         print "received person image"
     def receiveMsg_Image(self, message, sender):
         pass
-
+#@troupe(max_count=2,idle_count=2)
 class VideoRecord(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         super(VideoRecord, self).__init__(*args, **kw)
@@ -117,6 +143,7 @@ class VideoRecord(ActorTypeDispatcher):
     def receiveMsg_Image(self, message, sender):
         pass
 #检测人-->（人+上半身+脸+鼻子+眼睛）-->识别人
+#@troupe(max_count=2,idle_count=2)
 class HumanDetector(ActorTypeDispatcher):
     num=0
     def __init__(self, *args, **kw):
@@ -153,7 +180,7 @@ class HumanDetector(ActorTypeDispatcher):
     def fullBodyDetector(self,image):
         found, w = self.hog.detectMultiScale(image, winStride=(8,8), padding=(32,32), scale=1.05)
         self.draw_detections(image, found)
-        print "found {} person".format(len(found))
+        #print "found {} person".format(len(found))
         return self.cropImage(image, found)
 
     def fullBodyHaarDetector(self,image):
@@ -163,7 +190,7 @@ class HumanDetector(ActorTypeDispatcher):
         rects = self.detect(gray, self.bodyClassifier)
         bodys = []
         #self.draw_detections(image, rects, thickness = 1)
-        print "found {}  bodys".format(len(rects))
+        #print "found {}  bodys".format(len(rects))
         for x1, y1, x2, y2 in rects:
             roi = image.copy()[y1:y2, x1:x2]
             bodys.append(roi)
@@ -177,7 +204,7 @@ class HumanDetector(ActorTypeDispatcher):
         rects = self.detect(gray, self.upperBodyClassifier)
         uppers = []
         self.draw_detections(image, rects, thickness = 1)
-        print "found {} upper body".format(len(rects))
+        #print "found {} upper body".format(len(rects))
         for x1, y1, x2, y2 in rects:
             roi = image[y1:y2, x1:x2]
             uppers.append(roi)
@@ -219,7 +246,7 @@ class HumanDetector(ActorTypeDispatcher):
         return crops
 
     def detect(self,img, cascade):
-        rects = cascade.detectMultiScale(img, scaleFactor=3, minNeighbors=1, minSize=(100, 100),
+        rects = cascade.detectMultiScale(img, scaleFactor=3, minNeighbors=1, minSize=(150, 150),
                                          flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []

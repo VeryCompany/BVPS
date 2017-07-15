@@ -10,7 +10,7 @@ asys = ActorSystem((sys.argv + ['multiprocQueueBase'])[1])
 #定位摄像头 type == 1
 #采集摄像头 type == 2
 cameras = {
-"camera1":{"x":"","y":"","z":"","device":"http://192.168.0.163:8081","user":"","password":"","type":1}#,
+"camera1":{"x":"","y":"","z":"","device":0,"user":"","password":"","type":1}#,
 #"camera2":{"x":"","y":"","z":"","device":"rtsp://192.168.0.199:554","user":"","password":"","type":1},
 #"camera3":{"x":"","y":"","z":"","device":"rtsp://192.168.0.199:554","user":"","password":"","type":2}
 }
