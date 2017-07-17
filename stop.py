@@ -1,3 +1,4 @@
 from thespian.actors import ActorSystem
 import sys
-ActorSystem((sys.argv + ['multiprocTCPBase'])[1]).shutdown()
+from bvps.logger import logcfg
+ActorSystem(systemBase="multiprocTCPBase", logDefs=logcfg).shutdown()

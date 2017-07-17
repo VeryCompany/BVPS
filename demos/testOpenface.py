@@ -27,6 +27,7 @@ while True:
     ret, frame = video_capture.read()
     bbs = align.getAllFaceBoundingBoxes(frame)
     for bb in bbs:
+        print dir(bb)
         # print(len(bbs))
         landmarks = align.findLandmarks(frame, bb)
         alignedFace = align.align(96, frame, bb,
@@ -36,11 +37,20 @@ while True:
             continue
         bl = (bb.left(), bb.bottom())
         tr = (bb.right(), bb.top())
+        print bl
+        print "-----------------"
+        print tr
+        print "-----------------"
+        print "+++++++++++++++++++"
+        #print bb[0]
+        print "{}:{},{}:{}".format(bb.top(),bb.bottom(), bb.left(),bb.right())
+        roi = frame[bb.top():bb.bottom(), bb.left():bb.right()]
+        cv2.imshow("a",roi)
         cv2.rectangle(frame, bl, tr, color=(153, 255, 204),
                       thickness=3)
-        for p in openface.AlignDlib.OUTER_EYES_AND_NOSE:
-            cv2.circle(frame, center=landmarks[p], radius=3,
-                       color=(102, 204, 255), thickness=-1)
+        # for p in openface.AlignDlib.OUTER_EYES_AND_NOSE:
+        #     cv2.circle(frame, center=landmarks[p], radius=3,
+        #                color=(102, 204, 255), thickness=-1)
     cv2.imshow('', frame)
     # quit the program on the press of key 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
