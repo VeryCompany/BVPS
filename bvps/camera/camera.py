@@ -96,6 +96,9 @@ from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 
 
 class CameraCaptureThread(threading.Thread):
+    """
+    摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
+    """
     def __init__(self, camera, cameraName, cameraDevice, processors=[]):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
@@ -107,6 +110,7 @@ class CameraCaptureThread(threading.Thread):
         self.recognizer = recognizer(None)
 
     def process_recognize(self, human, t0):
+        """识别检测到的人体图片，返回人对应的用户Id"""
         if self.camera.modelupdated():
             self.recognizer = recognizer(self.camera.svmModel())
         log.debug("开始识别人！")
@@ -115,6 +119,7 @@ class CameraCaptureThread(threading.Thread):
         return human, uid, t0
 
     def parallelsWorker(self, method, humans, threads=cv2.getNumberOfCPUs()):
+        """多线程并行运算，提高运算速度"""
         pool = ThreadPool(threads if threads <= len(humans) else len(humans))
         results = pool.map(method, humans)
         pool.close()
@@ -122,11 +127,17 @@ class CameraCaptureThread(threading.Thread):
         return results
 
     def process_frame(self, ret, frame, t0):
-        #找出有效的人和脸的照片,是否需要设置专用的采集摄像头？还是所有的摄像头都可以用于采集？
+        """
+        处理摄像头抓取到的每一帧图像，找出有效的人和脸的照片。
+        是否需要设置专用的采集摄像头？还是所有的摄像头都可以用于采集？
+        如果处于采集状态，检测到的有效人体照片发送给后端进行学习。
+        """
         humans = self.detector.detect_humans(self.cameraName, frame, t0)
         if self.camera.startTrainning() :
-            #sending humans to trainning actors
-            #通过通道的人，需要开始和结束时间，基准时间t0
+            """
+            sending humans to trainning actors
+            通过通道的人，需要开始和结束时间，基准时间t0
+            """
         if len(humans) > 0:
             users = self.recognizeParallel(
                 self.process_recognize, humans, threads=cv2.getNumberOfCPUs())
