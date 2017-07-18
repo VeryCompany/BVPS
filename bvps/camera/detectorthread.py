@@ -19,13 +19,11 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 align = openface.AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
 net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=False)
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
-@troupe(max_count=10)
-class HumanDetector(ActorTypeDispatcher):
+class HumanDetector():
+    num = 1
     def __init__(self, *args, **kw):
-        log.info("init HumanDetector actor...")
-        super(HumanDetector, self).__init__(*args, **kw)
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
         self.bodyClassifier = cv2.CascadeClassifier(
@@ -38,40 +36,28 @@ class HumanDetector(ActorTypeDispatcher):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        log.info("init HumanDetector actor ok!")
 
-    def receiveMsg_tuple(self, message, sender):
-
-        cameraName = message[0]
-        image = message[2]
+    def detect_humans(self, cameraName,image,t0):
         validHuman = []
-
-        if len(self.HumanRecognizerProcessors) == 0:
-            self.HumanRecognizerProcessors = [
-                self.createActor(
-                    HumanRecognizer,
-                    globalName="{}-human-recognizer".format(cameraName))
-            ]
         for body in self.fullBodyHaarDetector(image):
-            #cv2.imwrite('images/{}.jpg'.format(self.num),body)
-            #for upb in self.upperBodyDetector(body):
-            faces = self.faceDetector(body)
+            #cv2.imwrite("images/{}.body.jpg".format(self.num), body)
+            faces = self.faceDetector(body[0])
+            if len(faces) > 0:
+                log.debug("发现{}个人脸".format(len(faces)))
             if len(faces) > 1:
                 continue
             for face in faces:
-                validHuman.append(body, face)
-            #        continue
-            #cv2.imwrite('images/old-{}.jpg'.format(self.num),image)
-        for person in validHuman:
-            for recognizer in self.HumanRecognizerProcessors:
-                self.send(recognizer, person)
+                #cv2.imwrite("images/{}.face.jpg".format(self.num), face)
+                validHuman.append((body, face))
+            self.num += 1
         t = clock()
-        t0 = message[3]
         self.latency.update(t - t0)
         self.frame_interval.update(t - self.last_frame_time)
-        log.debug("图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
-            self.latency.value * 1000, self.frame_interval.value * 1000))
+        if len(validHuman) > 0:
+            log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
+            len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
         self.last_frame_time = t
+        return validHuman
 
     def fullBodyDetector(self, image):
         found, w = self.hog.detectMultiScale(
@@ -87,10 +73,12 @@ class HumanDetector(ActorTypeDispatcher):
         rects = self.detect(gray, self.bodyClassifier)
         bodys = []
         #self.draw_detections(image, rects, thickness = 1)
-        #print "found {}  bodys".format(len(rects))
+        if len(rects) > 0:
+            log.debug("发现{}个人体图像".format(len(rects)))
         for x1, y1, x2, y2 in rects:
+
             roi = image.copy()[y1:y2, x1:x2]
-            bodys.append(roi)
+            bodys.append((roi,abs(x1-x2)/2,abs(y1-y2)/2))
         #dt = clock() - t
         #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
         return bodys
@@ -113,10 +101,12 @@ class HumanDetector(ActorTypeDispatcher):
 
     def faceDetector(self, frame):
         faces = []
-        bbs = align.getAllFaceBoundingBoxes(frame)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.equalizeHist(gray)
+        bbs = align.getAllFaceBoundingBoxes(gray)
         for bb in bbs:
             # print(len(bbs))
-            landmarks = align.findLandmarks(frame, bb)
+            landmarks = align.findLandmarks(gray, bb)
             alignedFace = align.align(
                 96,
                 frame,
@@ -127,7 +117,7 @@ class HumanDetector(ActorTypeDispatcher):
                 continue
 
             roi = frame[bb.top():bb.bottom(), bb.left():bb.right()]
-            faces.append(roi)
+            faces.append((alignedFace,abs(bb.top()-bb.bottom())/2,abs(bb.left()-bb.right())/2))
         return faces
 
     def faceDetector_2(self, image):

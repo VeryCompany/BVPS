@@ -15,10 +15,10 @@ logcfg = {
     'version': 1,
     'formatters': {
         'normal': {
-            'format': '%(levelname)-8s %(message)s'
+            'format': '%(asctime)s %(levelname)-8s %(message)s'
         },
         'actor': {
-            'format': '%(levelname)-8s %(actorAddress)s => %(message)s'
+            'format': '%(asctime)s %(levelname)-8s %(actorAddress)s => %(message)s'
         }
     },
     'filters': {
@@ -33,18 +33,18 @@ logcfg = {
         'h1': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': 'logs/bvps.log',
-            'encoding':'utf-8',
+            # 'encoding':'utf-8',
             'formatter': 'normal',
             'filters': ['notActorLog'],
-            'level': logging.INFO
+            'level': logging.DEBUG
         },
         'h2': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': 'logs/bvps_actor.log',
-            'encoding':'utf-8',
+            # 'encoding':'utf-8',
             'formatter': 'actor',
             'filters': ['isActorLog'],
-            'level': logging.INFO
+            'level': logging.DEBUG
         },
         'h3':{
             'class': 'logging.StreamHandler',
