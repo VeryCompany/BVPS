@@ -7,7 +7,6 @@ import threading
 from enum import Enum
 from bvps.camera.common import clock, draw_str, StatValue
 from thespian.troupe import troupe
-from bvps.camera.recognizer import HumanRecognizer
 import openface
 import logging as log
 #检测人-->（人+上半身+脸+鼻子+眼睛）-->识别人
@@ -19,7 +18,7 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 align = openface.AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
 net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=False)
 
 class HumanDetector():
     num = 1
@@ -48,7 +47,7 @@ class HumanDetector():
                 continue
             for face in faces:
                 #cv2.imwrite("images/{}.face.jpg".format(self.num), face)
-                validHuman.append((body, face))
+                validHuman.append((body, face,t0))
             self.num += 1
         t = clock()
         self.latency.update(t - t0)
