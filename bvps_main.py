@@ -19,21 +19,21 @@ try:
     #定位摄像头 type == 1
     #采集摄像头 type == 2
     cameras = {
-        # "camera1": {
-        #     "x": "",
-        #     "y": "",
-        #     "z": "",
-        #     "device": "rtsp://192.168.0.74:554",
-        #     "user": "",
-        #     "password": "",
-        #     "type": CameraCmdType.START_CAPTURE,
-        #     "port": 10000
-        # },
+        "camera1": {
+            "x": "",
+            "y": "",
+            "z": "",
+            "device": "http://localhost:8081",
+            "user": "",
+            "password": "",
+            "type": CameraCmdType.START_CAPTURE,
+            "port": 10000
+        },
         "camera2": {
             "x": "",
             "y": "",
             "z": "",
-            "device": "rtsp://192.168.0.205:554",
+            "device": "http://localhost:8082",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
@@ -43,7 +43,7 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": "rtsp://192.168.0.114:554",
+            "device": "http://localhost:8083",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
