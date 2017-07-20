@@ -23,7 +23,7 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": 0,
+            "device": "rtsp://192.168.0.74:554",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
