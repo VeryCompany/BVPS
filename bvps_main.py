@@ -28,7 +28,8 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10000
-        # },
+        }
+        # ,
         # "camera2": {
         #     "x": "",
         #     "y": "",
