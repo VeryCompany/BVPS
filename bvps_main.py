@@ -5,10 +5,9 @@ import os
 import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
-from bvps.camera.camera import Camera,CameraCmdType,CameraCmd
+from bvps.camera.camera import Camera, CameraCmdType, CameraCmd
 
 try:
-
 
     asys = ActorSystem(systemBase="multiprocTCPBase", logDefs=logcfg)
     sa = asys.createActor(
@@ -28,21 +27,43 @@ try:
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
-            "port":10000
-        } ,
-        "camera2":{"x":"","y":"","z":"","device":"rtsp://192.168.0.205:554","user":"","password":"","type":1,"port":10001},
-        "camera3":{"x":"","y":"","z":"","device":"rtsp://192.168.0.114:554","user":"","password":"","type":2,"port":10002}
+            "port": 10000
+        },
+        "camera2": {
+            "x": "",
+            "y": "",
+            "z": "",
+            "device": "rtsp://192.168.0.205:554",
+            "user": "",
+            "password": "",
+            "type": CameraCmdType.START_CAPTURE,
+            "port": 10001
+        },
+        "camera3": {
+            "x": "",
+            "y": "",
+            "z": "",
+            "device": "rtsp://192.168.0.114:554",
+            "user": "",
+            "password": "",
+            "type": CameraCmdType.START_CAPTURE,
+            "port": 10002
+        }
     }
     #启动采集摄像头
     #todo:消息反馈处理和异常处理
-    for camId,params in cameras.items():
-        cama = asys.createActor(Camera,globalName=camId)
+    for camId, params in cameras.items():
+        cama = asys.createActor(Camera, globalName=camId)
         if params["type"] == CameraCmdType.START_CAPTURE:
             print("启动摄像头{}，命令CameraCmdType.START_CAPTURE".format(camId))
-            asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE,camId,params))
+            asys.tell(cama,
+                      CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
         elif params["type"] == CameraCmdType.START_CAPTURE_FOR_COLLECTION:
-            print("启动摄像头{}，命令CameraCmdType.START_CAPTURE_FOR_COLLECTION".format(camId))
-            asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE_FOR_COLLECTION,camId,params))
+            print("启动摄像头{}，命令CameraCmdType.START_CAPTURE_FOR_COLLECTION".
+                  format(camId))
+            asys.tell(cama,
+                      CameraCmd(CameraCmdType.START_CAPTURE_FOR_COLLECTION,
+                                camId, params))
 
 except KeyboardInterrupt:
     print 'Interrupted'
