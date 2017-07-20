@@ -23,23 +23,24 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": "0",
+            "device": 0,
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10000
         }
+        ,
+        "camera2": {
+            "x": "",
+            "y": "",
+            "z": "",
+            "device": 1,
+            "user": "",
+            "password": "",
+            "type": CameraCmdType.START_CAPTURE,
+            "port": 10001
+        }
         # ,
-        # "camera2": {
-        #     "x": "",
-        #     "y": "",
-        #     "z": "",
-        #     "device": "rtsp://192.168.0.205:554",
-        #     "user": "",
-        #     "password": "",
-        #     "type": CameraCmdType.START_CAPTURE,
-        #     "port": 10001
-        # },
         # "camera3": {
         #     "x": "",
         #     "y": "",
