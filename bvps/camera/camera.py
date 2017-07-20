@@ -185,7 +185,7 @@ class CameraCaptureThread(threading.Thread):
             latency = StatValue()
             frame_interval = StatValue()
             last_frame_time = clock()
-            while True:
+            while (video.isOpened()):
                 if self.stopped():
                     break
                 while len(pending) > 0 and pending[0].ready():
@@ -196,8 +196,9 @@ class CameraCaptureThread(threading.Thread):
                     t = clock()
                     frame_interval.update(t - last_frame_time)
                     last_frame_time = t
-                    task = pool.apply_async(self.process_frame, (ret, frame, t))
-                    pending.append(task)
+                    if ret:
+                        task = pool.apply_async(self.process_frame, (ret, frame, t))
+                        pending.append(task)
         except Exception, e:
             log.info(e.message)
             exc_type, exc_value, exc_traceback = sys.exc_info()
