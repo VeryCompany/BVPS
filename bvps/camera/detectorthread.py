@@ -18,7 +18,7 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 align = openface.AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
 net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=False)
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 class HumanDetector():
     num = 1
@@ -139,7 +139,7 @@ class HumanDetector():
             img,
             scaleFactor=3,
             minNeighbors=1,
-            minSize=(150, 150),
+            minSize=(100, 100),
             flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []
