@@ -71,8 +71,9 @@ class HumanDetector():
         #t = clock()
         rects = self.detect(gray, self.bodyClassifier)
         bodys = []
-        #self.draw_detections(image, rects, thickness = 1)
+
         if len(rects) > 0:
+            self.draw_detections(image, rects, thickness = 1)
             log.debug("发现{}个人体图像".format(len(rects)))
         for x1, y1, x2, y2 in rects:
 
