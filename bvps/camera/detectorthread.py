@@ -83,7 +83,8 @@ class HumanDetector():
             #dt = clock() - t
             #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
             return bodys
-        except:
+        except Exception, e:
+            log.info(e.message)
             return []
 
     def upperBodyDetector(self, image):

@@ -128,7 +128,6 @@ class CameraCaptureThread(threading.Thread):
 
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
-
         log.debug("开始识别人！")
         uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
         log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
