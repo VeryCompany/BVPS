@@ -77,7 +77,7 @@ class HumanDetector():
             log.debug("发现{}个人体图像".format(len(rects)))
         for x1, y1, x2, y2 in rects:
 
-            roi = image.copy()[y1:y2, x1:x2]
+            roi = image[y1:y2, x1:x2]
             bodys.append((roi,max(x1,x2)-abs(x1-x2)/2,max(y1,y2)-abs(y1-y2)/2))
         #dt = clock() - t
         #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
@@ -139,7 +139,7 @@ class HumanDetector():
             img,
             scaleFactor=1.1,
             minNeighbors=2,
-            minSize=(100, 100),
+            minSize=(96, 96),
             flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []
