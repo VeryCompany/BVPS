@@ -139,7 +139,7 @@ class HumanDetector():
             img,
             scaleFactor=3,
             minNeighbors=1,
-            minSize=(100, 100),
+            minSize=(300, 300),
             flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []
