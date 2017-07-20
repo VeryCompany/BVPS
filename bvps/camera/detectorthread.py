@@ -84,7 +84,7 @@ class HumanDetector():
             #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
             return bodys
         except:
-            pass
+            return []
 
     def upperBodyDetector(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
