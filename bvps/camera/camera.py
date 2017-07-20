@@ -164,7 +164,7 @@ class CameraCaptureThread(threading.Thread):
                     faceX = human[1][1]
                     faceY = human[1][2]
                     #给用户的脸部中心画一个圈
-                    cv2.circle(fame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
+                    cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
                 #识别出用户，将用户的Id，图像坐标位置发送给中枢Actor做处理
 
             if not self.camera.frameQueue.full():
