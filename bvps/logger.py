@@ -53,7 +53,7 @@ logcfg = {
     },
     'loggers': {
         '': {
-            'handlers': ['h1', 'h2','h3'],
+            'handlers': ['h1', 'h2'],
             'level': logging.DEBUG
         }
     }
