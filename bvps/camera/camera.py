@@ -197,8 +197,7 @@ class CameraCaptureThread(threading.Thread):
                     t = clock()
                     frame_interval.update(t - last_frame_time)
                     last_frame_time = t
-                    task = pool.apply_async(self.process_frame, (ret, frame.copy(),
-                                                                 t))
+                    task = pool.apply_async(self.process_frame, (ret, frame, t))
                     pending.append(task)
         except Exception, e:
             log.info(e.message)
