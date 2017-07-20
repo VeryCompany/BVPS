@@ -137,9 +137,9 @@ class HumanDetector():
     def detect(self, img, cascade):
         rects = cascade.detectMultiScale(
             img,
-            scaleFactor=3,
-            minNeighbors=1,
-            minSize=(300, 300),
+            scaleFactor=1.1,
+            minNeighbors=2,
+            minSize=(100, 100),
             flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []
