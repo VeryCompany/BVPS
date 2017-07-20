@@ -66,22 +66,25 @@ class HumanDetector():
         return self.cropImage(image, found)
 
     def fullBodyHaarDetector(self, image):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        gray = cv2.equalizeHist(gray)
-        #t = clock()
-        rects = self.detect(gray, self.bodyClassifier)
-        bodys = []
+        try:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            gray = cv2.equalizeHist(gray)
+            #t = clock()
+            rects = self.detect(gray, self.bodyClassifier)
+            bodys = []
 
-        if len(rects) > 0:
-            self.draw_detections(image, rects, thickness = 1)
-            log.debug("发现{}个人体图像".format(len(rects)))
-        for x1, y1, x2, y2 in rects:
+            if len(rects) > 0:
+                self.draw_detections(image, rects, thickness = 1)
+                log.debug("发现{}个人体图像".format(len(rects)))
+            for x1, y1, x2, y2 in rects:
 
-            roi = image[y1:y2, x1:x2]
-            bodys.append((roi,max(x1,x2)-abs(x1-x2)/2,max(y1,y2)-abs(y1-y2)/2))
-        #dt = clock() - t
-        #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
-        return bodys
+                roi = image[y1:y2, x1:x2]
+                bodys.append((roi,max(x1,x2)-abs(x1-x2)/2,max(y1,y2)-abs(y1-y2)/2))
+            #dt = clock() - t
+            #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
+            return bodys
+        except:
+            pass
 
     def upperBodyDetector(self, image):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
