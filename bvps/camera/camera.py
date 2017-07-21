@@ -159,14 +159,14 @@ class CameraCaptureThread(threading.Thread):
             通过通道的人，需要开始和结束时间，基准时间t0
             """
             #    pass
-            if len(humans) > 0:
-                users = self.recognizeParallel(
-                    self.process_recognize, humans)
-                for human in humans:
-                    faceX = human[0][1]
-                    faceY = human[0][2]
-                    #给用户的脸部中心画一个圈
-                    cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
+            # if len(humans) > 0:
+            #     users = self.recognizeParallel(
+            #         self.process_recognize, humans)
+            #     for human in humans:
+            #         faceX = human[0][1]
+            #         faceY = human[0][2]
+            #         #给用户的脸部中心画一个圈
+            #         cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
                 #识别出用户，将用户的Id，图像坐标位置发送给中枢Actor做处理
 
 
@@ -193,7 +193,8 @@ class CameraCaptureThread(threading.Thread):
             while True:
                 try:
                     while len(pending) > 0 and pending[0].ready():
-                        ret, res, t0 = pending.popleft().get()
+                        pending.popleft()
+                        #ret, res, t0 = pending.popleft().get()
                         latency.update(clock() - t0)
                     if len(pending) > 0 and num % 20 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
