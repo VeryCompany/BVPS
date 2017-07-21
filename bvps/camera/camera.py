@@ -197,13 +197,13 @@ class CameraCaptureThread(threading.Thread):
                         pending.popleft()
                         #ret, res, t0 = pending.popleft().get()
                         #latency.update(clock() - t0)
-                    if len(pending) > 0 and num % 20 == 0:
+                    if len(pending) > 0 and num % 50 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
                     if len(pending) < threadn and video.grab():
-                        if num % 20 == 0:
+                        if num % 50 == 0:
                             log.debug("ready to video read().....")
                         ret,frame = video.retrieve()
-                        if num % 20 == 0:
+                        if num % 50 == 0:
                             log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
                         t = clock()
                         frame_interval.update(t - last_frame_time)
@@ -213,7 +213,7 @@ class CameraCaptureThread(threading.Thread):
                             pending.append(task)
                             if not self.camera.frameQueue.full():
                                self.camera.frameQueue.put_nowait(frame)
-                            if num % 20 == 0:
+                            if num % 50 == 0:
                                 log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
                     num+=1
                 except Exception, e:
