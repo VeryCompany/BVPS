@@ -210,7 +210,7 @@ class CameraCaptureThread(threading.Thread):
                             if not self.camera.frameQueue.full():
                                self.camera.frameQueue.put_nowait(frame)
                             if num % 10 == 0:
-                            log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
+                                log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
                     num+=1
                 except Exception, e:
                     log.info(e.message)
