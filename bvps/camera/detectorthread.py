@@ -52,7 +52,7 @@ class HumanDetector():
         t = clock()
         self.latency.update(t - t0)
         self.frame_interval.update(t - self.last_frame_time)
-        if len(validHuman) > 0:
+        #if len(validHuman) > 0:
             #log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
             #len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
         self.last_frame_time = t
