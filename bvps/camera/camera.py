@@ -30,7 +30,7 @@ class Camera(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         super(Camera, self).__init__(*args, **kw)
         self.threadPool = {}  #cameraName:threadID
-        self.frameQueue = multiprocessing.Queue(64)
+        self.frameQueue = multiprocessing.Queue(128)
         self.webserver = None
     @property
     def svmModel(self):
@@ -70,8 +70,7 @@ class Camera(ActorTypeDispatcher):
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
             self.webserver = WebServer(self.frameQueue, cmd.values["port"])
-            self.webserver.start()
-
+            self.webserver.start() 
             log.info("摄像头web服务器启动完成...")
             self.send(sender, "started ok!")
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
@@ -113,6 +112,7 @@ from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 
 
 class CameraCaptureThread(threading.Thread):
+
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
@@ -125,19 +125,22 @@ class CameraCaptureThread(threading.Thread):
         self.processors = processors
         self.detector = detector()
         self.recognizer = recognizer(None)
-
+        self.threadn=cv2.getNumberOfCPUs()*4
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
-        log.debug("开始识别人！")
-        uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
-        log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
-        return human, uid
+        #log.debug("开始识别人！")
+        try:
+            uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
+            #log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
+            return human, uid
+        except Exception, e:
+            log.info(e.message)
+            return human,None
 
     def recognizeParallel(self, method, humans):
-        threads=cv2.getNumberOfCPUs()
         """多线程并行运算，提高运算速度"""
-        pool = ThreadPool(threads if threads <= len(humans) else len(humans))
-        results = pool.map(method, humans)
+        pool = ThreadPool(processes=self.threadn)
+        results = pool.map_async(method, humans)
         pool.close()
         pool.join()
         return results
@@ -166,44 +169,50 @@ class CameraCaptureThread(threading.Thread):
                     cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
                 #识别出用户，将用户的Id，图像坐标位置发送给中枢Actor做处理
 
-            if not self.camera.frameQueue.full():
-                self.camera.frameQueue.put_nowait(frame)
+
         except Exception, e:
             log.info(e.message)
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_exception(exc_type, exc_value, exc_traceback,
-                              limit=2, file=sys.stdout)
+                              limit=5, file=sys.stdout)
         finally:
             return ret, frame, t0
 
     def startCapture(self):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
-            threadn = cv2.getNumberOfCPUs()
+            threadn=cv2.getNumberOfCPUs()*2
+            #video.set(cv2.CAP_PROP_FPS,25)
+            log.info("摄像头fps【{}】".format(video.get(cv2.CAP_PROP_FPS)))
             pool = ThreadPool(processes=threadn)
             pending = deque()
             latency = StatValue()
             frame_interval = StatValue()
             last_frame_time = clock()
-            while (video.isOpened()):
-                if self.stopped():
-                    break
-                while len(pending) > 0 and pending[0].ready():
-                    ret, res, t0 = pending.popleft().get()
-                    latency.update(clock() - t0)
-                if len(pending) < threadn:
-                    ret, frame = video.read()
-                    t = clock()
-                    frame_interval.update(t - last_frame_time)
-                    last_frame_time = t
-                    if ret:
-                        task = pool.apply_async(self.process_frame, (ret, frame, t))
-                        pending.append(task)
+            while True:
+                try:
+                    while len(pending) > 0 and pending[0].ready():
+                        ret, res, t0 = pending.popleft().get()
+                        latency.update(clock() - t0)
+                    #if len(pending) > 0:
+                    #    log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
+                    if len(pending) < threadn:
+                        #log.debug("ready to video read().....")
+                        ret, frame = video.read()
+                        #log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
+                        t = clock()
+                        frame_interval.update(t - last_frame_time)
+                        last_frame_time = t
+                        if ret:
+                            task = pool.apply_async(self.process_frame, (ret, frame, t))
+                            pending.append(task)
+                            if not self.camera.frameQueue.full():
+                               self.camera.frameQueue.put_nowait(frame)
+                            #log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
+                except Exception, e:
+                    log.info(e.message)
         except Exception, e:
             log.info(e.message)
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback,
-                              limit=2, file=sys.stdout)
 
 
     def run(self):

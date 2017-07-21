@@ -38,23 +38,23 @@ class HumanDetector():
 
     def detect_humans(self, cameraName,image,t0):
         validHuman = []
-        for body in self.fullBodyHaarDetector(image):
+        #for body in self.fullBodyHaarDetector(image):
             #cv2.imwrite("images/{}.body.jpg".format(self.num), body)
-            faces = self.faceDetector(body[0])
-            if len(faces) > 0:
-                log.debug("发现{}个人脸".format(len(faces)))
-            if len(faces) > 1:
-                continue
-            for face in faces:
-                #cv2.imwrite("images/{}.face.jpg".format(self.num), face)
-                validHuman.append((body, face,t0))
-            self.num += 1
+        faces = self.faceDetector(image)
+        #if len(faces) > 0:
+        #    log.debug("发现{}个人脸".format(len(faces)))
+        #if len(faces) > 1:
+        #    continue
+        for face in faces:
+            #cv2.imwrite("images/{}.face.jpg".format(self.num), face)
+            validHuman.append((face, face,t0))
+        self.num += 1
         t = clock()
         self.latency.update(t - t0)
         self.frame_interval.update(t - self.last_frame_time)
         if len(validHuman) > 0:
-            log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
-            len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
+            #log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
+            #len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
         self.last_frame_time = t
         return validHuman
 
@@ -72,8 +72,8 @@ class HumanDetector():
             #t = clock()
             rects = self.detect(gray, self.bodyClassifier)
             bodys = []
-            if len(rects) > 0:
-                log.debug("发现{}个人体图像".format(len(rects)))
+            #if len(rects) > 0:
+            #    log.debug("发现{}个人体图像".format(len(rects)))
             for x1, y1, x2, y2 in rects:
                 roi = image.copy()[y1:y2, x1:x2]
                 bodys.append((roi,max(x1,x2)-abs(x1-x2)/2,max(y1,y2)-abs(y1-y2)/2))
@@ -117,8 +117,8 @@ class HumanDetector():
             if alignedFace is None:
                 continue
 
-            roi = frame[bb.top():bb.bottom(), bb.left():bb.right()]
-            faces.append((alignedFace,abs(bb.top()-bb.bottom())/2,abs(bb.left()-bb.right())/2))
+            roi = frame.copy()[bb.top():bb.bottom(), bb.left():bb.right()]
+            faces.append((alignedFace,max(bb.top(),bb.bottom())-abs(bb.top()-bb.bottom())/2,max(bb.left(),bb.right())-abs(bb.left()-bb.right())/2))
         return faces
 
     def faceDetector_2(self, image):
