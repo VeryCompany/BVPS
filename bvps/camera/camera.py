@@ -198,11 +198,11 @@ class CameraCaptureThread(threading.Thread):
                         #latency.update(clock() - t0)
                     if len(pending) > 0 and num % 20 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
-                    if len(pending) < threadn and cv2.grub(video) > 0:
+                    if len(pending) < threadn and cv2.grab() > 0:
                         ret=true
                         if num % 20 == 0:
                             log.debug("ready to video read().....")
-                        frame = cv2.RetrieveFrame(video)
+                        frame = cv2.retrieve()
                         if num % 20 == 0:
                             log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
                         t = clock()
