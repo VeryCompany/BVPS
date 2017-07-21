@@ -70,7 +70,7 @@ class Camera(ActorTypeDispatcher):
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
             self.webserver = WebServer(self.frameQueue, cmd.values["port"])
-            self.webserver.start() 
+            self.webserver.start()
             log.info("摄像头web服务器启动完成...")
             self.send(sender, "started ok!")
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
@@ -182,7 +182,7 @@ class CameraCaptureThread(threading.Thread):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
-            #video.set(cv2.CAP_PROP_FPS,25)
+            video.set(cv2.CAP_PROP_FPS,10)
             log.info("摄像头fps【{}】".format(video.get(cv2.CAP_PROP_FPS)))
             pool = ThreadPool(processes=threadn)
             pending = deque()
