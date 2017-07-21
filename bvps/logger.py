@@ -54,7 +54,7 @@ logcfg = {
     'loggers': {
         '': {
             'handlers': ['h1', 'h2'],
-            'level': logging.DEBUG
+            'level': logging.INFO
         }
     }
 }
