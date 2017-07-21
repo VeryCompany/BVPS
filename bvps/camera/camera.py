@@ -131,7 +131,7 @@ class CameraCaptureThread(threading.Thread):
         #log.debug("开始识别人！")
         try:
             uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
-            #log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
+            log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
             return human, uid
         except Exception, e:
             log.info(e.message)
