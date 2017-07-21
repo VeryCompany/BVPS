@@ -183,9 +183,9 @@ class CameraCaptureThread(threading.Thread):
             video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
             video.set(cv2.CAP_PROP_FPS,10)
-            width = cap.get(cv2.CV_CAP_PROP_FRAME_WIDTH)
-            height = cap.get(cv2.CV_CAP_PROP_FRAME_HEIGHT)
-            codec = cap.get(cv2.CV_CAP_PROP_FOURCC)
+            width = video.get(cv2.CV_CAP_PROP_FRAME_WIDTH)
+            height = video.get(cv2.CV_CAP_PROP_FRAME_HEIGHT)
+            codec = video.get(cv2.CV_CAP_PROP_FOURCC)
             log.info("摄像头fps[{}] width:{}-height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
             pool = ThreadPool(processes=threadn)
             pending = deque()
