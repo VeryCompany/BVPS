@@ -200,7 +200,7 @@ class CameraCaptureThread(threading.Thread):
                     if len(pending) > 0 and num % 20 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
                     if len(pending) < threadn and video.grab():
-                        ret=true
+                        ret=True
                         if num % 20 == 0:
                             log.debug("ready to video read().....")
                         frame = video.retrieve()
