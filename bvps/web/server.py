@@ -29,11 +29,14 @@ class VideoHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write (bytearray(jpg))
                 self.wfile.write (b'\r\n')
-                #self.send_header('Content-type', 'multipart/x-mixed-replace; boundary=frame')
+        if self.path == "/feed":
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write("<html><body><h1>ok!</h1></body></html>")
 
-        else:
-            self._set_headers()
-            self.wfile.write("<html><body><h1>{}</h1></body></html>".format(self.path))
+        return
+
 
     def do_HEAD(self):
         self._set_headers()

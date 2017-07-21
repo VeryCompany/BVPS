@@ -174,7 +174,7 @@ class CameraCaptureThread(threading.Thread):
             log.info(e.message)
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_exception(exc_type, exc_value, exc_traceback,
-                              limit=5, file=sys.stdout)
+                              limit=10, file=sys.stdout)
         finally:
             return ret, frame, t0
 
@@ -189,6 +189,7 @@ class CameraCaptureThread(threading.Thread):
             latency = StatValue()
             frame_interval = StatValue()
             last_frame_time = clock()
+            num=10
             while True:
                 try:
                     while len(pending) > 0 and pending[0].ready():
@@ -208,7 +209,9 @@ class CameraCaptureThread(threading.Thread):
                             pending.append(task)
                             if not self.camera.frameQueue.full():
                                self.camera.frameQueue.put_nowait(frame)
-                            #log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
+                            if num % 10 == 0:
+                            log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
+                    num+=1
                 except Exception, e:
                     log.info(e.message)
         except Exception, e:
