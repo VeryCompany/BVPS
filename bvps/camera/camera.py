@@ -192,7 +192,7 @@ class CameraCaptureThread(threading.Thread):
             num=10
             while True:
                 try:
-                    while len(pending) > 0 and pending[0].ready():
+                    while len(pending) > 0 #and pending[0].ready():
                         pending.popleft()
                         #ret, res, t0 = pending.popleft().get()
                         #latency.update(clock() - t0)
