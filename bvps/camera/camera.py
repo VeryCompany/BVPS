@@ -195,7 +195,7 @@ class CameraCaptureThread(threading.Thread):
                     while len(pending) > 0 and pending[0].ready():
                         pending.popleft()
                         #ret, res, t0 = pending.popleft().get()
-                        latency.update(clock() - t0)
+                        #latency.update(clock() - t0)
                     if len(pending) > 0 and num % 20 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
                     if len(pending) < threadn:
