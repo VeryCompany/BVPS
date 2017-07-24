@@ -168,13 +168,14 @@ class CameraCaptureThread(threading.Thread):
             if len(humans) > 0:
                 users = self.recognizeParallel(
                     self.process_recognize, humans)
-                # for human in humans:
-                #     faceX = human[0][1]
-                #     faceY = human[0][2]
-                #     #给用户的脸部中心画一个圈
-                #     cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
+                for human in humans:
+                    faceX = human[0][1]
+                    faceY = human[0][2]
+                    #给用户的脸部中心画一个圈
+                    cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
                 #识别出用户，将用户的Id，图像坐标位置发送给中枢Actor做处理
-
+                if not self.camera.frameQueue.full():
+                   self.camera.frameQueue.put_nowait(frame)
 
         except Exception, e:
             log.info(e.message)
@@ -219,8 +220,7 @@ class CameraCaptureThread(threading.Thread):
                         if ret:
                             task = pool.apply_async(self.process_frame, (ret, frame, t))
                             pending.append(task)
-                            if not self.camera.frameQueue.full():
-                               self.camera.frameQueue.put_nowait(frame)
+
                             if num % 10 == 0:
                                 log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
                                 log.debug("pools num:{}".format(len(self.pools)))
