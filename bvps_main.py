@@ -79,7 +79,7 @@ try:
             "fourcc":('M', 'J', 'P', 'G')
         }
         ,
-        "camera4": {
+        "camera5": {
             "x": "",
             "y": "",
             "z": "",
@@ -93,7 +93,7 @@ try:
             "height":720
         }
         ,
-        "camera4": {
+        "camera6": {
             "x": "",
             "y": "",
             "z": "",
