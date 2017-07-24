@@ -225,7 +225,7 @@ class CameraCaptureThread(threading.Thread):
                             task = pool.apply_async(self.process_frame, (ret, frame, t))
                             pending.append(task)
 
-                            if num % 10 == 0:
+                            if num % 50 == 0:
                                 log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
                                 log.debug("pools num:{}".format(len(self.pools)))
                     num+=1

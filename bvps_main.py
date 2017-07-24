@@ -28,7 +28,7 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10000,
-            "frequency":30,
+            "frequency":10,
             "width":1280,
             "height":720
         }
@@ -43,8 +43,8 @@ try:
             "type": CameraCmdType.START_CAPTURE,
             "port": 10001,
             "frequency":100,
-            "width":1280,
-            "height":720
+            "width":640,
+            "height":480
         }
         ,
         "camera3": {
@@ -56,7 +56,7 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10002,
-            "frequency":30,
+            "frequency":10,
             "width":1280,
             "height":720
         }
