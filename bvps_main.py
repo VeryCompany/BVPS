@@ -43,9 +43,9 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10001,
-            "frequency":120,
-            "width":640,
-            "height":480,
+            "frequency":60,
+            "width":1280,
+            "height":720,
             "fourcc":('M', 'J', 'P', 'G')
         }
         ,
