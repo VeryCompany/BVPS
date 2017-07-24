@@ -116,7 +116,7 @@ class CameraCaptureThread(threading.Thread):
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
-    def __init__(self, camera, cameraName, cameraDevice, processors=[],cmd):
+    def __init__(self, camera, cameraName, cameraDevice, processors=[],initCmd=None):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
@@ -127,7 +127,7 @@ class CameraCaptureThread(threading.Thread):
         self.recognizer = recognizer(None)
         self.threadn=cv2.getNumberOfCPUs()*4
         self.pools={}
-        self.initCmd = cmd
+        self.initCmd = initCmd
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
         #log.debug("开始识别人！")
