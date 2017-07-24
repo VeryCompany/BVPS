@@ -22,7 +22,7 @@ class VideoHandler(BaseHTTPRequestHandler):
             self.end_headers()
             while True:
                 """Video streaming generator function."""
-                frame = WebServer.queue.get()
+                frame,t0 = WebServer.queue.get()
                 ret,jpg = cv2.imencode(".jpeg",frame)
                 self.wfile.write(b'--frame\r\n')
                 self.wfile.write(b'Content-Type: image/jpeg\r\n\r\n')

@@ -118,7 +118,7 @@ class HumanDetector():
                 continue
 
             roi = frame.copy()[bb.top():bb.bottom(), bb.left():bb.right()]
-            faces.append((alignedFace,max(bb.top(),bb.bottom())-(abs(bb.top()-bb.bottom())/2),max(bb.left(),bb.right())-(abs(bb.left()-bb.right())/2)))
+            faces.append((alignedFace,bb.dcenter().x,bb.dcenter().y))
         return faces
 
     def faceDetector_2(self, image):
