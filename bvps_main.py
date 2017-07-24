@@ -23,7 +23,7 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": 0,
+            "device": "/dev/video0",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
@@ -37,12 +37,12 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": 1,
+            "device": "/dev/video1",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10001,
-            "frequency":100
+            "frequency":100,
             "width":1280,
             "height":720
         }
@@ -51,7 +51,7 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": 2,
+            "device": "/dev/video2",
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
