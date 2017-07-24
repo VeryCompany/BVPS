@@ -101,7 +101,7 @@ try:
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
-            "port": 10004,
+            "port": 10005,
             "frequency":30,
             "width":1280,
             "height":720
