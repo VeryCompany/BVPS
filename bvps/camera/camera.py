@@ -227,6 +227,7 @@ class CameraCaptureThread(threading.Thread):
                     if len(pending) < threadn:
                         if num % 50 == 0:
                             log.debug("ready to video read().....")
+                        select.select((video,), (), ())
                         frame = video.read()
                         if num % 50 == 0:
                             log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
