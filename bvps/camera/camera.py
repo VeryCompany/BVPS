@@ -11,8 +11,6 @@ import multiprocessing
 #需要支持网络摄像头和本地USB摄像头
 import logging as log
 import sys, traceback
-import v4l2capture
-import select
 
 def handle_exception(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
@@ -118,7 +116,7 @@ class CameraCaptureThread(threading.Thread):
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
-    def __init__(self, camera, cameraName, cameraDevice, processors=[],init_cmd=None):
+    def __init__(self, camera, cameraName, cameraDevice, processors=[],cmd):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
@@ -129,7 +127,7 @@ class CameraCaptureThread(threading.Thread):
         self.recognizer = recognizer(None)
         self.threadn=cv2.getNumberOfCPUs()*4
         self.pools={}
-        self.initCmd = init_cmd
+        self.initCmd = cmd
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
         #log.debug("开始识别人！")
@@ -190,27 +188,16 @@ class CameraCaptureThread(threading.Thread):
 
     def startCapture(self):
         try:
-            video = v4l2capture.Video_device(self.cameraDevice)
-            # Suggest an image size to the device. The device may choose and
-            # return another size if it doesn't support the suggested one.
-            size_x, size_y = video.set_format(self.initCmd["width"], self.initCmd["height"], fourcc='MJPG')
-            video.set_fps(self.initCmd["frequency"])
-            # Create a buffer to store image data in. This must be done before
-            # calling 'start' if v4l2capture is compiled with libv4l2. Otherwise
-            # raises IOError.
-            video.create_buffers(30)
-
-            # Send the buffer to the device. Some devices require this to be done
-            # before calling 'start'.
-            video.queue_all_buffers()
-            log.info(video.get_info())
-            # Start the device. This lights the LED if it's a camera that has one.
-            video.start()
-
+            video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
+            video.set(cv2.CAP_PROP_FPS,self.camera.initCmd["frequency"])
+            video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd["width"])
+            video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd["height"])
+            width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+            height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            codec = video.get(cv2.CAP_PROP_FOURCC)
 
-
-            log.info("摄像头fps[{}] width:{}-height:{} codec:{}".format(self.initCmd["frequency"],size_x,size_y,video.get_fourcc()))
+            log.info("摄像头fps[{}] width:{}-height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
             pool = ThreadPool(processes=threadn)
             pending = deque()
             latency = StatValue()
@@ -225,17 +212,15 @@ class CameraCaptureThread(threading.Thread):
                         #latency.update(clock() - t0)
                     if len(pending) > 0 and num % 50 == 0:
                         log.debug("摄像头{}{}当前排队线程数{}个,线程池共{}个线程".format(self.cameraName,"拍摄中" if video.isOpened() else "已关闭",len(pending),threadn))
-                    if len(pending) < threadn:
+                    if len(pending) < threadn and video.grab():
                         if num % 50 == 0:
                             log.debug("ready to video read().....")
-                        select.select((video,), (), ())
-                        frame = video.read_and_queue()
+                        ret,frame = video.retrieve()
                         if num % 50 == 0:
                             log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
                         t = clock()
                         frame_interval.update(t - last_frame_time)
                         last_frame_time = t
-                        ret = True
                         if ret:
                             task = pool.apply_async(self.process_frame, (ret, frame, t))
                             pending.append(task)
