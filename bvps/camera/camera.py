@@ -231,6 +231,8 @@ class CameraCaptureThread(threading.Thread):
                             log.debug("读取摄像头frame{}".format("成功" if ret else "失败！"))
                         t = clock()
                         frame_interval.update(t - last_frame_time)
+                        if num % 50 == 0:
+                            log.debug("摄像头{}.当前fps{}".format(self.cameraName,frame_interval.value * 1000)))
                         last_frame_time = t
                         if ret:
                             task = pool.apply_async(self.process_frame, (ret, frame, t))
