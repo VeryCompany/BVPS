@@ -193,7 +193,7 @@ class CameraCaptureThread(threading.Thread):
             video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd.values["width"])
             video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd.values["height"])
             forcc = self.initCmd.values["fourcc"] if "fourcc" in self.initCmd.values else None
-            if forcc is not None
+            if forcc is not None:
                 video.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc(forcc[0],forcc[1],forcc[2],forcc[3]))
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
