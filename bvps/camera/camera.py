@@ -63,7 +63,7 @@ class Camera(ActorTypeDispatcher):
             ]
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             cct = CameraCaptureThread(self, cmd.cameraName,
-                                      cmd.values["device"], cps)
+                                      cmd.values["device"], cps,cmd)
             self.threadPool[cmd.cameraName] = cct
             cct.setDaemon(True)
             cct.start()
@@ -92,7 +92,7 @@ class Camera(ActorTypeDispatcher):
                     globalName="{}-video-record".format(cmd.cameraName))
             ]
             cct = CameraCaptureThread(self, cmd.cameraName,
-                                      cmd.values["device"], cps)
+                                      cmd.values["device"], cps,cmd)
             self.threadPool[cmd.cameraName] = cct
             cct.setDaemon(True)
             cct.start()
@@ -116,7 +116,7 @@ class CameraCaptureThread(threading.Thread):
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
-    def __init__(self, camera, cameraName, cameraDevice, processors=[]):
+    def __init__(self, camera, cameraName, cameraDevice, processors=[],cmd):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
@@ -127,6 +127,7 @@ class CameraCaptureThread(threading.Thread):
         self.recognizer = recognizer(None)
         self.threadn=cv2.getNumberOfCPUs()*4
         self.pools={}
+        self.initCmd = cmd
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
         #log.debug("开始识别人！")
@@ -190,9 +191,12 @@ class CameraCaptureThread(threading.Thread):
             video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
             video.set(cv2.CAP_PROP_FPS,25)
+            video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd["width"])
+            video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd["height"])
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
+
             log.info("摄像头fps[{}] width:{}-height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
             pool = ThreadPool(processes=threadn)
             pending = deque()
