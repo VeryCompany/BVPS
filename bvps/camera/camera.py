@@ -133,7 +133,7 @@ class CameraCaptureThread(threading.Thread):
         #log.debug("开始识别人！")
         try:
             uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
-            log.debug("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
+            log.info("识别用户id：{},x:{},y:{}".format(uid,human[0][1],human[0][2]))
             #发送至定位中枢，确定用户坐标
             return human, uid
         except Exception, e:
@@ -198,8 +198,8 @@ class CameraCaptureThread(threading.Thread):
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
-
-            log.info("摄像头fps[{}] \nwidth:{} \nheight:{} \ncodec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
+            log.info("摄像头{}".format(self.cameraName))
+            log.info("摄像头fps[{}] width:{} height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
             log.info("亮度:{}".format(cv2.CAP_PROP_BRIGHTNESS))
             log.info("对比度:{}".format(cv2.CAP_PROP_CONTRAST))
             log.info("饱和度:{}".format(cv2.CAP_PROP_SATURATION))
