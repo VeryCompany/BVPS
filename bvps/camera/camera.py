@@ -178,24 +178,29 @@ class CameraCaptureThread(threading.Thread):
     def startCapture(self):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
-            video.set(cv2.CAP_PROP_FPS,self.initCmd.values["frequency"])
-            video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd.values["width"])
-            video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd.values["height"])
+            # video.set(cv2.CAP_PROP_FPS,self.initCmd.values["frequency"])
+            # video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd.values["width"])
+            # video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd.values["height"])
+            log.info("摄像头{}初始化参数".format(self.cameraName))
+            for k,v in self.initCmd.values["video_properties"].items():
+                video.set(k,v)
+                log.info("video.set({},{})".format(k,v))
             forcc = self.initCmd.values["fourcc"] if "fourcc" in self.initCmd.values else None
             if forcc is not None:
                 video.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc(forcc[0],forcc[1],forcc[2],forcc[3]))
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
-            log.info("摄像头{}".format(self.cameraName))
+
             log.info("摄像头fps[{}] width:{} height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
-            log.info("亮度:{}".format(cv2.CAP_PROP_BRIGHTNESS))
-            log.info("对比度:{}".format(cv2.CAP_PROP_CONTRAST))
-            log.info("饱和度:{}".format(cv2.CAP_PROP_SATURATION))
-            log.info("色调:{}".format(cv2.CAP_PROP_HUE))
-            log.info("图像增益:{}".format(cv2.CAP_PROP_GAIN))
-            log.info("曝光:{}".format(cv2.CAP_PROP_EXPOSURE))
-            log.info("ISO:{}".format(cv2.CAP_PROP_ISO_SPEED))
+            log.info("亮度:{}".format(video.get(cv2.CAP_PROP_BRIGHTNESS)))
+            log.info("对比度:{}".format(video.get(cv2.CAP_PROP_CONTRAST)))
+            log.info("饱和度:{}".format(video.get(cv2.CAP_PROP_SATURATION)))
+            log.info("色调:{}".format(video.get(cv2.CAP_PROP_HUE)))
+            log.info("图像增益:{}".format(video.get(cv2.CAP_PROP_GAIN)))
+            log.info("曝光:{}".format(video.get(cv2.CAP_PROP_EXPOSURE)))
+            log.info("ISO:{}".format(video.get(cv2.CAP_PROP_ISO_SPEED)))
+            log.info("RGB?:{}".format(video.get(cv2.CAP_PROP_CONVERT_RGB)))
 
             latency = StatValue()
             frame_interval = StatValue()

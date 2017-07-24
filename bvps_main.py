@@ -29,16 +29,13 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10000,
-            "frequency":15,
-            "width":640,
-            "height":480,
             "fourcc":('M', 'J', 'P', 'G'),
             "processNum":4,
             "focallength":5,
             "video_properties":{
-                cv2.CAP_PROP_FRAME_WIDTH:1280,
-                cv2.CAP_PROP_FRAME_HEIGHT:720,
-                cv2.CAP_PROP_FPS:30
+                cv2.CAP_PROP_FRAME_WIDTH:800,
+                cv2.CAP_PROP_FRAME_HEIGHT:600,
+                cv2.CAP_PROP_FPS:25
             }
         }
         # ,
