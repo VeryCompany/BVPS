@@ -12,6 +12,7 @@ import multiprocessing
 import logging as log
 import sys, traceback
 import v4l2capture
+import select
 
 def handle_exception(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
