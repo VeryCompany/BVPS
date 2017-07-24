@@ -27,7 +27,10 @@ try:
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
-            "port": 10000
+            "port": 10000,
+            "frequency":30
+            "width":1280,
+            "height":720
         }
         ,
         "camera2": {
@@ -38,7 +41,10 @@ try:
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
-            "port": 10001
+            "port": 10001,
+            "frequency":100
+            "width":1280,
+            "height":720
         }
         ,
         "camera3": {
@@ -49,7 +55,10 @@ try:
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
-            "port": 10002
+            "port": 10002,
+            "frequency":30
+            "width":1280,
+            "height":720
         }
     }
     #启动采集摄像头
