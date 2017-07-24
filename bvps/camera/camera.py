@@ -232,7 +232,7 @@ class CameraCaptureThread(threading.Thread):
                         t = clock()
                         frame_interval.update(t - last_frame_time)
                         if num % 50 == 0:
-                            log.info("摄像头{}.当前fps{}".format(self.cameraName,frame_interval.value * 1000)))
+                            log.info("摄像头{}.当前fps{}".format(self.cameraName,int(1000/(frame_interval.value * 1000)))
                         last_frame_time = t
                         if ret:
                             task = pool.apply_async(self.process_frame, (ret, frame, t))
