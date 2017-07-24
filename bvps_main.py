@@ -75,8 +75,7 @@ try:
             "port": 10003,
             "frequency":30,
             "width":1280,
-            "height":720,
-            "fourcc":('M', 'J', 'P', 'G')
+            "height":720
         }
         # ,
         # "camera5": {
