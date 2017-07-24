@@ -190,9 +190,9 @@ class CameraCaptureThread(threading.Thread):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
-            video.set(cv2.CAP_PROP_FPS,self.initCmd["frequency"])
-            video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd["width"])
-            video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd["height"])
+            video.set(cv2.CAP_PROP_FPS,self.initCmd.values["frequency"])
+            video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd.values["width"])
+            video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd.values["height"])
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
