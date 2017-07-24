@@ -9,7 +9,7 @@ from bvps.camera.camera import Camera, CameraCmdType, CameraCmd
 
 try:
 
-    asys = ActorSystem(systemBase="multiprocTCPBase", logDefs=logcfg)
+    asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,

@@ -126,6 +126,7 @@ class CameraCaptureThread(threading.Thread):
         self.detector = detector()
         self.recognizer = recognizer(None)
         self.threadn=cv2.getNumberOfCPUs()*4
+        self.pools={}
     def process_recognize(self, human):
         """识别检测到的人体图片，返回人对应的用户Id"""
         #log.debug("开始识别人！")
@@ -140,10 +141,14 @@ class CameraCaptureThread(threading.Thread):
 
     def recognizeParallel(self, method, humans):
         """多线程并行运算，提高运算速度"""
+        kt=clock()
         pool = ThreadPool(processes=self.threadn)
+        self.pools[kt]=pool
         results = pool.map_async(method, humans)
         pool.close()
         pool.join()
+        pool.terminate()
+        self.pools.pop(kt, None)
         return results
 
     def process_frame(self, ret, frame, t0):
@@ -183,7 +188,7 @@ class CameraCaptureThread(threading.Thread):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
             threadn=cv2.getNumberOfCPUs()*2
-            video.set(cv2.CAP_PROP_FPS,10)
+            video.set(cv2.CAP_PROP_FPS,25)
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
@@ -216,8 +221,9 @@ class CameraCaptureThread(threading.Thread):
                             pending.append(task)
                             if not self.camera.frameQueue.full():
                                self.camera.frameQueue.put_nowait(frame)
-                            if num % 50 == 0:
+                            if num % 10 == 0:
                                 log.debug("摄像头[{}]拍摄1帧图像，当前排队线程数{}个".format(self.cameraName,len(pending)))
+                                log.debug("pools num:{}".format(len(self.pools)))
                     num+=1
                 except Exception, e:
                     log.info(e.message)
