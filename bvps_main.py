@@ -30,7 +30,8 @@ try:
             "port": 10000,
             "frequency":30,
             "width":1280,
-            "height":720
+            "height":720,
+            "fourcc":('M', 'J', 'P', 'G')
         }
         ,
         "camera2": {
@@ -44,7 +45,8 @@ try:
             "port": 10001,
             "frequency":120,
             "width":640,
-            "height":480
+            "height":480,
+            "fourcc":('M', 'J', 'P', 'G')
         }
         ,
         "camera3": {
@@ -58,7 +60,8 @@ try:
             "port": 10002,
             "frequency":30,
             "width":1280,
-            "height":720
+            "height":720,
+            "fourcc":('M', 'J', 'P', 'G')
         }
     }
     #启动采集摄像头
