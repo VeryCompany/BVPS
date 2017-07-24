@@ -78,20 +78,20 @@ try:
             "height":720,
             "fourcc":('M', 'J', 'P', 'G')
         }
-        ,
-        "camera5": {
-            "x": "",
-            "y": "",
-            "z": "",
-            "device": "rtsp://192.168.0.205:554",
-            "user": "",
-            "password": "",
-            "type": CameraCmdType.START_CAPTURE,
-            "port": 10004,
-            "frequency":30,
-            "width":1280,
-            "height":720
-        }
+        # ,
+        # "camera5": {
+        #     "x": "",
+        #     "y": "",
+        #     "z": "",
+        #     "device": "rtsp://192.168.0.205:554",
+        #     "user": "",
+        #     "password": "",
+        #     "type": CameraCmdType.START_CAPTURE,
+        #     "port": 10004,
+        #     "frequency":30,
+        #     "width":1280,
+        #     "height":720
+        # }
         ,
         "camera6": {
             "x": "",
