@@ -31,6 +31,7 @@ class Camera(ActorTypeDispatcher):
         super(Camera, self).__init__(*args, **kw)
         self.threadPool = {}  #cameraName:threadID
         self.frameQueue = multiprocessing.Queue(64)
+        self.processQueue = multiprocessing.Queue(64)
         self.webserver = None
     @property
     def svmModel(self):
