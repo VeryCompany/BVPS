@@ -1,0 +1,4 @@
+from productModel import ProductModel
+from rackModel import RackModel
+from humanModel import HumanModel
+from shoppingCartModel import ShoppingCartProductModel
