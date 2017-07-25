@@ -38,7 +38,7 @@ try:
             "video_properties":{
                 cv2.CAP_PROP_FRAME_WIDTH:1280,
                 cv2.CAP_PROP_FRAME_HEIGHT:720,
-                cv2.CAP_PROP_FPS:25
+                cv2.CAP_PROP_FPS:30
             }
         },
         "camera2": {
@@ -56,7 +56,7 @@ try:
             "video_properties":{
                 cv2.CAP_PROP_FRAME_WIDTH:1280,
                 cv2.CAP_PROP_FRAME_HEIGHT:720,
-                cv2.CAP_PROP_FPS:25
+                cv2.CAP_PROP_FPS:30
             }
         },
         "camera3": {
@@ -74,7 +74,7 @@ try:
             "video_properties":{
                 cv2.CAP_PROP_FRAME_WIDTH:1280,
                 cv2.CAP_PROP_FRAME_HEIGHT:720,
-                cv2.CAP_PROP_FPS:25
+                cv2.CAP_PROP_FPS:30
             }
         },
         "camera4": {
