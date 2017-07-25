@@ -56,7 +56,7 @@ try:
             "video_properties":{
                 cv2.CAP_PROP_FRAME_WIDTH:1280,
                 cv2.CAP_PROP_FRAME_HEIGHT:720,
-                cv2.CAP_PROP_FPS:30
+                cv2.CAP_PROP_FPS:60
             }
         },
         "camera3": {
