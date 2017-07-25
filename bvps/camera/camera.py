@@ -30,7 +30,7 @@ class Camera(ActorTypeDispatcher):
     svm_model = None
     svm_model_updated = False
     training_started = False
-    training_start_time,training_end_time = clock(),clock()
+    training_start_time,training_end_time =None,None
     def __init__(self, *args, **kw):
         super(Camera, self).__init__(*args, **kw)
         self.frameQueue = multiprocessing.Queue(64)
@@ -69,18 +69,21 @@ class Camera(ActorTypeDispatcher):
             self.send(sender, "camera stopped!")
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
-        log.info("训练器是我{}".format(cmd.msg))
         if cmd.cctype == CameraCmdType.TRAINOR_INIT:
             self.trainor = cmd.msg
             self.send(self.trainor,"训练器初始化ok!")
         elif cmd.cctype == CameraCmdType.TRAINOR_START:
-            self.training_started = True
             self.training_start_time = cmd.msg
             self.training_uid = cmd.uid
         elif cmd.cctype == CameraCmdType.TRAINOR_END:
-            self.training_started = False
             self.training_end_time = cmd.msg
             self.training_uid = cmd.uid
+        elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK
+            self.training_start_time, self.training_end_time = clock(),None
+            self.training_uid = cmd.uid
+        elif cmd.cctype == CameraCmdType.MODEL_UPDATED
+            self.svm_model = cmd.msg
+            self.svm_model_updated = True
 
     def receiveMsg_HumanMsg(self, cmd, sender):
         pass
@@ -108,60 +111,7 @@ class CameraCaptureThread(threading.Thread):
         self.threadn=cv2.getNumberOfCPUs()*4
         self.pools={}
         self.initCmd = initCmd
-    def process_recognize(self, human):
-        """识别检测到的人体图片，返回人对应的用户Id"""
-        #log.debug("开始识别人！")
-        try:
-            uid = self.recognizer.whoru(human, t0) if self.recognizer.svm is not None else None
-            log.info("摄像头{}识别用户id：{},x:{},y:{}".format(self.cameraName,uid,human[0][1],human[0][2]))
-            #发送至定位中枢，确定用户坐标
-            return human, uid
-        except Exception, e:
-            log.info(e.message)
-            return human,None
 
-    def recognizeParallel(self, method, humans):
-        """多线程并行运算，提高运算速度"""
-        kt=clock()
-        pool = ThreadPool(processes=self.threadn)
-        self.pools[kt]=pool
-        results = pool.map_async(method, humans)
-        pool.close()
-        pool.join()
-        pool.terminate()
-        self.pools.pop(kt, None)
-        return results
-
-    def process_frame(self, ret, frame, t0):
-        """
-        处理摄像头抓取到的每一帧图像，找出有效的人和脸的照片。
-        是否需要设置专用的采集摄像头？还是所有的摄像头都可以用于采集？
-        如果处于采集状态，检测到的有效人体照片发送给后端进行学习。
-        """
-        try:
-            humans = self.detector.detect_humans(self.cameraName, frame, t0)
-
-
-            """
-            sending humans to trainning actors
-            通过通道的人，需要开始和结束时间，基准时间t0
-            """
-            #   pass
-            if len(humans) > 0:
-                if self.camera.training_started and t0 > self.camera.training_start_time and t0 < self.camera.training_end_time:
-                    for human in humans:
-                        self.camera.send(self.trainor,human)
-                else:
-                    users = self.recognizeParallel(
-                        self.process_recognize, humans)
-
-        except Exception, e:
-            log.info(e.message)
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback,
-                              limit=10, file=sys.stdout)
-        finally:
-            return ret, frame, t0
 
     def startCapture(self):
         try:
@@ -245,6 +195,14 @@ class CameraCmdType(Enum):
     TRAINOR_INIT = 5
     TRAINOR_START = 6
     TRAINOR_END = 7
+    PERSON_LEAVE = 8
+    TRAINOR_CAPTURE_OK = 9
+    MODEL_UPDATED = 10
+
+class CameraType(Enum):
+    CAPTURE = 1
+    POSITION = 2
+    BOTH_CAPTURE_POSITION = 3
 
 class TrainingCMD(object):
     def __init__(self,cctype,msg,uid=None):
