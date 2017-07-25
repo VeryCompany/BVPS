@@ -5,7 +5,9 @@ import os
 import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
-from bvps.camera.camera import Camera, CameraCmdType, CameraCmd
+from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD
+from bvps.camera.trainer import HumanModelTrainer
+
 import cv2
 
 try:
@@ -16,6 +18,7 @@ try:
         targetActorRequirements=None,
         globalName="SystemActor",
         sourceHash=None)
+    trainor = asys.createActor(HumanModelTrainer, targetActorRequirements=None, globalName="HumanModelTrainer", sourceHash=None)
     #未来会从数据库或者配置文件中读取
     #定位摄像头 type == 1
     #采集摄像头 type == 2
@@ -125,6 +128,7 @@ try:
             asys.tell(cama,
                       CameraCmd(CameraCmdType.START_CAPTURE_FOR_COLLECTION,
                                 camId, params))
+        asys.tell(cama, TrainingCMD(CameraCmdType.TRAINOR_INIT,trainor))
 
 except KeyboardInterrupt:
     print 'Interrupted'

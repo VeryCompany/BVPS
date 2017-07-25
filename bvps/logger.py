@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 
 
@@ -18,7 +19,7 @@ logcfg = {
             'format': '%(asctime)s %(levelname)-8s %(message)s'
         },
         'actor': {
-            'format': '%(asctime)s %(levelname)-8s %(actorAddress)s => %(message)s'
+            'format': '%(asctime)s %(levelname)-8s 进程:[%(process)d]-[%(processName)s] 线程:[%(threadName)s] 地址:[%(actorAddress)s] => %(message)s'
         }
     },
     'filters': {

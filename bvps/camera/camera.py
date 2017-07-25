@@ -30,48 +30,27 @@ class Camera(ActorTypeDispatcher):
     svm_model = None
     svm_model_updated = False
     training_started = False
+    training_start_time,training_end_time = clock()
     def __init__(self, *args, **kw):
         super(Camera, self).__init__(*args, **kw)
-        self.threadPool = {}  #cameraName:threadID
         self.frameQueue = multiprocessing.Queue(64)
         self.processQueue = multiprocessing.Queue(64)
         self.webserver = None
         self.cameraServer = None
-    @property
-    def svmModel(self):
-        self.svm_model_updated = False
-        return svm_model
-    @svmModel.setter
-    def svmModel(self,svm_model):
-        self.svm_model = svm_model
-    @property
-    def modelupdated(self):
-        return self.svm_model_updated
-    @property
-    def startTrainning(self):
-        return self.training_started
+        self.cct = None
+        self.cps = []
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-            if cmd.cameraName in self.threadPool and self.threadPool[cmd.
-                                                                     cameraName].isAlive(
-                                                                     ):
-                log.info("摄像头 {} 接收到 START_CAPTURE 命令,但是摄像头已经启动".format(cmd.cameraName))
+            if self.cct is not None and self.cct.isAlive():
                 return
-
-            cps = [
-                self.createActor(
-                    VideoRecord,
-                    globalName="{}-video-record".format(cmd.cameraName))
-            ]
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
-            cct = CameraCaptureThread(self, cmd.cameraName,
-                                      cmd.values["device"], cps,cmd)
-            self.threadPool[cmd.cameraName] = cct
-            cct.setDaemon(True)
-            cct.start()
+            self.cct = CameraCaptureThread(self, cmd.cameraName,
+                                      cmd.values["device"], self.cps,cmd)
+            self.cct.setDaemon(True)
+            self.cct.start()
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
             self.webserver = WebServer(self.frameQueue, cmd.values["port"])
@@ -80,17 +59,28 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像处理服务器......".format(cmd.cameraName))
             pn = cmd.values["processNum"]
             for p in range(0, pn, 1):
-                cams = CameraServer(self.frameQueue,cmd,self,cct)
+                cams = CameraServer(self.frameQueue,cmd,self,self.cct)
                 cams.start()
             log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
-            if self.threadPool.exit(cmd.cameraName):
-                self.threadPool[cmd.cameraName].stop()
-                self.threadPool[cmd.cameraName].join()
+            if self.cct is not None and self.cct.isAlive():
+                self.cct.stop()
+                self.cct.join(timeout=10)
             self.send(sender, "camera stopped!")
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
-        self.training_started = True
+        log.info("训练器是我{}".format(cmd.msg))
+        if cmd.cctype == CameraCmdType.TRAINOR_INIT:
+            self.trainor = cmd.msg
+            self.send(self.trainor,"训练器初始化ok!")
+        elif cmd.cctype == CameraCmdType.TRAINOR_START:
+            self.training_started = True
+            self.training_start_time = cmd.msg
+            self.training_uid = cmd.uid
+        elif cmd.cctype == CameraCmdType.TRAINOR_END:
+            self.training_started = False
+            self.training_end_time = cmd.msg
+            self.training_uid = cmd.uid
 
     def receiveMsg_HumanMsg(self, cmd, sender):
         pass
@@ -150,22 +140,20 @@ class CameraCaptureThread(threading.Thread):
         """
         try:
             humans = self.detector.detect_humans(self.cameraName, frame, t0)
-            #if self.camera. startTrainning():
+
+
             """
             sending humans to trainning actors
             通过通道的人，需要开始和结束时间，基准时间t0
             """
             #   pass
             if len(humans) > 0:
-                users = self.recognizeParallel(
-                    self.process_recognize, humans)
-                # for human in humans:
-                #     faceX = human[0][1]
-                #     faceY = human[0][2]
-                #     #给用户的脸部中心画一个圈
-                #     cv2.circle(frame, (faceX,faceY), 5,  (0,255,0), thickness=3, lineType=8, shift=0)
-                #识别出用户，将用户的Id，图像坐标位置发送给中枢Actor做处理
-
+                if self.camera.training_started and t0 > self.camera.training_start_time and t0 < self.camera.training_end_time:
+                    for human in humans:
+                        self.camera.send(self.trainor,human)
+                else:
+                    users = self.recognizeParallel(
+                        self.process_recognize, humans)
 
         except Exception, e:
             log.info(e.message)
@@ -208,6 +196,8 @@ class CameraCaptureThread(threading.Thread):
             num=10
             while True:
                 try:
+                    if self.stopped():
+                        break
                     if video.grab():
                         ret,frame = video.retrieve()
                         if num % 50 == 0:
@@ -252,7 +242,15 @@ class CameraCmdType(Enum):
     STOP_CAPTURE = 2
     RESTART_CAPTURE = 3
     START_CAPTURE_FOR_COLLECTION = 4
+    TRAINOR_INIT = 5
+    TRAINOR_START = 6
+    TRAINOR_END = 7
 
+class TrainingCMD(object):
+    def __init__(self,cctype,msg,uid=None):
+        self.cctype = cctype
+        self.msg = msg
+        self.uid = uid
 
 #摄像头命令定义
 class CameraCmd(object):

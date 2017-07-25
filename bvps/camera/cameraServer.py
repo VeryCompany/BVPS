@@ -38,8 +38,12 @@ class CameraServer(multiprocessing.Process):
         通过通道的人，需要开始和结束时间，基准时间t0
         """
         if len(humans) > 0:
-            users = self.recognizeParallel(
-                self.process_recognize, humans)
+            if self.camera.training_started and t0 > self.camera.training_start_time and t0 < self.camera.training_end_time:
+                for human in humans:
+                    self.camera.send(self.trainor,human)
+            else:
+                users = self.recognizeParallel(
+                    self.process_recognize, humans)
 
     def recognizeParallel(self, method, humans):
         """多线程并行运算，提高运算速度"""
