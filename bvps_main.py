@@ -5,7 +5,10 @@ import os
 import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
-from bvps.camera.camera import Camera, CameraCmdType, CameraCmd
+from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD
+from bvps.camera.trainer import HumanModelTrainer
+
+import cv2
 
 try:
 
@@ -15,6 +18,7 @@ try:
         targetActorRequirements=None,
         globalName="SystemActor",
         sourceHash=None)
+    trainor = asys.createActor(HumanModelTrainer, targetActorRequirements=None, globalName="HumanModelTrainer", sourceHash=None)
     #未来会从数据库或者配置文件中读取
     #定位摄像头 type == 1
     #采集摄像头 type == 2
@@ -28,83 +32,87 @@ try:
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
             "port": 10000,
-            "frequency":30,
-            "width":1280,
-            "height":720,
-            "fourcc":('M', 'J', 'P', 'G')
-        }
-        ,
-        "camera2": {
-            "x": "",
-            "y": "",
-            "z": "",
-            "device": 1,
-            "user": "",
-            "password": "",
-            "type": CameraCmdType.START_CAPTURE,
-            "port": 10001,
-            "frequency":60,
-            "width":1280,
-            "height":720,
-            "fourcc":('M', 'J', 'P', 'G')
-        }
-        ,
-        "camera3": {
-            "x": "",
-            "y": "",
-            "z": "",
-            "device": 2,
-            "user": "",
-            "password": "",
-            "type": CameraCmdType.START_CAPTURE,
-            "port": 10002,
-            "frequency":30,
-            "width":1280,
-            "height":720,
-            "fourcc":('M', 'J', 'P', 'G')
-        }
-        ,
-        "camera4": {
-            "x": "",
-            "y": "",
-            "z": "",
-            "device": "rtsp://192.168.0.74:554",
-            "user": "",
-            "password": "",
-            "type": CameraCmdType.START_CAPTURE,
-            "port": 10003,
-            "frequency":30,
-            "width":1280,
-            "height":720
+            "fourcc":('M', 'J', 'P', 'G'),
+            "processNum":4,
+            "focallength":5,
+            "video_properties":{
+                cv2.CAP_PROP_FRAME_WIDTH:800,
+                cv2.CAP_PROP_FRAME_HEIGHT:600,
+                cv2.CAP_PROP_FPS:25
+            }
         }
         # ,
-        # "camera5": {
+        # "camera2": {
         #     "x": "",
         #     "y": "",
         #     "z": "",
-        #     "device": "rtsp://192.168.0.205:554",
+        #     "device": 1,
         #     "user": "",
         #     "password": "",
         #     "type": CameraCmdType.START_CAPTURE,
-        #     "port": 10004,
+        #     "port": 10001,
+        #     "frequency":60,
+        #     "width":1280,
+        #     "height":720,
+        #     "fourcc":('M', 'J', 'P', 'G')
+        # }
+        # ,
+        # "camera3": {
+        #     "x": "",
+        #     "y": "",
+        #     "z": "",
+        #     "device": 2,
+        #     "user": "",
+        #     "password": "",
+        #     "type": CameraCmdType.START_CAPTURE,
+        #     "port": 10002,
+        #     "frequency":30,
+        #     "width":1280,
+        #     "height":720,
+        #     "fourcc":('M', 'J', 'P', 'G')
+        # }
+        # ,
+        # "camera4": {
+        #     "x": "",
+        #     "y": "",
+        #     "z": "",
+        #     "device": "rtsp://192.168.0.74:554",
+        #     "user": "",
+        #     "password": "",
+        #     "type": CameraCmdType.START_CAPTURE,
+        #     "port": 10003,
         #     "frequency":30,
         #     "width":1280,
         #     "height":720
         # }
-        ,
-        "camera6": {
-            "x": "",
-            "y": "",
-            "z": "",
-            "device": "rtsp://192.168.0.114:554",
-            "user": "",
-            "password": "",
-            "type": CameraCmdType.START_CAPTURE,
-            "port": 10005,
-            "frequency":30,
-            "width":1280,
-            "height":720
-        }
+        # # ,
+        # # "camera5": {
+        # #     "x": "",
+        # #     "y": "",
+        # #     "z": "",
+        # #     "device": "rtsp://192.168.0.205:554",
+        # #     "user": "",
+        # #     "password": "",
+        # #     "type": CameraCmdType.START_CAPTURE,
+        # #     "port": 10004,
+        # #     "frequency":30,
+        # #     "width":1280,
+        # #     "height":720
+        # # }
+        # ,
+        # "camera6": {
+        #     "x": "",
+        #     "y": "",
+        #     "z": "",
+        #     "device": "rtsp://192.168.0.114:554",
+        #     "user": "",
+        #     "password": "",
+        #     "type": CameraCmdType.START_CAPTURE,
+        #     "port": 10005,
+        #     "frequency":30,
+        #     "width":1280,
+        #     "height":720
+        # }
     }
     #启动采集摄像头
     #todo:消息反馈处理和异常处理
@@ -120,6 +128,7 @@ try:
             asys.tell(cama,
                       CameraCmd(CameraCmdType.START_CAPTURE_FOR_COLLECTION,
                                 camId, params))
+        asys.tell(cama, TrainingCMD(CameraCmdType.TRAINOR_INIT,trainor))
 
 except KeyboardInterrupt:
     print 'Interrupted'
