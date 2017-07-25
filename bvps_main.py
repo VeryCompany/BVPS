@@ -63,7 +63,7 @@ try:
             "x": "",
             "y": "",
             "z": "",
-            "device": 1,
+            "device": 2,
             "user": "",
             "password": "",
             "type": CameraCmdType.START_CAPTURE,
