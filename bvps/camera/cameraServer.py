@@ -47,8 +47,8 @@ class CameraServer(multiprocessing.Process):
             if (self.camera.training_start_time is not None and t0 > self.camera.training_start_time) and (self.camera.training_end_time is None or t0 < self.camera.training_end_time):
                 for human in humans:
                     self.camera.send(self.trainor, (human,self.training_uid))
-            if self.camera.svm_model is not None:
-                users = self.recognizeParallel(self.process_recognize, humans)
+            #if self.camera.svm_model is not None:
+            users = self.recognizeParallel(self.process_recognize, humans)
 
     def recognizeParallel(self, method, humans):
         """多线程并行运算，提高运算速度"""
