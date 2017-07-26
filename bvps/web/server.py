@@ -10,7 +10,6 @@ def draw_center_line(frame):
     vv = frame.shape
     h = vv[0]
     w = vv[1]
-    print h,h/2,w,w/2
     cv2.line(frame, (0,h/2), (w,h/2), (255,0,0),1)
     cv2.line(frame, (w/2,0), (w/2,h), (255,0,0),1)
     cv2.circle(frame,(w/2,h/2), 63, (0,0,255), 1)
