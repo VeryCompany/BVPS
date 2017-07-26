@@ -150,6 +150,10 @@ class CameraCaptureThread(threading.Thread):
                         break
                     if video.grab():
                         ret,frame = video.retrieve()
+                        h,w,d = frame.Shape
+                        if w > 640 or h > 480 :
+                            frame = cv2.resize(frame,640,480)
+                            
                         if num % 50 == 0:
                             log.debug("读取摄像头{}frame{}".format(self.cameraName,"成功" if ret else "失败！"))
                         t = clock()
