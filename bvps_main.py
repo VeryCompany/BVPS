@@ -36,8 +36,8 @@ try:
                 "angle_x":0,
                 "angle_y":0,
                 "angle_z":0,
-                "sensor_width",4.8,
-                "sensor_height",3.6,
+                "sensor_width":4.8,
+                "sensor_height":3.6,
                 "distortion_ceof":{},
                 "camera_matrix":[]
             }
@@ -61,8 +61,8 @@ try:
                 "angle_x":0,
                 "angle_y":0,
                 "angle_z":0,
-                "sensor_width",4.8,
-                "sensor_height",3.6,
+                "sensor_width":4.8,
+                "sensor_height":3.6,
                 "distortion_ceof":{},
                 "camera_matrix":[]
             }
