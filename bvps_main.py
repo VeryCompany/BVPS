@@ -50,7 +50,9 @@ try:
             "processNum": 4,
             "focallength": 5,
             "video_properties": {
-                cv2.CAP_PROP_FPS: 25
+                cv2.CAP_PROP_FPS: 25,
+                cv2.CAP_PROP_FRAME_WIDTH: 640,
+                cv2.CAP_PROP_FRAME_HEIGHT: 480
             }
         },
         "camera5": {
@@ -75,7 +77,9 @@ try:
             "processNum": 4,
             "focallength": 5,
             "video_properties": {
-                cv2.CAP_PROP_FPS: 25
+                cv2.CAP_PROP_FPS: 25,
+                cv2.CAP_PROP_FRAME_WIDTH: 640,
+                cv2.CAP_PROP_FRAME_HEIGHT: 480
             }
         }
     }
