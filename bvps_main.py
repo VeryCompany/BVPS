@@ -40,7 +40,7 @@ try:
                 "sensor_height":3.6,
                 "distortion_ceof":{},
                 "camera_matrix":[]
-            }
+            },
             "device": "rtsp://192.168.0.74:554",
             "user": "",
             "password": "",
@@ -65,7 +65,7 @@ try:
                 "sensor_height":3.6,
                 "distortion_ceof":{},
                 "camera_matrix":[]
-            }
+            },
             "device": "rtsp://192.168.0.114:554",
             "user": "",
             "password": "",
