@@ -165,9 +165,9 @@ class CameraCaptureThread(threading.Thread):
                                 newframe = cv2.resize(frame,(640,480))
 
                             if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((frame,t))
+                                self.camera.processQueue.put_nowait((newframe,t))
                             if not self.camera.frameQueue.full():
-                                self.camera.frameQueue.put_nowait((frame,t))
+                                self.camera.frameQueue.put_nowait((newframe,t))
                         last_frame_time = t
                     num+=1
                 except Exception, e:
