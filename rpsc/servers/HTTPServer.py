@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from flask import *
 from datetime import datetime
-from controls import ControlCenter
+from rpsc.controls import ControlCenter
 
 app = Flask(__name__)
 
@@ -34,13 +34,33 @@ def userComeOut(userId):
 @app.route("/user/userloc",methods=["POST"])
 def userLoc():
     # print "userId->:",request.form['userId']
-    print request.json
+    userId = None
+    userloc = None
+    userloctime = None
+
+    usermsg = request.json
+    print usermsg
+
+    if usermsg.has_key("userloc"):
+        userloc = usermsg["userloc"]
+    if usermsg.has_key("userId"):
+        userId = usermsg["userId"]
+    if usermsg.has_key("userloctime"):
+        userloctime = usermsg["userloctime"]
+        print userloctime
+
+    if userId is not None and userloc is not None:
+        ControlCenter.sendHumanLoc(userId, userloc, str(userloctime))
+
     # print request.values["userId"]
     #userloc= str(request.form['userloc'])
     #print "userloc->", userloc, type(userloc)
-    print "urlPath->:",request.args.get("urlpath","---")
+    # print "urlPath->:",request.args.get("urlpath","---")
     return Response("{\"message\": \"success\"}",mimetype='application/json;charset=utf-8')
 
-def startHTTP():
+def startHTTP(asys):
+    ControlCenter.setAsys(asys)
     print "Http Server Start ..."
-    app.run(host='',port='8080')
+    global app
+
+    app.run(host='',port='8080',debug=True,use_reloader=False)

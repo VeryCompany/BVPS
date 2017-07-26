@@ -1,5 +1,5 @@
 from SocketServer import ThreadingTCPServer, StreamRequestHandler
-from controls import ControlCenter
+from rpsc.controls import ControlCenter
 
 dataMsg = bytes()
 
@@ -47,7 +47,8 @@ class RackServer(StreamRequestHandler):
                 print dataReceiveErr
                 break
 
-def startTCP():
+def startTCP(asys):
+    ControlCenter.setAsys(asys)
     HOST = ''
     PORT = 8999
     ADDR = (HOST, PORT)

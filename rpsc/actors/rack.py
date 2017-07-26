@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from thespian.actors import ActorTypeDispatcher
-from controls import rackController
-from models import RackModel, ProductModel
-from config import RackConfig
+from rpsc.controls import rackController
+from rpsc.models import RackModel, ProductModel
+from rpsc.config import RackConfig
 import datetime
 
 class RackActor(ActorTypeDispatcher):

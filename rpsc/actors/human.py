@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 from thespian.actors import ActorTypeDispatcher
-from models import HumanModel, ShoppingCartProductModel
-import json
+from rpsc.models import HumanModel, ShoppingCartProductModel
+# from rpsc.controls import ControlCenter
+from rpsc.actors.core import *
 
 class HumanActor(ActorTypeDispatcher):
 
     def __init__(self, *args, **kw):
         super(HumanActor, self).__init__(*args, **kw)
         self.human = None
+        self.coreActor = None
+
+    def getCoreActor(self):
+        if self.coreActor is None:
+            self.coreActor = self.createActor(CoreActor, globalName="coreActor")
+        return self.coreActor
 
     def receiveMsg_HumanTakeProduct(self, message, sender):
         product = message.product
@@ -41,6 +48,9 @@ class HumanActor(ActorTypeDispatcher):
         time = message.time
         if self.human is not None:
             print "用户:", humanId, "在[", time, "]离开"
+            coreActor = self.getCoreActor()
+            self.send(coreActor, UserEvent(humanId, "out"))
+            # ControlCenter.asys.tell(ControlCenter.coreActor, UserEvent(humanId, "out"))
             self.human = None
         else:
             print "用户:", humanId, "已经离开"
@@ -53,6 +63,9 @@ class HumanActor(ActorTypeDispatcher):
             self.human= HumanModel(humanId, loc, ShoppingCartProductModel(0))
             self.human.setComeTime(time)
             print "用户:", humanId, "在[", time, "]进入超市", type(humanId)
+            coreActor = self.getCoreActor()
+            self.send(coreActor, UserEvent(humanId, "in"))
+            # ControlCenter.asys.tell(ControlCenter.coreActor, UserEvent(humanId, "in"))
         else:
             print "存在用户:", humanId
 

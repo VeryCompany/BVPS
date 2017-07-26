@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from models import RackModel
+from rpsc.models import RackModel
 
 racks = dict()
 

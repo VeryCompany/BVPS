@@ -2,6 +2,15 @@
 import threading
 from servers import TCPServer, HTTPServer
 
+def serverStart(asys):
+    t1 = threading.Thread(target=TCPServer.startTCP,args=(asys,))
+    t2 = threading.Thread(target=HTTPServer.startHTTP,args=(asys,))
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
 
 if __name__ == "__main__":
     # p1 = multiprocessing.Process(target=TCPServer.startTCP)
@@ -9,12 +18,6 @@ if __name__ == "__main__":
     #
     # p1.start()
     # p2.start()
-    t1 = threading.Thread(target=TCPServer.startTCP)
-    t2 = threading.Thread(target=HTTPServer.startHTTP)
-
-    t1.start()
-    t2.start()
-
-    t1.join()
-    t2.join()
+    # serverStart()
+    pass
 
