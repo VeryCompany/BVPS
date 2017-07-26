@@ -19,11 +19,11 @@ cameras = {
             "angle_x":0,
             "angle_y":0,
             "angle_z":0,
-            "sensor_width",4.8,
-            "sensor_height",3.6,
+            "sensor_width":4.8,
+            "sensor_height":3.6,
             "distortion_ceof":{},
             "camera_matrix":[]
-        }
+        },
         "device": 0,
         "user": "",
         "password": "",
@@ -46,11 +46,11 @@ cameras = {
             "angle_x":0,
             "angle_y":0,
             "angle_z":0,
-            "sensor_width",4.8,
-            "sensor_height",3.6,
+            "sensor_width":4.8,
+            "sensor_height":3.6,
             "distortion_ceof":{},
             "camera_matrix":[]
-        }
+        },
         "device": 1,
         "user": "",
         "password": "",
@@ -73,11 +73,11 @@ cameras = {
             "angle_x":0,
             "angle_y":0,
             "angle_z":0,
-            "sensor_width",4.8,
-            "sensor_height",3.6,
+            "sensor_width":4.8,
+            "sensor_height":3.6,
             "distortion_ceof":{},
             "camera_matrix":[]
-        }
+        },
         "device": 2,
         "user": "",
         "password": "",
@@ -100,11 +100,11 @@ cameras = {
             "angle_x":0,
             "angle_y":0,
             "angle_z":0,
-            "sensor_width",4.8,
-            "sensor_height",3.6,
+            "sensor_width":4.8,
+            "sensor_height":3.6,
             "distortion_ceof":{},
             "camera_matrix":[]
-        }
+        },
         "device": "rtsp://192.168.0.74:554",
         "user": "",
         "password": "",
@@ -125,11 +125,11 @@ cameras = {
             "angle_x":0,
             "angle_y":0,
             "angle_z":0,
-            "sensor_width",4.8,
-            "sensor_height",3.6,
+            "sensor_width":4.8,
+            "sensor_height":3.6,
             "distortion_ceof":{},
             "camera_matrix":[]
-        }
+        },
         "device": "rtsp://192.168.0.114:554",
         "user": "",
         "password": "",
