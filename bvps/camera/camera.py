@@ -162,7 +162,7 @@ class CameraCaptureThread(threading.Thread):
                             h,w,d = frame.shape
 
                             if w > 640 or h > 480 :
-                                newframe = cv2.resize(frame,(640,480))
+                                newframe = cv2.resize(frame,(w/2,h/2))
 
                             if not self.camera.processQueue.full():
                                 self.camera.processQueue.put_nowait((newframe,t))
