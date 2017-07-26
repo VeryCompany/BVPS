@@ -41,7 +41,7 @@ try:
                 "distortion_ceof":{},
                 "camera_matrix":[]
             },
-            "device": "rtsp://192.168.0.74:554",
+            "device": "rtsp://192.168.0.198:554",
             "user": "",
             "password": "",
             "cameraType": CameraType.POSITION,
