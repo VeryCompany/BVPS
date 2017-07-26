@@ -15,9 +15,7 @@ import copy
 #训练模型
 #@troupe(max_count=10,idle_count=5)
 class HumanModelTrainer(ActorTypeDispatcher):
-    human_map = {
-        "unknown":[]
-    }
+    human_map = {}
 
     def __init__(self, *args, **kw):
         super(HumanModelTrainer, self).__init__(*args, **kw)
@@ -39,7 +37,7 @@ class HumanModelTrainer(ActorTypeDispatcher):
         log.info("训练器收到消息:[{}]".format(message))
     def receiveMsg_tuple(self, message, sender):
         """
-        接收N张照片，如果接收到足够数量的样板，返回消息
+        接收N张照片，如果接收到足够数量的样本，返回消息
         """
         human = message[0][0]
         uid = message[1]
