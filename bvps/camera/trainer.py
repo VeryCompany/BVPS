@@ -63,26 +63,3 @@ class HumanModelTrainer(ActorTypeDispatcher):
             uids.extend([uid for x in range(len(imgs))])
         self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         return self.svm
-
-    """
-    def trainSVM(self):
-        print("+ Training SVM on {} labeled images.".format(len(self.images)))
-        d = self.getData()
-        if d is None:
-            self.svm = None
-            return
-        else:
-            (X, y) = d
-            numIdentities = len(set(y + [-1]))
-            if numIdentities <= 1:
-                return
-
-            param_grid = [
-                {'C': [1, 10, 100, 1000],
-                 'kernel': ['linear']},
-                {'C': [1, 10, 100, 1000],
-                 'gamma': [0.001, 0.0001],
-                 'kernel': ['rbf']}
-            ]
-            self.svm = GridSearchCV(SVC(C=1), param_grid, cv=5).fit(X, y)
-    """

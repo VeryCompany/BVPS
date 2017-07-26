@@ -67,10 +67,13 @@ class CameraServer(multiprocessing.Process):
         #log.debug("开始识别人！")
 
         try:
+            t0 = human[2]
             uid = self.recognizer.whoru(
-                human, t0) if self.recognizer.svm is not None else None
+                human) if self.recognizer.svm is not None else None
             log.info("摄像头{}识别用户id：{},x:{},y:{}".format(
                 self.cmd.cameraName, uid, human[0][1], human[0][2]))
+            if uid is not None:
+                pass
             #发送至定位中枢，确定用户坐标
             return human, uid
         except Exception, e:
