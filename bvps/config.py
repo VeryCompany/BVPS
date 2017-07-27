@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from bvps.camera.camera import CameraType
+import cv2
+
 training_config = {
     "cap_nums":30
 }
@@ -76,7 +79,7 @@ cameras = {
 camera_group = {
     "group_1":{
         "members":["camera4","camera5"],
-        "primary":"camera4"
+        "primary":"camera4",
         "baseline_mm":220,
         "cx":0,
         "cy":0
