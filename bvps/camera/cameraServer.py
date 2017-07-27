@@ -85,7 +85,7 @@ class CameraServer(multiprocessing.Process):
                 self.cmd.cameraName, uid, human[0][1], human[0][2]))
             if uid is not None:
                 msg = (self.cmd.cameraName, uid, human[0][1], human[0][2],
-                       human[0][0], self.cct.resolution,0, secs)
+                       human[0][0], self.cct.resolution,0, int(secs))
                 self.camera.send(self.position, msg)
             return human, uid
         except Exception, e:
