@@ -80,7 +80,7 @@ class Camera(ActorTypeDispatcher):
             self.training_end_time = cmd.msg
             self.training_uid = cmd.uid
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
-            self.training_start_time, self.training_end_time = clock(),None
+            self.training_start_time, self.training_end_time = None,None
             self.training_uid = cmd.uid
         elif cmd.cctype == CameraCmdType.MODEL_UPDATED:
             self.svm_model = cmd.msg
