@@ -20,8 +20,10 @@ align = openface.AlignDlib(
 net = openface.TorchNeuralNet(
     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
+
 class HumanDetector():
     num = 1
+
     def __init__(self, *args, **kw):
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -36,10 +38,10 @@ class HumanDetector():
         self.last_frame_time = clock()
         self.latency = StatValue()
 
-    def detect_humans(self, cameraName,image,t0):
+    def detect_humans(self, cameraName, image, t0, secs):
         validHuman = []
         #for body in self.fullBodyHaarDetector(image):
-            #cv2.imwrite("images/{}.body.jpg".format(self.num), body)
+        #cv2.imwrite("images/{}.body.jpg".format(self.num), body)
         faces = self.faceDetector(image)
         #if len(faces) > 0:
         #    log.debug("发现{}个人脸".format(len(faces)))
@@ -47,14 +49,14 @@ class HumanDetector():
         #    continue
         for face in faces:
             #cv2.imwrite("images/{}.face.jpg".format(self.num), face)
-            validHuman.append((face, face,t0))
+            validHuman.append((face, face, t0, secs))
         self.num += 1
         t = clock()
         self.latency.update(t - t0)
         self.frame_interval.update(t - self.last_frame_time)
         #if len(validHuman) > 0:
-            #log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
-            #len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
+        #log.debug("发现有效人物目标{}个 图像延迟:{:0.1f} 目标检测器用时：{:0.1f} ms".format(
+        #len(validHuman),self.latency.value * 1000, self.frame_interval.value * 1000))
         self.last_frame_time = t
         return validHuman
 
@@ -76,7 +78,8 @@ class HumanDetector():
             #    log.debug("发现{}个人体图像".format(len(rects)))
             for x1, y1, x2, y2 in rects:
                 roi = image.copy()[y1:y2, x1:x2]
-                bodys.append((roi,max(x1,x2)-abs(x1-x2)/2,max(y1,y2)-abs(y1-y2)/2))
+                bodys.append((roi, max(x1, x2) - abs(x1 - x2) / 2,
+                              max(y1, y2) - abs(y1 - y2) / 2))
             #dt = clock() - t
             #draw_str(image, (20, 20), 'time: %.1f ms' % (dt*1000))
             return bodys
@@ -118,7 +121,7 @@ class HumanDetector():
                 continue
 
             roi = frame.copy()[bb.top():bb.bottom(), bb.left():bb.right()]
-            faces.append((alignedFace,bb.dcenter().x,bb.dcenter().y))
+            faces.append((alignedFace, bb.dcenter().x, bb.dcenter().y))
         return faces
 
     def faceDetector_2(self, image):
@@ -141,7 +144,7 @@ class HumanDetector():
             scaleFactor=1.05,
             minNeighbors=4,
             minSize=(100, 100),
-            maxSize=(500,500),
+            maxSize=(500, 500),
             flags=cv2.CASCADE_SCALE_IMAGE)
         if len(rects) == 0:
             return []

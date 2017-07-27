@@ -9,6 +9,7 @@ from bvps.camera.common import clock, draw_str, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
+from bvps.system.position_actor import PositionActor
 
 
 class CameraServer(multiprocessing.Process):
@@ -22,33 +23,42 @@ class CameraServer(multiprocessing.Process):
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
+        position = camera.createActor(
+            PositionActor,
+            targetActorRequirements=None,
+            globalName="CameraPositionActor",
+            sourceHash=None)
 
     def run(self):
         latency = StatValue()
         while True:
-            frame, t0 = CameraServer.queue.get()
-            self.process_frame(frame, t0)
+            frame, t0, secs = CameraServer.queue.get()
+            self.process_frame(frame, t0, secs)
             t = clock()
             latency.update(t - t0)
             log.debug("摄像头[{}]进程{}处理数据，处理耗时{:0.1f}ms...".format(
                 self.cmd.cameraName, self.pid, latency.value * 1000))
 
-    def process_frame(self, frame, t0):
-        if self.camera.svm_model_updated :
+    def process_frame(self, frame, t0, secs):
+        if self.camera.svm_model_updated:
             self.recognizer.svm = self.camera.svm_model
             self.camera.svm_model_updated = False
-        humans = self.detector.detect_humans(self.cmd.cameraName, frame, t0)
+        humans = self.detector.detect_humans(self.cmd.cameraName, frame, t0,
+                                             secs)
         #if self.camera. startTrainning():
         """
         sending humans to trainning actors
         通过通道的人，需要开始和结束时间，基准时间t0
         """
         if len(humans) > 0:
-            if (self.camera.training_start_time is not None and t0 > self.camera.training_start_time) and (self.camera.training_end_time is None or t0 < self.camera.training_end_time):
+            if (self.camera.training_start_time is not None
+                    and t0 > self.camera.training_start_time) and (
+                        self.camera.training_end_time is None
+                        or t0 < self.camera.training_end_time):
                 for human in humans:
-                    self.camera.send(self.trainor, (human,self.training_uid))
-            #if self.camera.svm_model is not None:
-            users = self.recognizeParallel(self.process_recognize, humans)
+                    self.camera.send(self.trainor, (human, self.training_uid))
+            if self.camera.svm_model is not None:
+                users = self.recognizeParallel(self.process_recognize, humans)
 
     def recognizeParallel(self, method, humans):
         """多线程并行运算，提高运算速度"""
@@ -68,13 +78,15 @@ class CameraServer(multiprocessing.Process):
 
         try:
             t0 = human[2]
+            secs = human[3]
             uid = self.recognizer.whoru(
                 human) if self.recognizer.svm is not None else None
-            log.info("摄像头{}识别用户id：{},x:{},y:{}".format(
+            log.debug("摄像头{}识别用户id：{},x:{},y:{}".format(
                 self.cmd.cameraName, uid, human[0][1], human[0][2]))
             if uid is not None:
-                pass
-            #发送至定位中枢，确定用户坐标
+                msg = (self.cmd.cameraName, uid, human[0][1], human[0][2],
+                       human[0][0], self.cct.resolution,0, secs)
+                self.camera.send(self.position, msg)
             return human, uid
         except Exception, e:
             log.info(e.message)

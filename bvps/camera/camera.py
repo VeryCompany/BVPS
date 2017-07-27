@@ -12,6 +12,7 @@ import multiprocessing
 import logging as log
 import sys, traceback
 from bvps.camera.cameraServer import CameraServer
+import time
 
 def handle_exception(exc_type, exc_value, exc_traceback):
     if issubclass(exc_type, KeyboardInterrupt):
@@ -85,7 +86,7 @@ class Camera(ActorTypeDispatcher):
             self.svm_model = cmd.msg
             self.svm_model_updated = True
 
-    def receiveMsg_HumanMsg(self, cmd, sender):
+    def receiveMsg_PositionActorMsg(self, cmd, sender):
         pass
 
 
@@ -116,9 +117,6 @@ class CameraCaptureThread(threading.Thread):
     def startCapture(self):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
-            # video.set(cv2.CAP_PROP_FPS,self.initCmd.values["frequency"])
-            # video.set(cv2.CAP_PROP_FRAME_WIDTH,self.initCmd.values["width"])
-            # video.set(cv2.CAP_PROP_FRAME_HEIGHT,self.initCmd.values["height"])
             log.info("摄像头{}初始化参数".format(self.cameraName))
             for k,v in self.initCmd.values["video_properties"].items():
                 video.set(k,v)
@@ -129,7 +127,7 @@ class CameraCaptureThread(threading.Thread):
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
-
+            self.resolution = (width,height)
             log.info("摄像头fps[{}] width:{} height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
             log.info("亮度:{}".format(video.get(cv2.CAP_PROP_BRIGHTNESS)))
             log.info("对比度:{}".format(video.get(cv2.CAP_PROP_CONTRAST)))
@@ -144,6 +142,7 @@ class CameraCaptureThread(threading.Thread):
             frame_interval = StatValue()
             last_frame_time = clock()
             num=10
+            scale= self.initCmd.values["scale"]
             while True:
                 try:
                     if self.stopped():
@@ -161,13 +160,13 @@ class CameraCaptureThread(threading.Thread):
                         if ret:
                             h,w,d = frame.shape
 
-                            if w > 640 or h > 480 :
-                                newframe = cv2.resize(frame,(w/2,h/2))
+                            if scale is not None:
+                                newframe = cv2.resize(frame,(int(w*resize),int(h*resize)))
 
                             if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((newframe,t))
+                                self.camera.processQueue.put_nowait((newframe,t,time.time()))
                             if not self.camera.frameQueue.full():
-                                self.camera.frameQueue.put_nowait((newframe,t))
+                                self.camera.frameQueue.put_nowait((newframe,t,time.time()))
                         last_frame_time = t
                     num+=1
                 except Exception, e:
@@ -185,12 +184,6 @@ class CameraCaptureThread(threading.Thread):
     def stopped(self):
         return self._stop_event.is_set()
 
-
-class HumanMsg(object):
-    def __init__(self, **kwargs):
-        self.vmap = {}
-        for name, value in kwargs.items():
-            self.vmap[name] = value
 
 
 #摄像头命令类型定义

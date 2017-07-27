@@ -5,6 +5,7 @@ import os
 import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
+from bvps.system.position_actor import PositionActor
 from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD, CameraType
 from bvps.camera.trainer import HumanModelTrainer
 
@@ -18,7 +19,11 @@ try:
         targetActorRequirements=None,
         globalName="SystemActor",
         sourceHash=None)
-
+    position = asys.createActor(
+        PositionActor,
+        targetActorRequirements=None,
+        globalName="CameraPositionActor",
+        sourceHash=None)
     trainor = asys.createActor(
         HumanModelTrainer,
         targetActorRequirements=None,
@@ -27,62 +32,7 @@ try:
     #未来会从数据库或者配置文件中读取
     #定位摄像头 type == 1
     #采集摄像头 type == 2
-    cameras = {
-        "camera4": {
-            "parameters":{
-                "x": "",
-                "y": "",
-                "z": "",
-                "angle_x":0,
-                "angle_y":0,
-                "angle_z":0,
-                "sensor_width":4.8,
-                "sensor_height":3.6,
-                "distortion_ceof":{},
-                "camera_matrix":[]
-            },
-            "device": "rtsp://192.168.0.198:554",
-            "user": "",
-            "password": "",
-            "cameraType": CameraType.POSITION,
-            "port": 10004,
-            "fourcc": ('M', 'J', 'P', 'G'),
-            "processNum": 4,
-            "focallength": 5,
-            "video_properties": {
-                cv2.CAP_PROP_FPS: 25,
-                cv2.CAP_PROP_FRAME_WIDTH: 640,
-                cv2.CAP_PROP_FRAME_HEIGHT: 480
-            }
-        },
-        "camera5": {
-            "parameters":{
-                "x": "",
-                "y": "",
-                "z": "",
-                "angle_x":0,
-                "angle_y":0,
-                "angle_z":0,
-                "sensor_width":4.8,
-                "sensor_height":3.6,
-                "distortion_ceof":{},
-                "camera_matrix":[]
-            },
-            "device": "rtsp://192.168.0.114:554",
-            "user": "",
-            "password": "",
-            "cameraType": CameraType.POSITION,
-            "port": 10005,
-            "fourcc": ('M', 'J', 'P', 'G'),
-            "processNum": 4,
-            "focallength": 5,
-            "video_properties": {
-                cv2.CAP_PROP_FPS: 25,
-                cv2.CAP_PROP_FRAME_WIDTH: 640,
-                cv2.CAP_PROP_FRAME_HEIGHT: 480
-            }
-        }
-    }
+    from bvps.config import cameras
     #启动采集摄像头
     #todo:消息反馈处理和异常处理
     for camId, params in cameras.items():
@@ -90,7 +40,6 @@ try:
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE".format(camId))
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
-
         asys.tell(cama, TrainingCMD(CameraCmdType.TRAINOR_INIT, trainor))
 
 except KeyboardInterrupt:
