@@ -43,7 +43,7 @@ class TrainingServer(multiprocessing.Process):
             """
             log.info("-------------------")
             message = TrainingServer.in_queue.get()
-            human = message[0][0]
+            human = message[0][0][0]
             uid = message[1]
             t0 = message[0][2]
             log.info("receive uid:{},faces".format(uid))
@@ -83,7 +83,7 @@ class TrainingServer(multiprocessing.Process):
 
                 for img in imgs:
                     log.info("msg--type:{}".format(type(img)))
-                
+                    images.append(img)
                 log.info("type:{}".format(type(imgs)))
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
