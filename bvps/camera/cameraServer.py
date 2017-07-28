@@ -77,11 +77,14 @@ class TrainingServer(multiprocessing.Process):
             global spg
             uids, images = [], []
             hums = copy.deepcopy(self.human_map)
+            log.info(hums)
             for uid, imgs in hums:
                 if len(imgs) < tc["cap_nums"]:
                     continue
                 images.extend(imgs)
                 uids.extend([uid for x in range(len(imgs))])
+                log.info(images)
+                log.info(uids)
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         except Exception as e:
             log.error(e)
