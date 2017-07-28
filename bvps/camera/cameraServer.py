@@ -16,7 +16,12 @@ class CameraServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
         self.cmd = cmd
-        self.camera = camera
+        from bvps.camera.camera import Camera
+        self.camera = camera.createActor(
+            Camera,
+            targetActorRequirements=None,
+            globalName=camera.cameraId,
+            sourceHash=None)
         self.cct = cct
         self.detector = detector()
         self.recognizer = recognizer(None)

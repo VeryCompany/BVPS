@@ -47,10 +47,11 @@ class Camera(ActorTypeDispatcher):
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-            
+
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
+            self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
                                       cmd.values["device"], self.cps,cmd)
             self.cct.setDaemon(True)
