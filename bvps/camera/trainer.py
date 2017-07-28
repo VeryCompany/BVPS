@@ -57,6 +57,7 @@ class HumanModelTrainer(ActorTypeDispatcher):
             self.train()
             self.send(sender,
                       TrainingCMD(CameraCmdType.MODEL_UPDATED, self.svm))
+        # 训练不应该在这里！
 
     def train(self):
         uids, images = [], []

@@ -52,9 +52,9 @@ class CameraServer(multiprocessing.Process):
         """
         if len(humans) > 0:
             if (self.camera.training_start_time is not None
-                    and t0 > self.camera.training_start_time) and (
+                    and secs > self.camera.training_start_time) and (
                         self.camera.training_end_time is None
-                        or t0 < self.camera.training_end_time):
+                        or secs < self.camera.training_end_time):
                 for human in humans:
                     self.camera.send(self.trainor, (human, self.training_uid))
             if self.camera.svm_model is not None:

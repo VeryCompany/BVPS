@@ -15,3 +15,6 @@ results = pool.map(urllib2.urlopen, urls)
 #close the pool and wait for the work to finish
 pool.close()
 pool.join()
+
+
+print results
