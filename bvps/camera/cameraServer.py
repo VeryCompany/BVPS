@@ -27,7 +27,9 @@ import copy
 
 
 class TrainingServer(multiprocessing.Process):
-    human_map = {}
+    human_map = {
+        "unknown":[[[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]]]
+    }
 
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self)
