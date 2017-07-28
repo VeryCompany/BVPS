@@ -23,11 +23,12 @@ class CameraServer(multiprocessing.Process):
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
         from bvps.system.position_actor import PositionActor
-        position = camera.createActor(
+        self.position = camera.createActor(
             PositionActor,
             targetActorRequirements=None,
             globalName="CameraPositionActor",
             sourceHash=None)
+
 
     def run(self):
         latency = StatValue()
@@ -56,8 +57,8 @@ class CameraServer(multiprocessing.Process):
             if (start is not None and secs > start) and (end is None
                                                          or secs < end):
                 for human in humans:
-                    #self.camera.send(self.trainor, (human, self.training_uid))
-                    self.camera.send(self.trainor, "发送进店照片!")
+                    self.camera.send(self.camera.trainor, (human, self.training_uid))
+                    self.camera.send(self.camera.trainor, "发送进店照片!")
             if self.camera.svm_model is not None:
                 users = self.recognizeParallel(self.process_recognize, humans)
 
