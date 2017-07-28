@@ -34,6 +34,7 @@ class CameraServer(multiprocessing.Process):
             targetActorRequirements=None,
             globalName="HumanModelTrainer",
             sourceHash=None)
+        camera.send(self.trainor,"创建培训期")
 
 
     def run(self):
