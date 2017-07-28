@@ -143,6 +143,7 @@ class TrainingServer(multiprocessing.Process):
             """
             接收N张照片，如果接收到足够数量的样本，返回消息
             """
+            log.info("-------------------")
             message = self.in_queue.get()
             human = message[0][0]
             uid = message[1]
