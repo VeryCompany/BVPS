@@ -61,6 +61,7 @@ class TrainingServer(multiprocessing.Process):
             if len(self.human_map[uid]) >= tc["cap_nums"]:
 
                 self.train()
+                log.info(self.svm)
                 TrainingServer.out_queue.put_nowait(self.svm)
                 last_uid = uid
                 # self.send(sender,
