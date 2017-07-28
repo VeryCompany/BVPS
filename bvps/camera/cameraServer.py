@@ -56,7 +56,7 @@ class CameraServer(multiprocessing.Process):
             if (start is not None and secs > start) and (end is None
                                                          or secs < end):
                 for human in humans:
-                    self.camera.send(self.trainor, (human, self.training_uid))
+                    #self.camera.send(self.trainor, (human, self.training_uid))
                     self.camera.send(self.trainor, "发送进店照片!")
             if self.camera.svm_model is not None:
                 users = self.recognizeParallel(self.process_recognize, humans)
