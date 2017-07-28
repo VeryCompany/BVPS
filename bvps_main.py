@@ -8,12 +8,14 @@ from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD, CameraType
 from bvps.camera.trainer import HumanModelTrainer
+from rpsc.start import serverStart
 
 import cv2
 
 try:
 
     asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
+    serverStart(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,

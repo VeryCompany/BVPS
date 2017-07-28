@@ -31,6 +31,24 @@ def userComeOut(userId):
     ControlCenter.humanOutShop(userId, str(datetime.now()))
     return str(userId) + " 出店"
 
+@app.route("/user/rssis",methods=["POST"])
+def userRssis():
+    userId = None
+    rssis = None
+    rssitime = None
+
+    usermsg = request.values
+    if usermsg.has_key("userId"):
+        userId = usermsg["userId"]
+    if usermsg.has_key("time"):
+        rssitime = int(usermsg["time"]) /1000
+    if usermsg.has_key("rssis"):
+        rssis = usermsg["rssis"]
+
+    print userId, rssis, rssitime
+
+    return Response("{\"message\": \"success\"}",mimetype='application/json;charset=utf-8')
+
 @app.route("/user/userloc",methods=["POST"])
 def userLoc():
     # print "userId->:",request.form['userId']

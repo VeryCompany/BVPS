@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from thespian.actors import ActorTypeDispatcher
 from rpsc.models import HumanModel, ShoppingCartProductModel
-# from rpsc.controls import ControlCenter
 from rpsc.actors.core import *
+
+from bvps.config import cameras
+from bvps.camera.camera import Camera, CameraType, CameraCmd, CameraCmdType
 
 class HumanActor(ActorTypeDispatcher):
 
@@ -65,7 +67,12 @@ class HumanActor(ActorTypeDispatcher):
             print "用户:", humanId, "在[", time, "]进入超市", type(humanId)
             coreActor = self.getCoreActor()
             self.send(coreActor, UserEvent(humanId, "in"))
-            # ControlCenter.asys.tell(ControlCenter.coreActor, UserEvent(humanId, "in"))
+
+            for camId, params in cameras.items():
+                if params.has_key("cameraType") and params["cameraType"] == CameraType.CAPTURE:
+                    cam = self.createActor(Camera, globalName=camId)
+                    self.send(cam, CameraCmd(CameraCmdType.TRAINOR_START, camId, params))
+
         else:
             print "存在用户:", humanId
 

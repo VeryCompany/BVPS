@@ -75,7 +75,6 @@ cameras = {
         }
     },
     "camera3": {
-        "groupId":"group_1",
         "parameters":{
             "x": "",
             "y": "",
