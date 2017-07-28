@@ -41,7 +41,6 @@ class TrainingServer(multiprocessing.Process):
             """
             接收N张照片，如果接收到足够数量的样本，返回消息
             """
-            log.info("-------------------")
             message = self.in_queue.get()
             human = message[0][0]
             uid = message[1]
@@ -77,17 +76,17 @@ class TrainingServer(multiprocessing.Process):
             uids.extend([uid for x in range(len(imgs))])
         self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         return self.svm
-        
+
 class CameraServer(multiprocessing.Process):
     def __init__(self, queue, cmd, user_queue, cct):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
 
-        CameraServer.trainor_queue = multiprocessing.Queue(64)
-        CameraServer.svm_queue = multiprocessing.Queue(64)
+        self.trainor_queue = multiprocessing.Queue(64)
+        self.svm_queue = multiprocessing.Queue(64)
 
-        trainoingserv = TrainingServer(CameraServer.trainor_queue,
-                                       CameraServer.svm_queue)
+        trainoingserv = TrainingServer(self.trainor_queue,
+                                       self.svm_queue)
         trainoingserv.start()
 
         self.cmd = cmd
@@ -138,10 +137,10 @@ class CameraServer(multiprocessing.Process):
                 log.info("found {} faces".format(len(humans)))
                 for human in humans:
                     # log.info(self.trainor)
-                    CameraServer.trainor_queue.put_nowait((human, uid))
-                    log.info("CameraServer.trainor_queue.qsize():{}".format(CameraServer.trainor_queue.qsize()))
-            if CameraServer.svm_queue.qsize() > 0:
-                self.recognizer.svm = CameraServer.svm_queue.get()
+                    self.trainor_queue.put_nowait((human, uid))
+                    log.info("CameraServer.trainor_queue.qsize():{}".format(self.trainor_queue.qsize()))
+            if self.svm_queue.qsize() > 0:
+                self.recognizer.svm = self.svm_queue.get()
 
             users = self.recognizeParallel(self.process_recognize, humans)
 
