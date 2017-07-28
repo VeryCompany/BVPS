@@ -40,6 +40,7 @@ class Camera(ActorTypeDispatcher):
         self.cameraServer = None
         self.cct = None
         self.cps = []
+        from bvps.camera.trainer import HumanModelTrainer
         self.trainor = self.createActor(
             HumanModelTrainer,
             targetActorRequirements=None,
