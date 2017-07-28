@@ -60,7 +60,7 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像处理服务器......".format(cmd.cameraName))
             pn = cmd.values["processNum"]
             for p in range(0, pn, 1):
-                cams = CameraServer(self.frameQueue,cmd,self,self.cct)
+                cams = CameraServer(self.processQueue,cmd,self,self.cct)
                 cams.start()
             log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
@@ -163,7 +163,7 @@ class CameraCaptureThread(threading.Thread):
                                 newframe = cv2.resize(frame,(int(w*scale),int(h*scale)))
 
                             if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((newframe,t,time.time()))
+                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.training_start_time, self.training_end_time))
                             if not self.camera.frameQueue.full():
                                 self.camera.frameQueue.put_nowait((newframe,t,time.time()))
                         last_frame_time = t

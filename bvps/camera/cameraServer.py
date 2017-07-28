@@ -32,14 +32,14 @@ class CameraServer(multiprocessing.Process):
     def run(self):
         latency = StatValue()
         while True:
-            frame, t0, secs = CameraServer.queue.get()
-            self.process_frame(frame, t0, secs)
+            frame, t0, secs, start, end = CameraServer.queue.get()
+            self.process_frame(frame, t0, secs, start, end)
             t = clock()
             latency.update(t - t0)
             log.debug("摄像头[{}]进程{}处理数据，处理耗时{:0.1f}ms...".format(
                 self.cmd.cameraName, self.pid, latency.value * 1000))
 
-    def process_frame(self, frame, t0, secs):
+    def process_frame(self, frame, t0, secs, start, end ):
         if self.camera.svm_model_updated:
             self.recognizer.svm = self.camera.svm_model
             self.camera.svm_model_updated = False
@@ -52,11 +52,11 @@ class CameraServer(multiprocessing.Process):
         """
         #log.info("探测到{}个人".format(len(humans)))
         if len(humans) > 0:
-            log.info("{}---{}--{}".format(secs,self.camera.training_start_time,self.camera.training_end_time))
-            if (self.camera.training_start_time is not None
-                    and secs > self.camera.training_start_time) and (
-                        self.camera.training_end_time is None
-                        or secs < self.camera.training_end_time):
+            log.info("{}---{}--{}".format(secs,start,end))
+            if (start is not None
+                    and secs > start) and (
+                        end is None
+                        or secs < end:
                 for human in humans:
                     self.camera.send(self.trainor, (human, self.training_uid))
                     self.camera.send(self.trainor, "发送进店照片!")
