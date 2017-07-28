@@ -49,8 +49,10 @@ class TrainingServer(multiprocessing.Process):
             log.info("receive uid:{},faces".format(uid))
             if uid == last_uid:
                 continue
-            if len(self.human_map[uid]) < tc["cap_nums"]:
+            log.info("newuser {}".format(uid))
+            if uid in self.human_map and len(self.human_map[uid]) < tc["cap_nums"]:
                 self.human_map[uid].append(human)
+                log.info("msg")
 
             log.info(
                 "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
