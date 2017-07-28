@@ -86,9 +86,7 @@ class CameraServer(multiprocessing.Process):
         self.trainor_queue = multiprocessing.Queue(64)
         self.svm_queue = multiprocessing.Queue(64)
 
-        trainoingserv = TrainingServer(self.trainor_queue,
-                                       self.svm_queue)
-        trainoingserv.start()
+
 
         self.cmd = cmd
         from bvps.camera.camera import Camera
@@ -114,6 +112,9 @@ class CameraServer(multiprocessing.Process):
 
     def run(self):
         latency = StatValue()
+        trainoingserv = TrainingServer(self.trainor_queue,
+                                       self.svm_queue)
+        trainoingserv.start()
         while True:
             frame, t0, secs, start, end, uid = CameraServer.queue.get()
             self.process_frame(frame, t0, secs, start, end, uid)
