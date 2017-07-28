@@ -80,7 +80,10 @@ class TrainingServer(multiprocessing.Process):
             for uid, imgs in hums.items():
                 if len(imgs) < tc["cap_nums"]:
                     continue
-                images.extend(imgs)
+
+                for img in imgs:
+                    log.info("msg--type:{}".format(type(img)))
+                
                 log.info("type:{}".format(type(imgs)))
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
