@@ -66,6 +66,7 @@ class CameraServer(multiprocessing.Process):
             log.info("{}---{}--{}--{}".format(secs, start, end, uid))
             if (start is not None and secs > start) and (end is None
                                                          or secs < end):
+                log.info("found {} faces".format(len(humans)))
                 for human in humans:
                     # log.info(self.trainor)
                     CameraServer.trainor_queue.put_nowait((human, uid))
@@ -109,7 +110,7 @@ class CameraServer(multiprocessing.Process):
 
 # from bvps.config import training_config as tc
 
-tc = {"cap_nums": 30}
+tc = {"cap_nums": 10}
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
@@ -146,6 +147,7 @@ class TrainingServer(multiprocessing.Process):
             human = message[0][0]
             uid = message[1]
             t0 = message[0][2]
+            log.info("receive uid:{},faces".format(uid))
             if uid == last_uid:
                 continue
             if len(self.human_map[uid]) < tc["cap_nums"]:
