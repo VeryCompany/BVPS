@@ -29,7 +29,7 @@ class CameraServer(multiprocessing.Process):
             globalName="CameraPositionActor",
             sourceHash=None)
         from bvps.camera.trainer import HumanModelTrainer
-        self.trainor = self.createActor(
+        self.trainor = camera.createActor(
             HumanModelTrainer,
             targetActorRequirements=None,
             globalName="HumanModelTrainer",
