@@ -17,7 +17,8 @@ class CameraServer(multiprocessing.Process):
         CameraServer.trainor_queue = multiprocessing.Queue(64)
         CameraServer.svm_queue = multiprocessing.Queue(64)
 
-        trainoingserv=TrainingServer(CameraServer.trainor_queue, CameraServer.svm_queue)
+        trainoingserv = TrainingServer(CameraServer.trainor_queue,
+                                       CameraServer.svm_queue)
         trainoingserv.start()
 
         self.cmd = cmd
@@ -42,7 +43,6 @@ class CameraServer(multiprocessing.Process):
         #     sourceHash=None)
         # camera.send(self.trainor,"创建培训期")
 
-
     def run(self):
         latency = StatValue()
         while True:
@@ -63,7 +63,7 @@ class CameraServer(multiprocessing.Process):
         """
         #log.info("探测到{}个人".format(len(humans)))
         if len(humans) > 0:
-            log.info("{}---{}--{}".format(secs, start, end))
+            log.info("{}---{}--{}--{}".format(secs, start, end, uid))
             if (start is not None and secs > start) and (end is None
                                                          or secs < end):
                 for human in humans:
@@ -106,25 +106,27 @@ class CameraServer(multiprocessing.Process):
             log.info(e.message)
             return human, None
 
+
 # from bvps.config import training_config as tc
 
-tc = {
-    "cap_nums":30
-}
+tc = {"cap_nums": 30}
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
 # from bvps.config import svm_param_grid as spg
 
-spg = [
-    {'C': [1, 10, 100, 1000],
-     'kernel': ['linear']},
-    {'C': [1, 10, 100, 1000],
-     'gamma': [0.001, 0.0001],
-     'kernel': ['rbf']}
-]
+spg = [{
+    'C': [1, 10, 100, 1000],
+    'kernel': ['linear']
+}, {
+    'C': [1, 10, 100, 1000],
+    'gamma': [0.001, 0.0001],
+    'kernel': ['rbf']
+}]
 
 import copy
+
+
 class TrainingServer(multiprocessing.Process):
     human_map = {}
 
@@ -132,6 +134,7 @@ class TrainingServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         self.in_queue = in_queue
         self.out_queue = out_queue
+
     def run(self):
         global tc
         last_uid = None
@@ -143,12 +146,13 @@ class TrainingServer(multiprocessing.Process):
             human = message[0][0]
             uid = message[1]
             t0 = message[0][2]
-            if uid == last_uid :
+            if uid == last_uid:
                 continue
             if len(self.human_map[uid]) < tc["cap_nums"]:
                 self.human_map[uid].append(human)
 
-            log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
+            log.info(
+                "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
             if len(self.human_map[uid]) >= tc["cap_nums"]:
 
                 self.train()
