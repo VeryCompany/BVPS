@@ -96,7 +96,7 @@ cameras = {
         "cameraType": CameraType.CAPTURE,
         "port": 10006,
         "fourcc": ('M', 'J', 'P', 'G'),
-        "processNum": 4,
+        "processNum": 1,
         "video_properties": {
             cv2.CAP_PROP_FPS: 25,
             cv2.CAP_PROP_FRAME_WIDTH: 1280,
