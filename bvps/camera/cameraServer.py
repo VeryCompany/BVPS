@@ -7,7 +7,7 @@ from bvps.camera.common import clock, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
-
+import numpy as np
 tc = {"cap_nums": 10}
 
 from sklearn.grid_search import GridSearchCV
@@ -77,7 +77,6 @@ class TrainingServer(multiprocessing.Process):
             global spg
             uids, images = [], []
             hums = copy.deepcopy(self.human_map)
-            log.info(hums)
             for uid, imgs in hums.items():
                 if len(imgs) < tc["cap_nums"]:
                     continue
@@ -85,6 +84,8 @@ class TrainingServer(multiprocessing.Process):
                 uids.extend([uid for x in range(len(imgs))])
                 log.info(images)
                 log.info(uids)
+                images = np.vstack(images)
+                uids = np.vstack(uids)
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         except Exception as e:
             log.error(e)
