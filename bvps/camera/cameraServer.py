@@ -109,7 +109,12 @@ class CameraServer(multiprocessing.Process):
             log.info(e.message)
             return human, None
 
-from bvps.config import training_config as tc
+# from bvps.config import training_config as tc
+
+tc = {
+    "cap_nums":30
+}
+
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
 from bvps.config import svm_param_grid as spg
@@ -122,6 +127,7 @@ class TrainingServer(multiprocessing.Process):
         self.in_queue = in_queue
         self.out_queue = out_queue
     def run(self):
+        global tc
         last_uid = None
         while True:
             """
