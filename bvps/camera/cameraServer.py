@@ -80,9 +80,6 @@ class TrainingServer(multiprocessing.Process):
             uids, images = [], []
             hums = copy.deepcopy(self.human_map)
             for uid, imgs in hums.items():
-                if len(imgs) < tc["cap_nums"]:
-                    continue
-
                 for img in imgs:
                     log.info("msg--type:{}".format(type(img)))
                     images.append(img.flatten())
