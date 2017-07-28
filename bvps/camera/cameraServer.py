@@ -54,9 +54,6 @@ class CameraServer(multiprocessing.Process):
                 self.cmd.cameraName, self.pid, latency.value * 1000))
 
     def process_frame(self, frame, t0, secs, start, end, uid):
-        if self.camera.svm_model_updated:
-            self.recognizer.svm = self.camera.svm_model
-            self.camera.svm_model_updated = False
         humans = self.detector.detect_humans(self.cmd.cameraName, frame, t0,
                                              secs)
         #if self.camera. startTrainning():
