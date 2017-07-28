@@ -94,7 +94,7 @@ cameras = {
         "user": "",
         "password": "",
         "cameraType": CameraType.CAPTURE,
-        "port": 10005,
+        "port": 10006,
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
         "video_properties": {
