@@ -35,16 +35,36 @@ class TrainingServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         TrainingServer.in_queue = in_queue
         TrainingServer.out_queue = out_queue
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
-        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
+        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
+        [ 18,  16,  20],
+        [ 24,  22,  27]]]))
     def run(self):
         global tc
         last_uid = None
@@ -96,7 +116,7 @@ class TrainingServer(multiprocessing.Process):
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
 
-            X = np.array(images)
+            X = np.vstack(images)
             y = np.array(uids)
             log.info("typeX:{}---typey:{}---lenx:{},leny:{}".format(type(X),type(y),len(X),len(y)))
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
