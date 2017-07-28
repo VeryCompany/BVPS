@@ -9,8 +9,6 @@ from bvps.camera.common import clock, draw_str, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
-from bvps.system.position_actor import PositionActor
-
 
 class CameraServer(multiprocessing.Process):
     def __init__(self, queue, cmd, camera, cct):
@@ -23,6 +21,7 @@ class CameraServer(multiprocessing.Process):
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
+        from bvps.system.position_actor import PositionActor
         position = camera.createActor(
             PositionActor,
             targetActorRequirements=None,
