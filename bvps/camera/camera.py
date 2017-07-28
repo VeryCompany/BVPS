@@ -53,7 +53,7 @@ class Camera(ActorTypeDispatcher):
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-            threading.Thread(target=self.process_user,args=(Camera.user_queue,self.pa,))
+            threading.Thread(target=self.process_user,args=(Camera.user_queue,))
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
@@ -95,10 +95,10 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_PositionActorMsg(self, cmd, sender):
         pass
 
-    def process_user(self,uq,ps):
+    def process_user(self,uq):
         while true:
             um = qu.get()
-            self.send(ps,um)
+            self.send(self.pa,um)
 
 
 from bvps.camera.detectorthread import HumanDetector as detector
