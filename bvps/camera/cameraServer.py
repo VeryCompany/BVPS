@@ -39,7 +39,7 @@ class CameraServer(multiprocessing.Process):
             log.debug("摄像头[{}]进程{}处理数据，处理耗时{:0.1f}ms...".format(
                 self.cmd.cameraName, self.pid, latency.value * 1000))
 
-    def process_frame(self, frame, t0, secs, start, end ):
+    def process_frame(self, frame, t0, secs, start, end):
         if self.camera.svm_model_updated:
             self.recognizer.svm = self.camera.svm_model
             self.camera.svm_model_updated = False
@@ -52,11 +52,9 @@ class CameraServer(multiprocessing.Process):
         """
         #log.info("探测到{}个人".format(len(humans)))
         if len(humans) > 0:
-            log.info("{}---{}--{}".format(secs,start,end))
-            if (start is not None
-                    and secs > start) and (
-                        end is None
-                        or secs < end:
+            log.info("{}---{}--{}".format(secs, start, end))
+            if (start is not None and secs > start) and (end is None
+                                                         or secs < end):
                 for human in humans:
                     self.camera.send(self.trainor, (human, self.training_uid))
                     self.camera.send(self.trainor, "发送进店照片!")
@@ -82,8 +80,7 @@ class CameraServer(multiprocessing.Process):
         try:
             t0 = human[2]
             secs = human[3]
-            uid = self.recognizer.whoru(
-                human)
+            uid = self.recognizer.whoru(human)
             #if self.recognizer.svm is not None else None
             log.info("摄像头{}识别用户id：{},x:{},y:{}".format(
                 self.cmd.cameraName, uid, human[0][1], human[0][2]))
