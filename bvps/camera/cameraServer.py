@@ -8,7 +8,76 @@ from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
 
+tc = {"cap_nums": 10}
 
+from sklearn.grid_search import GridSearchCV
+from sklearn.svm import SVC
+# from bvps.config import svm_param_grid as spg
+
+spg = [{
+    'C': [1, 10, 100, 1000],
+    'kernel': ['linear']
+}, {
+    'C': [1, 10, 100, 1000],
+    'gamma': [0.001, 0.0001],
+    'kernel': ['rbf']
+}]
+
+import copy
+
+
+class TrainingServer(multiprocessing.Process):
+    human_map = {}
+
+    def __init__(self, in_queue, out_queue):
+        multiprocessing.Process.__init__(self)
+        self.in_queue = in_queue
+        self.out_queue = out_queue
+
+    def run(self):
+        global tc
+        last_uid = None
+        while True:
+            """
+            接收N张照片，如果接收到足够数量的样本，返回消息
+            """
+            log.info("-------------------")
+            message = self.in_queue.get()
+            human = message[0][0]
+            uid = message[1]
+            t0 = message[0][2]
+            log.info("receive uid:{},faces".format(uid))
+            if uid == last_uid:
+                continue
+            if len(self.human_map[uid]) < tc["cap_nums"]:
+                self.human_map[uid].append(human)
+
+            log.info(
+                "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
+            if len(self.human_map[uid]) >= tc["cap_nums"]:
+
+                self.train()
+                self.out_queue.put_nowait(self.svm)
+                last_uid = uid
+                # self.send(sender,
+                #           TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
+                # self.train()
+                # self.send(sender,
+                #           TrainingCMD(CameraCmdType.MODEL_UPDATED, self.svm))
+            # 训练不应该在这里！
+
+    def train(self):
+        global spg
+        uids, images = [], []
+        hums = copy.deepcopy(self.human_map)
+        for uid, imgs in hums:
+            if len(imgs) < tc["cap_nums"]:
+                continue
+            images.extend(imgs)
+            uids.extend([uid for x in range(len(imgs))])
+        self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
+        return self.svm
+        
 class CameraServer(multiprocessing.Process):
     def __init__(self, queue, cmd, user_queue, cct):
         multiprocessing.Process.__init__(self)
@@ -110,73 +179,3 @@ class CameraServer(multiprocessing.Process):
 
 
 # from bvps.config import training_config as tc
-
-tc = {"cap_nums": 10}
-
-from sklearn.grid_search import GridSearchCV
-from sklearn.svm import SVC
-# from bvps.config import svm_param_grid as spg
-
-spg = [{
-    'C': [1, 10, 100, 1000],
-    'kernel': ['linear']
-}, {
-    'C': [1, 10, 100, 1000],
-    'gamma': [0.001, 0.0001],
-    'kernel': ['rbf']
-}]
-
-import copy
-
-
-class TrainingServer(multiprocessing.Process):
-    human_map = {}
-
-    def __init__(self, in_queue, out_queue):
-        multiprocessing.Process.__init__(self)
-        self.in_queue = in_queue
-        self.out_queue = out_queue
-
-    def run(self):
-        global tc
-        last_uid = None
-        while True:
-            """
-            接收N张照片，如果接收到足够数量的样本，返回消息
-            """
-            log.info("-------------------")
-            message = self.in_queue.get()
-            human = message[0][0]
-            uid = message[1]
-            t0 = message[0][2]
-            log.info("receive uid:{},faces".format(uid))
-            if uid == last_uid:
-                continue
-            if len(self.human_map[uid]) < tc["cap_nums"]:
-                self.human_map[uid].append(human)
-
-            log.info(
-                "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
-            if len(self.human_map[uid]) >= tc["cap_nums"]:
-
-                self.train()
-                self.out_queue.put_nowait(self.svm)
-                last_uid = uid
-                # self.send(sender,
-                #           TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
-                # self.train()
-                # self.send(sender,
-                #           TrainingCMD(CameraCmdType.MODEL_UPDATED, self.svm))
-            # 训练不应该在这里！
-
-    def train(self):
-        global spg
-        uids, images = [], []
-        hums = copy.deepcopy(self.human_map)
-        for uid, imgs in hums:
-            if len(imgs) < tc["cap_nums"]:
-                continue
-            images.extend(imgs)
-            uids.extend([uid for x in range(len(imgs))])
-        self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
-        return self.svm
