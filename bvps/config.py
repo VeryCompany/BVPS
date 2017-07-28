@@ -14,7 +14,7 @@ svm_param_grid = [
 ]
 """摄像头配置信息"""
 cameras = {
-    "camera4": {
+    "camera1": {
         "groupId":"group_1",
         "parameters":{
             "x": "",
@@ -31,7 +31,7 @@ cameras = {
             "camera_matrix":[]
         },
         "scale":1.0/2.0,
-        "device": "rtsp://192.168.0.198:554",
+        "device": "rtsp://192.168.0.81:554",
         "user": "",
         "password": "",
         "cameraType": CameraType.POSITION,
@@ -44,7 +44,7 @@ cameras = {
             cv2.CAP_PROP_FRAME_HEIGHT: 720
         }
     },
-    "camera5": {
+    "camera2": {
         "groupId":"group_1",
         "parameters":{
             "x": "",
@@ -61,10 +61,40 @@ cameras = {
             "camera_matrix":[]
         },
         "scale":1.0/2.0,
-        "device": "rtsp://192.168.0.114:554",
+        "device": "rtsp://192.168.0.82:554",
         "user": "",
         "password": "",
         "cameraType": CameraType.POSITION,
+        "port": 10005,
+        "fourcc": ('M', 'J', 'P', 'G'),
+        "processNum": 4,
+        "video_properties": {
+            cv2.CAP_PROP_FPS: 25,
+            cv2.CAP_PROP_FRAME_WIDTH: 1280,
+            cv2.CAP_PROP_FRAME_HEIGHT: 720
+        }
+    },
+    "camera3": {
+        "groupId":"group_1",
+        "parameters":{
+            "x": "",
+            "y": "",
+            "z": "",
+            "angle_x":0,
+            "angle_y":0,
+            "angle_z":0,
+            "focallength": 6,
+            "sensor_width":4.8,
+            "sensor_height":2.7,
+            "pixel_mm":0.00375,
+            "distortion_ceof":{},
+            "camera_matrix":[]
+        },
+        "scale":1.0/2.0,
+        "device": "rtsp://192.168.0.80:554",
+        "user": "",
+        "password": "",
+        "cameraType": CameraType.CAPTURE,
         "port": 10005,
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,

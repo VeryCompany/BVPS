@@ -75,9 +75,7 @@ class Camera(ActorTypeDispatcher):
             self.send(self.trainor,"训练器初始化ok!")
         elif cmd.cctype == CameraCmdType.TRAINOR_START:
             self.training_start_time = cmd.msg
-            self.training_uid = cmd.uid
-        elif cmd.cctype == CameraCmdType.TRAINOR_END:
-            self.training_end_time = cmd.msg
+            self.training_end_time = cmd.msg + 5
             self.training_uid = cmd.uid
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
             self.training_start_time, self.training_end_time = None,None
