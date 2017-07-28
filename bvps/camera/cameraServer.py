@@ -96,7 +96,7 @@ class TrainingServer(multiprocessing.Process):
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
 
-            X = np.vstack(images)
+            X = np.array(images)
             y = np.array(uids)
             log.info("typeX:{}---typey:{}---lenx:{},leny:{}".format(type(X),type(y),len(X),len(y)))
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
