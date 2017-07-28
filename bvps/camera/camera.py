@@ -40,6 +40,11 @@ class Camera(ActorTypeDispatcher):
         self.cameraServer = None
         self.cct = None
         self.cps = []
+        self.trainor = self.createActor(
+            HumanModelTrainer,
+            targetActorRequirements=None,
+            globalName="HumanModelTrainer",
+            sourceHash=None)
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
@@ -70,10 +75,7 @@ class Camera(ActorTypeDispatcher):
             self.send(sender, "camera stopped!")
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
-        if cmd.cctype == CameraCmdType.TRAINOR_INIT:
-            self.trainor = cmd.msg
-            self.send(self.trainor,"训练器初始化ok!")
-        elif cmd.cctype == CameraCmdType.TRAINOR_START:
+        if cmd.cctype == CameraCmdType.TRAINOR_START:
             self.training_start_time = int(cmd.msg)
             self.training_end_time = int(cmd.msg + 10)
             self.training_uid = cmd.uid
