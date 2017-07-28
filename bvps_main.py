@@ -14,7 +14,7 @@ import cv2
 
 try:
 
-    asys = ActorSystem(systemBase="multiprocTCPBase", logDefs=logcfg)
+    asys = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
     serverStart(asys)
     sa = asys.createActor(
         SystemActor,
