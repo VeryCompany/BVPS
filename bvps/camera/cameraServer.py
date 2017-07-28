@@ -4,7 +4,7 @@ import os
 import logging as log
 import multiprocessing
 import cv2
-from thespian.actors import ActorSystem
+
 from bvps.camera.common import clock, draw_str, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
@@ -12,36 +12,45 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 
 class CameraServer(multiprocessing.Process):
+
+    position = None
+    trainor = None
+
     def __init__(self, queue, cmd, camera, cct):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
         self.cmd = cmd
-        asys = ActorSystem(systemBase="multiprocUDPBase")
-        log.info(asys)
-        self.camera = asys.createActor(
-            Camera,
-            targetActorRequirements=None,
-            globalName=camera.cameraId,
-            sourceHash=None)
+        self.camera = camera
         self.cct = cct
         self.detector = detector()
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
+
         from bvps.system.position_actor import PositionActor
-        self.position = asys.createActor(
+        self.position = camera.createActor(
             PositionActor,
             targetActorRequirements=None,
             globalName="CameraPositionActor",
             sourceHash=None)
-        from bvps.camera.trainer import HumanModelTrainer
-        self.trainor = asys.createActor(
-            HumanModelTrainer,
-            targetActorRequirements=None,
-            globalName="HumanModelTrainer",
-            sourceHash=None)
-        camera.send(self.trainor,"创建培训期")
+        # from bvps.camera.trainer import HumanModelTrainer
+        # self.trainor = camera.createActor(
+        #     HumanModelTrainer,
+        #     targetActorRequirements=None,
+        #     globalName="HumanModelTrainer",
+        #     sourceHash=None)
+        # camera.send(self.trainor,"创建培训期")
 
+    def getTrainorActor(self):
+        if self.trainor is None:
+            from bvps.camera.trainer import HumanModelTrainer
+            self.trainor = self.camera.createActor(
+                HumanModelTrainer,
+                targetActorRequirements=None,
+                globalName="HumanModelTrainer",
+                sourceHash=None)
+            self.camera.send(self.trainor, "创建培训期")
+        return self.trainor
 
     def run(self):
         latency = StatValue()
@@ -72,7 +81,7 @@ class CameraServer(multiprocessing.Process):
                 for human in humans:
                     log.info(self.trainor)
                     #self.camera.send(self.trainor, (human, self.training_uid))
-                    self.camera.send(self.trainor, "发送进店照片!")
+                    self.camera.send(self.getTrainorActor(), "发送进店照片!")
                     #log.info(human)
             if self.camera.svm_model is not None:
                 users = self.recognizeParallel(self.process_recognize, humans)
