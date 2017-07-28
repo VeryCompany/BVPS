@@ -31,8 +31,8 @@ class TrainingServer(multiprocessing.Process):
 
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self)
-        self.in_queue = in_queue
-        self.out_queue = out_queue
+        TrainingServer.in_queue = in_queue
+        TrainingServer.out_queue = out_queue
 
     def run(self):
         global tc
@@ -41,7 +41,8 @@ class TrainingServer(multiprocessing.Process):
             """
             接收N张照片，如果接收到足够数量的样本，返回消息
             """
-            message = self.in_queue.get()
+            log.info("-------------------")
+            message = TrainingServer.in_queue.get()
             human = message[0][0]
             uid = message[1]
             t0 = message[0][2]
@@ -56,7 +57,7 @@ class TrainingServer(multiprocessing.Process):
             if len(self.human_map[uid]) >= tc["cap_nums"]:
 
                 self.train()
-                self.out_queue.put_nowait(self.svm)
+                TrainingServer.out_queue.put_nowait(self.svm)
                 last_uid = uid
                 # self.send(sender,
                 #           TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
@@ -137,10 +138,10 @@ class CameraServer(multiprocessing.Process):
                 log.info("found {} faces".format(len(humans)))
                 for human in humans:
                     # log.info(self.trainor)
-                    self.trainor_queue.put_nowait((human, uid))
-                    log.info("CameraServer.trainor_queue.qsize():{}".format(self.trainor_queue.qsize()))
-            if self.svm_queue.qsize() > 0:
-                self.recognizer.svm = self.svm_queue.get()
+                    CameraServer.trainor_queue.put_nowait((human, uid))
+                    log.info("CameraServer.trainor_queue.qsize():{}".format(CameraServer.trainor_queue.qsize()))
+            if CameraServer.svm_queue.qsize() > 0:
+                self.recognizer.svm = CameraServer.svm_queue.get()
 
             users = self.recognizeParallel(self.process_recognize, humans)
 
