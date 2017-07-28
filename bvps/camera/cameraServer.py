@@ -16,12 +16,7 @@ class CameraServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
         self.cmd = cmd
-        from bvps.camera.camera import Camera
-        self.camera = camera.createActor(
-            Camera,
-            targetActorRequirements=None,
-            globalName=camera.cameraId,
-            sourceHash=None)
+
         self.cct = cct
         self.detector = detector()
         self.recognizer = recognizer(None)
@@ -40,7 +35,12 @@ class CameraServer(multiprocessing.Process):
             globalName="HumanModelTrainer",
             sourceHash=None)
         camera.send(self.trainor,"创建培训期")
-
+        from bvps.camera.camera import Camera
+        self.camera = self.position.createActor(
+            Camera,
+            targetActorRequirements=None,
+            globalName=camera.cameraId,
+            sourceHash=None)
 
     def run(self):
         latency = StatValue()
