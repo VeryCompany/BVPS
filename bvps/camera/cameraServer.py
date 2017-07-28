@@ -59,9 +59,10 @@ class TrainingServer(multiprocessing.Process):
             log.info(
                 "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
             if len(self.human_map[uid]) >= tc["cap_nums"]:
-
+                log.info("开始训练样品。。。")
                 self.train()
                 log.info(self.svm)
+                log.info("训练样本完成。。。")
                 TrainingServer.out_queue.put_nowait(self.svm)
                 last_uid = uid
                 # self.send(sender,
