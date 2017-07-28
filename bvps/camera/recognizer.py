@@ -28,6 +28,8 @@ class OpenFaceRecognizer(object):
     def __init__(self,svm):
         self.svm = svm
     def whoru(self,human):
+        if self.svm is None:
+            return None
         face = human[1][0]
         rep = net.forward(face)
         identity = self.svm.predict(rep)[0]
