@@ -50,7 +50,9 @@ class TrainingServer(multiprocessing.Process):
             if uid == last_uid:
                 continue
             log.info("newuser {}".format(uid))
-            if uid in self.human_map and len(self.human_map[uid]) < tc["cap_nums"]:
+            if uid not in self.human_map:
+                self.human_map[uid] = []
+            if len(self.human_map[uid]) < tc["cap_nums"]:
                 self.human_map[uid].append(human)
                 log.info("msg")
 
