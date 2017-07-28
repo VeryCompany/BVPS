@@ -37,7 +37,7 @@ logcfg = {
             # 'encoding':'utf-8',
             'formatter': 'normal',
             'filters': ['notActorLog'],
-            'level': logging.INFO
+            'level': logging.DEBUG
         },
         'h2': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
@@ -45,17 +45,17 @@ logcfg = {
             # 'encoding':'utf-8',
             'formatter': 'actor',
             'filters': ['isActorLog'],
-            'level': logging.INFO
+            'level': logging.DEBUG
         },
         'h3':{
             'class': 'logging.StreamHandler',
-            'level': logging.INFO
+            'level': logging.DEBUG
         }
     },
     'loggers': {
         '': {
             'handlers': ['h1', 'h2'],
-            'level': logging.INFO
+            'level': logging.DEBUG
         }
     }
 }
