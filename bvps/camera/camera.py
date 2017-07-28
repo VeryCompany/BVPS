@@ -39,12 +39,6 @@ class Camera(ActorTypeDispatcher):
         self.cameraServer = None
         self.cct = None
         self.cps = []
-        from bvps.system.position_actor import PositionActor
-        self.pa = self.createActor(
-            PositionActor,
-            targetActorRequirements=None,
-            globalName="CameraPositionActor",
-            sourceHash=None)
 
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
@@ -70,6 +64,14 @@ class Camera(ActorTypeDispatcher):
                 cams = CameraServer(self.processQueue,cmd,Camera.user_queue,self.cct)
                 cams.start()
             log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
+
+            from bvps.system.position_actor import PositionActor
+            self.pa = self.createActor(
+                PositionActor,
+                targetActorRequirements=None,
+                globalName="CameraPositionActor",
+                sourceHash=None)
+
             userThread = threading.Thread(target=self.process_user, args=(Camera.user_queue,))
             userThread.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
