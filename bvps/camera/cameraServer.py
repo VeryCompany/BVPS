@@ -83,7 +83,7 @@ class TrainingServer(multiprocessing.Process):
 
                 for img in imgs:
                     log.info("msg--type:{}".format(type(img)))
-                    images.append(img)
+                    images.append(img.flatten())
                 log.info("type:{}".format(type(imgs)))
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
