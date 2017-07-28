@@ -138,10 +138,10 @@ class CameraServer(multiprocessing.Process):
                 log.info("found {} faces".format(len(humans)))
                 for human in humans:
                     # log.info(self.trainor)
-                    CameraServer.trainor_queue.put_nowait((human, uid))
-                    log.info("CameraServer.trainor_queue.qsize():{}".format(CameraServer.trainor_queue.qsize()))
-            if CameraServer.svm_queue.qsize() > 0:
-                self.recognizer.svm = CameraServer.svm_queue.get()
+                    self.trainor_queue.put_nowait((human, uid))
+                    log.info("self.trainor_queue.qsize():{}".format(self.trainor_queue.qsize()))
+            if self.svm_queue.qsize() > 0:
+                self.recognizer.svm = self.svm_queue.get()
 
             users = self.recognizeParallel(self.process_recognize, humans)
 
