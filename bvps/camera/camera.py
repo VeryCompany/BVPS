@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from thespian.actors import *
-import numpy as np
 import cv2
 import threading
 from enum import Enum
 from bvps.camera.common import clock, draw_str, StatValue
-from thespian.troupe import troupe
-from bvps.camera.videoRecord import VideoRecord
 import multiprocessing
 #需要支持网络摄像头和本地USB摄像头
 import logging as log
-import sys, traceback
+import sys
 from bvps.camera.cameraServer import CameraServer
 import time
 
@@ -42,6 +39,7 @@ class Camera(ActorTypeDispatcher):
         self.cameraServer = None
         self.cct = None
         self.cps = []
+        from bvps.system.position_actor import PositionActor
         self.pa = self.createActor(
             PositionActor,
             targetActorRequirements=None,
@@ -96,8 +94,8 @@ class Camera(ActorTypeDispatcher):
         pass
 
     def process_user(self,uq):
-        while true:
-            um = qu.get()
+        while True:
+            um = uq.get()
             self.send(self.pa,um)
 
 

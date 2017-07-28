@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-import sys
-import os
 import logging as log
 import multiprocessing
 import cv2
 
-from bvps.camera.common import clock, draw_str, StatValue
+from bvps.camera.common import clock, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
@@ -19,7 +17,7 @@ class CameraServer(multiprocessing.Process):
         CameraServer.trainor_queue = multiprocessing.Queue(64)
         CameraServer.svm_queue = multiprocessing.Queue(64)
 
-        trainoingserv=TrainingServer(trainor_queue, svm_queue)
+        trainoingserv=TrainingServer(CameraServer.trainor_queue, CameraServer.svm_queue)
         trainoingserv.start()
 
         self.cmd = cmd
@@ -30,19 +28,19 @@ class CameraServer(multiprocessing.Process):
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
-        from bvps.system.position_actor import PositionActor
-        self.position = camera.createActor(
-            PositionActor,
-            targetActorRequirements=None,
-            globalName="CameraPositionActor",
-            sourceHash=None)
-        from bvps.camera.trainer import HumanModelTrainer
-        self.trainor = camera.createActor(
-            HumanModelTrainer,
-            targetActorRequirements=None,
-            globalName="HumanModelTrainer",
-            sourceHash=None)
-        camera.send(self.trainor,"创建培训期")
+        # from bvps.system.position_actor import PositionActor
+        # self.position = camera.createActor(
+        #     PositionActor,
+        #     targetActorRequirements=None,
+        #     globalName="CameraPositionActor",
+        #     sourceHash=None)
+        # from bvps.camera.trainer import HumanModelTrainer
+        # self.trainor = camera.createActor(
+        #     HumanModelTrainer,
+        #     targetActorRequirements=None,
+        #     globalName="HumanModelTrainer",
+        #     sourceHash=None)
+        # camera.send(self.trainor,"创建培训期")
 
 
     def run(self):
@@ -72,10 +70,10 @@ class CameraServer(multiprocessing.Process):
             if (start is not None and secs > start) and (end is None
                                                          or secs < end):
                 for human in humans:
-                    log.info(self.trainor)
+                    # log.info(self.trainor)
                     CameraServer.trainor_queue.put_nowait((human, uid))
-            if self.svm_queue.qsize() > 0:
-                self.recognizer.svm = self.svm_queue.get()
+            if CameraServer.svm_queue.qsize() > 0:
+                self.recognizer.svm = CameraServer.svm_queue.get()
 
             users = self.recognizeParallel(self.process_recognize, humans)
 
@@ -112,6 +110,10 @@ class CameraServer(multiprocessing.Process):
             return human, None
 
 from bvps.config import training_config as tc
+from sklearn.grid_search import GridSearchCV
+from sklearn.svm import SVC
+from bvps.config import svm_param_grid as spg
+import copy
 class TrainingServer(multiprocessing.Process):
     human_map = {}
 
