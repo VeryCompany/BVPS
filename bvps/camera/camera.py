@@ -29,6 +29,7 @@ class Camera(ActorTypeDispatcher):
     svm_model_updated = False
     training_started = False
     training_start_time,training_end_time =None,None
+    training_uid = None
     def __init__(self, *args, **kw):
         super(Camera, self).__init__(*args, **kw)
         self.frameQueue = multiprocessing.Queue(64)
