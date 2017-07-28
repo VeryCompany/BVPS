@@ -73,17 +73,19 @@ class TrainingServer(multiprocessing.Process):
             # 训练不应该在这里！
 
     def train(self):
-        global spg
-        uids, images = [], []
-        hums = copy.deepcopy(self.human_map)
-        for uid, imgs in hums:
-            if len(imgs) < tc["cap_nums"]:
-                continue
-            images.extend(imgs)
-            uids.extend([uid for x in range(len(imgs))])
-        self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
-        return self.svm
-
+        try：
+            global spg
+            uids, images = [], []
+            hums = copy.deepcopy(self.human_map)
+            for uid, imgs in hums:
+                if len(imgs) < tc["cap_nums"]:
+                    continue
+                images.extend(imgs)
+                uids.extend([uid for x in range(len(imgs))])
+            self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
+        except Exception as e:
+            log.error(e)
+        
 class CameraServer(multiprocessing.Process):
     def __init__(self, queue, cmd, user_queue, cct):
         multiprocessing.Process.__init__(self)
