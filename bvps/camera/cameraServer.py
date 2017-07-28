@@ -4,7 +4,7 @@ import os
 import logging as log
 import multiprocessing
 import cv2
-
+from thespian.actors import ActorSystem
 from bvps.camera.common import clock, draw_str, StatValue
 from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
@@ -16,31 +16,32 @@ class CameraServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
         self.cmd = cmd
-
+        asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
+        log.info(asys)
+        self.camera = asys.createActor(
+            Camera,
+            targetActorRequirements=None,
+            globalName=camera.cameraId,
+            sourceHash=None)
         self.cct = cct
         self.detector = detector()
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
         from bvps.system.position_actor import PositionActor
-        self.position = camera.createActor(
+        self.position = asys.createActor(
             PositionActor,
             targetActorRequirements=None,
             globalName="CameraPositionActor",
             sourceHash=None)
         from bvps.camera.trainer import HumanModelTrainer
-        self.trainor = camera.createActor(
+        self.trainor = asys.createActor(
             HumanModelTrainer,
             targetActorRequirements=None,
             globalName="HumanModelTrainer",
             sourceHash=None)
         camera.send(self.trainor,"创建培训期")
-        from bvps.camera.camera import Camera
-        self.camera = self.position.createActor(
-            Camera,
-            targetActorRequirements=None,
-            globalName=camera.cameraId,
-            sourceHash=None)
+
 
     def run(self):
         latency = StatValue()
