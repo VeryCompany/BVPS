@@ -16,7 +16,7 @@ class CameraServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
         self.cmd = cmd
-        asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
+        asys = ActorSystem(systemBase="multiprocUDPBase")
         log.info(asys)
         self.camera = asys.createActor(
             Camera,
