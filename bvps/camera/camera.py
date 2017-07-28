@@ -163,7 +163,7 @@ class CameraCaptureThread(threading.Thread):
                                 newframe = cv2.resize(frame,(int(w*scale),int(h*scale)))
 
                             if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.training_start_time, self.training_end_time))
+                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.camera.training_start_time, self.camera.training_end_time))
                             if not self.camera.frameQueue.full():
                                 self.camera.frameQueue.put_nowait((newframe,t,time.time()))
                         last_frame_time = t
