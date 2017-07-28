@@ -12,57 +12,50 @@ from multiprocessing.dummy import Pool as ThreadPool
 
 
 class CameraServer(multiprocessing.Process):
-
-    position = None
-    trainor = None
-
-    def __init__(self, queue, cmd, camera, cct):
+    def __init__(self, queue, cmd, user_queue, cct):
         multiprocessing.Process.__init__(self)
         CameraServer.queue = queue
+
+        CameraServer.trainor_queue = multiprocessing.Queue(64)
+        CameraServer.svm_queue = multiprocessing.Queue(64)
+
+        trainoingserv=TrainingServer(trainor_queue, svm_queue)
+        trainoingserv.start()
+
         self.cmd = cmd
-        self.camera = camera
+        from bvps.camera.camera import Camera
+        self.user_queue = user_queue
         self.cct = cct
         self.detector = detector()
         self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
-
         from bvps.system.position_actor import PositionActor
         self.position = camera.createActor(
             PositionActor,
             targetActorRequirements=None,
             globalName="CameraPositionActor",
             sourceHash=None)
-        # from bvps.camera.trainer import HumanModelTrainer
-        # self.trainor = camera.createActor(
-        #     HumanModelTrainer,
-        #     targetActorRequirements=None,
-        #     globalName="HumanModelTrainer",
-        #     sourceHash=None)
-        # camera.send(self.trainor,"创建培训期")
+        from bvps.camera.trainer import HumanModelTrainer
+        self.trainor = camera.createActor(
+            HumanModelTrainer,
+            targetActorRequirements=None,
+            globalName="HumanModelTrainer",
+            sourceHash=None)
+        camera.send(self.trainor,"创建培训期")
 
-    def getTrainorActor(self):
-        if self.trainor is None:
-            from bvps.camera.trainer import HumanModelTrainer
-            self.trainor = self.camera.createActor(
-                HumanModelTrainer,
-                targetActorRequirements=None,
-                globalName="HumanModelTrainer",
-                sourceHash=None)
-            self.camera.send(self.trainor, "创建培训期")
-        return self.trainor
 
     def run(self):
         latency = StatValue()
         while True:
-            frame, t0, secs, start, end = CameraServer.queue.get()
-            self.process_frame(frame, t0, secs, start, end)
+            frame, t0, secs, start, end, uid = CameraServer.queue.get()
+            self.process_frame(frame, t0, secs, start, end, uid)
             t = clock()
             latency.update(t - t0)
             log.debug("摄像头[{}]进程{}处理数据，处理耗时{:0.1f}ms...".format(
                 self.cmd.cameraName, self.pid, latency.value * 1000))
 
-    def process_frame(self, frame, t0, secs, start, end):
+    def process_frame(self, frame, t0, secs, start, end, uid):
         if self.camera.svm_model_updated:
             self.recognizer.svm = self.camera.svm_model
             self.camera.svm_model_updated = False
@@ -80,11 +73,11 @@ class CameraServer(multiprocessing.Process):
                                                          or secs < end):
                 for human in humans:
                     log.info(self.trainor)
-                    #self.camera.send(self.trainor, (human, self.training_uid))
-                    self.camera.send(self.getTrainorActor(), "发送进店照片!")
-                    #log.info(human)
-            if self.camera.svm_model is not None:
-                users = self.recognizeParallel(self.process_recognize, humans)
+                    CameraServer.trainor_queue.put_nowait((human, uid))
+            if self.svm_queue.qsize() > 0:
+                self.recognizer.svm = self.svm_queue.get()
+
+            users = self.recognizeParallel(self.process_recognize, humans)
 
     def recognizeParallel(self, method, humans):
         """多线程并行运算，提高运算速度"""
@@ -112,8 +105,55 @@ class CameraServer(multiprocessing.Process):
             if uid is not None:
                 msg = (self.cmd.cameraName, uid, human[0][1], human[0][2],
                        human[0][0], self.cct.resolution, 0, int(secs))
-                self.camera.send(self.position, msg)
+                self.user_queue.put_nowait(msg)
             return human, uid
         except Exception, e:
             log.info(e.message)
             return human, None
+
+from bvps.config import training_config as tc
+class TrainingServer(multiprocessing.Process):
+    human_map = {}
+
+    def __init__(self, in_queue, out_queue):
+        multiprocessing.Process.__init__(self)
+        self.in_queue = in_queue
+        self.out_queue = out_queue
+    def run(self):
+        last_uid = None
+        while True:
+            """
+            接收N张照片，如果接收到足够数量的样本，返回消息
+            """
+            message = self.in_queue.get()
+            human = message[0][0]
+            uid = message[1]
+            t0 = message[0][2]
+            if uid == last_uid :
+                continue
+            if len(self.human_map[uid]) < tc["cap_nums"]:
+                self.human_map[uid].append(human)
+
+            log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
+            if len(self.human_map[uid]) >= tc["cap_nums"]:
+
+                self.train()
+                self.out_queue.put_nowait(self.svm)
+                last_uid = uid
+                # self.send(sender,
+                #           TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
+                # self.train()
+                # self.send(sender,
+                #           TrainingCMD(CameraCmdType.MODEL_UPDATED, self.svm))
+            # 训练不应该在这里！
+
+    def train(self):
+        uids, images = [], []
+        hums = copy.deepcopy(self.human_map)
+        for uid, imgs in hums:
+            if len(imgs) < tc["cap_nums"]:
+                continue
+            images.extend(imgs)
+            uids.extend([uid for x in range(len(imgs))])
+        self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
+        return self.svm

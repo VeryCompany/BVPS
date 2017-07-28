@@ -36,18 +36,24 @@ class Camera(ActorTypeDispatcher):
         super(Camera, self).__init__(*args, **kw)
         self.frameQueue = multiprocessing.Queue(64)
         self.processQueue = multiprocessing.Queue(64)
+
+        Camera.user_queue = multiprocessing.Queue(64)
         self.webserver = None
         self.cameraServer = None
         self.cct = None
         self.cps = []
-
+        self.pa = self.createActor(
+            PositionActor,
+            targetActorRequirements=None,
+            globalName="CameraPositionActor",
+            sourceHash=None)
 
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-
+            threading.Thread(target=self.process_user,args=(Camera.user_queue,self.pa,))
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
@@ -64,7 +70,7 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像处理服务器......".format(cmd.cameraName))
             pn = cmd.values["processNum"]
             for p in range(0, pn, 1):
-                cams = CameraServer(self.processQueue,cmd,self,self.cct)
+                cams = CameraServer(self.processQueue,cmd,Camera.user_queue,self.cct)
                 cams.start()
             log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
@@ -89,6 +95,10 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_PositionActorMsg(self, cmd, sender):
         pass
 
+    def process_user(self,uq,ps):
+        while true:
+            um = qu.get()
+            self.send(ps,um)
 
 
 from bvps.camera.detectorthread import HumanDetector as detector
@@ -164,7 +174,7 @@ class CameraCaptureThread(threading.Thread):
                                 newframe = cv2.resize(frame,(int(w*scale),int(h*scale)))
 
                             if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.camera.training_start_time, self.camera.training_end_time))
+                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.camera.training_start_time, self.camera.training_end_time,self.camera.training_uid))
                             if not self.camera.frameQueue.full():
                                 self.camera.frameQueue.put_nowait((newframe,t,time.time()))
                         last_frame_time = t
