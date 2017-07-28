@@ -52,7 +52,7 @@ class CameraServer(multiprocessing.Process):
         """
         #log.info("探测到{}个人".format(len(humans)))
         if len(humans) > 0:
-
+            log.info("{}---{}--{}".format(secs,self.camera.training_start_time,self.camera.training_end_time))
             if (self.camera.training_start_time is not None
                     and secs > self.camera.training_start_time) and (
                         self.camera.training_end_time is None
