@@ -77,6 +77,7 @@ class Camera(ActorTypeDispatcher):
             self.training_start_time = int(cmd.msg)
             self.training_end_time = int(cmd.msg + 10)
             self.training_uid = cmd.uid
+            log.info("用户{},时间{}".format(cmd.uid,cmd.msg))
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
             self.training_start_time, self.training_end_time = None,None
             self.training_uid = cmd.uid

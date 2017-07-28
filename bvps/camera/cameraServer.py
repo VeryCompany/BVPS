@@ -10,6 +10,7 @@ from bvps.camera.detectorthread import HumanDetector as detector
 from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from multiprocessing.dummy import Pool as ThreadPool
 
+
 class CameraServer(multiprocessing.Process):
     def __init__(self, queue, cmd, camera, cct):
         multiprocessing.Process.__init__(self)
@@ -79,12 +80,13 @@ class CameraServer(multiprocessing.Process):
             t0 = human[2]
             secs = human[3]
             uid = self.recognizer.whoru(
-                human) if self.recognizer.svm is not None else None
-            log.debug("摄像头{}识别用户id：{},x:{},y:{}".format(
+                human)
+            #if self.recognizer.svm is not None else None
+            log.info("摄像头{}识别用户id：{},x:{},y:{}".format(
                 self.cmd.cameraName, uid, human[0][1], human[0][2]))
             if uid is not None:
                 msg = (self.cmd.cameraName, uid, human[0][1], human[0][2],
-                       human[0][0], self.cct.resolution,0, int(secs))
+                       human[0][0], self.cct.resolution, 0, int(secs))
                 self.camera.send(self.position, msg)
             return human, uid
         except Exception, e:
