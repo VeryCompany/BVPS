@@ -43,8 +43,8 @@ class RackServer(StreamRequestHandler):
                         break
                 self.wfile.write("00".decode("hex"))
             except Exception as dataReceiveErr:
+                print self.client_address, "TcpServer Error:", dataReceiveErr
                 self.request.close()
-                print dataReceiveErr
                 break
 
 def startTCP(asys):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from thespian.actors import *
 import logging
 from bvps.config import cameras as cms
@@ -19,6 +20,7 @@ class PositionActor(ActorTypeDispatcher):
     position_cache = {}
 
     def __init__(self, *args, **kw):
+        super(PositionActor, self).__init__(*args, **kw)
         logging.info("system actor started")
 
     def processPosition(self):
