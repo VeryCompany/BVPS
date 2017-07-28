@@ -70,6 +70,7 @@ class CameraServer(multiprocessing.Process):
                 for human in humans:
                     # log.info(self.trainor)
                     CameraServer.trainor_queue.put_nowait((human, uid))
+                    log.info("CameraServer.trainor_queue.qsize():{}".format(CameraServer.trainor_queue.qsize()))
             if CameraServer.svm_queue.qsize() > 0:
                 self.recognizer.svm = CameraServer.svm_queue.get()
 
