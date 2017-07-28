@@ -41,17 +41,13 @@ class Camera(ActorTypeDispatcher):
         self.cct = None
         self.cps = []
 
-    from bvps.camera.trainer import HumanModelTrainer
+
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-            self.trainor = self.createActor(
-                HumanModelTrainer,
-                targetActorRequirements=None,
-                globalName="HumanModelTrainer",
-                sourceHash=None)
+            
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
