@@ -84,8 +84,8 @@ class TrainingServer(multiprocessing.Process):
                 uids.extend([uid for x in range(len(imgs))])
                 log.info(images)
                 log.info(uids)
-                images = np.vstack(images)
-                uids = np.array(uids)
+                images = np.array(images)
+                #uids = np.array(uids)
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         except Exception as e:
             log.error(e)
