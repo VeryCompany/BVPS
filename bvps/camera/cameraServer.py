@@ -117,7 +117,16 @@ tc = {
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
-from bvps.config import svm_param_grid as spg
+# from bvps.config import svm_param_grid as spg
+
+spg = [
+    {'C': [1, 10, 100, 1000],
+     'kernel': ['linear']},
+    {'C': [1, 10, 100, 1000],
+     'gamma': [0.001, 0.0001],
+     'kernel': ['rbf']}
+]
+
 import copy
 class TrainingServer(multiprocessing.Process):
     human_map = {}
@@ -156,6 +165,7 @@ class TrainingServer(multiprocessing.Process):
             # 训练不应该在这里！
 
     def train(self):
+        global spg
         uids, images = [], []
         hums = copy.deepcopy(self.human_map)
         for uid, imgs in hums:
