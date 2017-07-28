@@ -45,7 +45,7 @@ logcfg = {
             # 'encoding':'utf-8',
             'formatter': 'actor',
             'filters': ['isActorLog'],
-            'level': logging.DEBUG
+            'level': logging.INFO
         },
         'h3':{
             'class': 'logging.StreamHandler',
