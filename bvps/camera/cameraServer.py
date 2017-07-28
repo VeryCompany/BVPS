@@ -50,6 +50,7 @@ class CameraServer(multiprocessing.Process):
         sending humans to trainning actors
         通过通道的人，需要开始和结束时间，基准时间t0
         """
+        log.info("探测到{}个人".format(len(humans)))
         if len(humans) > 0:
             if (self.camera.training_start_time is not None
                     and secs > self.camera.training_start_time) and (
