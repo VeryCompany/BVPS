@@ -28,14 +28,14 @@ import copy
 
 class TrainingServer(multiprocessing.Process):
     human_map = {
-        "unknown":[[[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]]
+        "unknown":[]
     }
 
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self)
         TrainingServer.in_queue = in_queue
         TrainingServer.out_queue = out_queue
-
+        self.human_map["unknown"].append(np.array([[1,1,1,1,1,1,1,1],[123,131231,12,3,123,1,23,1]]))
     def run(self):
         global tc
         last_uid = None
