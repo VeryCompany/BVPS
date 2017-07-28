@@ -35,36 +35,7 @@ class TrainingServer(multiprocessing.Process):
         multiprocessing.Process.__init__(self)
         TrainingServer.in_queue = in_queue
         TrainingServer.out_queue = out_queue
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
-        self.human_map["unknown"].append(np.array([[[ 22,  20,  24],
-        [ 18,  16,  20],
-        [ 24,  22,  27]]]))
+
     def run(self):
         global tc
         last_uid = None
@@ -90,11 +61,12 @@ class TrainingServer(multiprocessing.Process):
             log.info(
                 "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
             if len(self.human_map[uid]) >= tc["cap_nums"]:
-                log.info("开始训练样品。。。")
-                self.train()
-                log.info(self.svm)
-                log.info("训练样本完成。。。")
-                TrainingServer.out_queue.put_nowait(self.svm)
+                if len(self.human_map) > 1:
+                    log.info("开始训练样品。。。")
+                    self.train()
+                    log.info(self.svm)
+                    log.info("训练样本完成。。。")
+                    TrainingServer.out_queue.put_nowait(self.svm)
                 last_uid = uid
                 # self.send(sender,
                 #           TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
