@@ -4,7 +4,9 @@ from rpsc.models import HumanModel, ShoppingCartProductModel
 from rpsc.actors.core import *
 
 from bvps.config import cameras
-from bvps.camera.camera import Camera, CameraType, CameraCmd, CameraCmdType
+from bvps.camera.camera import Camera, CameraType, TrainingCMD, CameraCmdType
+
+import time
 
 class HumanActor(ActorTypeDispatcher):
 
@@ -59,19 +61,19 @@ class HumanActor(ActorTypeDispatcher):
 
     def receiveMsg_HumanCome(self, message, sender):
         humanId = message.humanId
-        time = message.time
+        usertime = message.time
         loc = message.loc
         if self.human is None:
             self.human= HumanModel(humanId, loc, ShoppingCartProductModel(0))
-            self.human.setComeTime(time)
-            print "用户:", humanId, "在[", time, "]进入超市", type(humanId)
+            self.human.setComeTime(usertime)
+            print "用户:", humanId, "在[", usertime, "]进入超市", type(humanId)
             coreActor = self.getCoreActor()
             self.send(coreActor, UserEvent(humanId, "in"))
 
             for camId, params in cameras.items():
                 if params.has_key("cameraType") and params["cameraType"] == CameraType.CAPTURE:
                     cam = self.createActor(Camera, globalName=camId)
-                    self.send(cam, CameraCmd(CameraCmdType.TRAINOR_START, camId, params))
+                    self.send(cam, TrainingCMD(CameraCmdType.TRAINOR_START, time.time(), humanId))
 
         else:
             print "存在用户:", humanId
