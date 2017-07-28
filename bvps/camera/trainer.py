@@ -47,11 +47,11 @@ class HumanModelTrainer(ActorTypeDispatcher):
         human = message[0][0]
         uid = message[1]
         t0 = message[0][2]
-        if len(human_map[uid]) < tc["cap_nums"]:
-            human_map[uid].append(human)
+        if len(self.human_map[uid]) < tc["cap_nums"]:
+            self.human_map[uid].append(human)
 
-        log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(human_map[uid])))
-        if len(human_map[uid]) >= tc["cap_nums"]:
+        log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
+        if len(self.human_map[uid]) >= tc["cap_nums"]:
             self.send(sender,
                       TrainingCMD(CameraCmdType.TRAINOR_CAPTURE_OK, "ok", uid))
             self.train()
