@@ -159,7 +159,7 @@ class CameraCaptureThread(threading.Thread):
                             h,w,d = frame.shape
 
                             if scale is not None:
-                                newframe = cv2.resize(frame,(int(w*resize),int(h*resize)))
+                                newframe = cv2.resize(frame,(int(w*scale),int(h*scale)))
 
                             if not self.camera.processQueue.full():
                                 self.camera.processQueue.put_nowait((newframe,t,time.time()))
