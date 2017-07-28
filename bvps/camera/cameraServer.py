@@ -81,8 +81,11 @@ class TrainingServer(multiprocessing.Process):
                 if len(imgs) < tc["cap_nums"]:
                     continue
                 images.extend(imgs)
+                log.info("type:{}".format(type(imgs)))
+                log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
-                images = images.reshape((len(images), -1))
+                images = np.asarray(images)
+                uids = np.asarray(uids)
             self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(images, uids)
         except Exception as e:
             log.error(e)
