@@ -51,7 +51,6 @@ class Camera(ActorTypeDispatcher):
             log.info(self.webserver.pid)
         #todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
-            threading.Thread(target=self.process_user,args=(Camera.user_queue,))
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
@@ -71,6 +70,8 @@ class Camera(ActorTypeDispatcher):
                 cams = CameraServer(self.processQueue,cmd,Camera.user_queue,self.cct)
                 cams.start()
             log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
+            userThread = threading.Thread(target=self.process_user, args=(Camera.user_queue,))
+            userThread.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 self.cct.stop()
