@@ -1,39 +1,60 @@
 # -*- coding: utf-8 -*-
-from thespian.actors import *
-import cv2
-import threading
-from enum import Enum
-from bvps.camera.common import clock, draw_str, StatValue
-import multiprocessing
-#需要支持网络摄像头和本地USB摄像头
-import logging as log
-import sys
-from bvps.camera.cameraServer import CameraServer
-import time
+"""camera script."""
+# 需要支持网络摄像头和本地USB摄像头
 
-def handle_exception(exc_type, exc_value, exc_traceback):
+import logging as log
+import multiprocessing
+import sys
+import threading
+import time
+from enum import Enum
+
+import cv2
+from bvps.camera.cameraServer import CameraServer
+from bvps.camera.common import StatValue, clock
+from bvps.camera.detectorthread import HumanDetector as detector
+from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
+from thespian.actors import ActorTypeDispatcher
+
+
+def Handle_exception(exc_type, exc_value, exc_traceback):
+    """exception."""
     if issubclass(exc_type, KeyboardInterrupt):
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
         return
 
-    log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
-
-sys.excepthook = handle_exception
-
+    log.error(
+        "Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 
+sys.excepthook = Handle_exception
 
 
 class Camera(ActorTypeDispatcher):
     svm_model = None
     svm_model_updated = False
     training_started = False
-    training_start_time,training_end_time =None,None
+    training_start_time, training_end_time = None, None
     training_uid = None
+
     def __init__(self, *args, **kw):
+        """Init camera setting up."""
         super(Camera, self).__init__(*args, **kw)
-        self.frameQueue = multiprocessing.Queue(64)
-        self.processQueue = multiprocessing.Queue(64)
+        self.frameQueue = multiprocessing.Queue(64)  #
+
+        self.pre_process_queue = multiprocessing.Queue(64)  # 图像预处理Queue
+        self.pre_process_out_queue = multiprocessing.Queue(64)
+
+        self.human_detector_q = multiprocessing.Queue(64)  # 人脸和人体识别器
+        self.human_detector_out_q = multiprocessing.Queue(64)  # 人脸和人体识别器输出
+
+        self.training_dset_q = multiprocessing.Queue(
+            64)  # frame queue for trainer
+        self.training_model_oq = multiprocessing.Queue(
+            64)  # Update old recognize model queue
+
+        self.recognizer_in_q = multiprocessing.Queue(64)  # 识别器输入队列包括图片和模型
+        self.recognizer_out_q = multiprocessing.Queue(64)  # 识别器输入队列
 
         Camera.user_queue = multiprocessing.Queue(64)
         self.webserver = None
@@ -44,14 +65,14 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
-        #todo:异常处理！！！！！
+        # todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 return
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
-                                      cmd.values["device"], self.cps,cmd)
+                                           cmd.values["device"], self.cps, cmd)
             self.cct.setDaemon(True)
             self.cct.start()
             from bvps.web.server import WebServer
@@ -62,9 +83,12 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像处理服务器......".format(cmd.cameraName))
             pn = cmd.values["processNum"]
             for p in range(0, pn, 1):
-                cams = CameraServer(self.processQueue,cmd,Camera.user_queue,self.cct)
+                cams = CameraServer(self.pre_process_queue,
+                                    self.pre_process_out_queue, cmd,
+                                    Camera.user_queue, self.cct)
                 cams.start()
-            log.info("启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName,pn))
+            log.info(
+                "启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
 
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
@@ -73,7 +97,8 @@ class Camera(ActorTypeDispatcher):
                 globalName="CameraPositionActor",
                 sourceHash=None)
 
-            userThread = threading.Thread(target=self.process_user, args=(Camera.user_queue,))
+            userThread = threading.Thread(
+                target=self.process_user, args=(Camera.user_queue, ))
             userThread.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
@@ -86,9 +111,9 @@ class Camera(ActorTypeDispatcher):
             self.training_start_time = int(cmd.msg)
             self.training_end_time = int(cmd.msg + 10)
             self.training_uid = cmd.uid
-            log.info("用户{},时间{}".format(cmd.uid,cmd.msg))
+            log.info("用户{},时间{}".format(cmd.uid, cmd.msg))
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
-            self.training_start_time, self.training_end_time = None,None
+            self.training_start_time, self.training_end_time = None, None
             self.training_uid = cmd.uid
         elif cmd.cctype == CameraCmdType.MODEL_UPDATED:
             self.svm_model = cmd.msg
@@ -97,22 +122,23 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_PositionActorMsg(self, cmd, sender):
         pass
 
-    def process_user(self,uq):
+    def process_user(self, uq):
         while True:
             um = uq.get()
-            self.send(self.pa,um)
-
-
-from bvps.camera.detectorthread import HumanDetector as detector
-from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
+            self.send(self.pa, um)
 
 
 class CameraCaptureThread(threading.Thread):
-
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
-    def __init__(self, camera, cameraName, cameraDevice, processors=[],initCmd=None):
+
+    def __init__(self,
+                 camera,
+                 cameraName,
+                 cameraDevice,
+                 processors=[],
+                 initCmd=None):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
@@ -121,26 +147,29 @@ class CameraCaptureThread(threading.Thread):
         self.processors = processors
         self.detector = detector()
         self.recognizer = recognizer(None)
-        self.threadn=cv2.getNumberOfCPUs()*4
-        self.pools={}
+        self.threadn = cv2.getNumberOfCPUs() * 4
+        self.pools = {}
         self.initCmd = initCmd
-
 
     def startCapture(self):
         try:
             video = cv2.VideoCapture(self.cameraDevice)
             log.info("摄像头{}初始化参数".format(self.cameraName))
-            for k,v in self.initCmd.values["video_properties"].items():
-                video.set(k,v)
-                log.info("video.set({},{})".format(k,v))
-            forcc = self.initCmd.values["fourcc"] if "fourcc" in self.initCmd.values else None
+            for k, v in self.initCmd.values["video_properties"].items():
+                video.set(k, v)
+                log.info("video.set({},{})".format(k, v))
+            forcc = self.initCmd.values[
+                "fourcc"] if "fourcc" in self.initCmd.values else None
             if forcc is not None:
-                video.set(cv2.CAP_PROP_FOURCC,cv2.VideoWriter_fourcc(forcc[0],forcc[1],forcc[2],forcc[3]))
+                video.set(cv2.CAP_PROP_FOURCC,
+                          cv2.VideoWriter_fourcc(forcc[0], forcc[1], forcc[2],
+                                                 forcc[3]))
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             codec = video.get(cv2.CAP_PROP_FOURCC)
-            self.resolution = (width,height)
-            log.info("摄像头fps[{}] width:{} height:{} codec:{}".format(video.get(cv2.CAP_PROP_FPS),width,height,codec))
+            self.resolution = (width, height)
+            log.info("摄像头fps[{}] width:{} height:{} codec:{}".format(
+                video.get(cv2.CAP_PROP_FPS), width, height, codec))
             log.info("亮度:{}".format(video.get(cv2.CAP_PROP_BRIGHTNESS)))
             log.info("对比度:{}".format(video.get(cv2.CAP_PROP_CONTRAST)))
             log.info("饱和度:{}".format(video.get(cv2.CAP_PROP_SATURATION)))
@@ -150,42 +179,38 @@ class CameraCaptureThread(threading.Thread):
             log.info("ISO:{}".format(video.get(cv2.CAP_PROP_ISO_SPEED)))
             log.info("RGB?:{}".format(video.get(cv2.CAP_PROP_CONVERT_RGB)))
 
-            latency = StatValue()
             frame_interval = StatValue()
             last_frame_time = clock()
-            num=10
-            scale= self.initCmd.values["scale"]
+            num = 10
             while True:
                 try:
                     if self.stopped():
                         break
                     if video.grab():
-                        ret,frame = video.retrieve()
-                        #log.info(frame.shape)
-                        #log.info(type(frame.shape))
+                        ret, frame = video.retrieve()
+                        frame_time = time.time()
                         if num % 50 == 0:
-                            log.debug("读取摄像头{}frame{}".format(self.cameraName,"成功" if ret else "失败！"))
+                            log.debug("读取摄像头{}frame{}".format(
+                                self.cameraName, "成功" if ret else "失败！"))
                         t = clock()
                         frame_interval.update(t - last_frame_time)
                         if num % 50 == 0:
-                            log.debug("摄像头{}.当前fps:{}".format(self.cameraName,int(1000/(frame_interval.value * 1000))))
+                            log.debug("摄像头{}.当前fps:{}".format(
+                                self.cameraName,
+                                int(1000 / (frame_interval.value * 1000))))
                         if ret:
-                            h,w,d = frame.shape
-
-                            if scale is not None:
-                                newframe = cv2.resize(frame,(int(w*scale),int(h*scale)))
-
-                            if not self.camera.processQueue.full():
-                                self.camera.processQueue.put_nowait((newframe,t,time.time(),self.camera.training_start_time, self.camera.training_end_time,self.camera.training_uid))
+                            if not self.camera.pre_process_queue.full():
+                                self.camera.pre_process_queue.put_nowait(
+                                    (frame, t, frame_time))
                             if not self.camera.frameQueue.full():
-                                self.camera.frameQueue.put_nowait((newframe,t,time.time()))
+                                self.camera.frameQueue.put_nowait((frame, t,
+                                                                   frame_time))
                         last_frame_time = t
-                    num+=1
+                    num += 1
                 except Exception, e:
                     log.info(e.message)
         except Exception, e:
             log.info(e.message)
-
 
     def run(self):
         self.startCapture()
@@ -197,8 +222,7 @@ class CameraCaptureThread(threading.Thread):
         return self._stop_event.is_set()
 
 
-
-#摄像头命令类型定义
+# 摄像头命令类型定义
 class CameraCmdType(Enum):
     START_CAPTURE = 1
     STOP_CAPTURE = 2
@@ -211,18 +235,21 @@ class CameraCmdType(Enum):
     TRAINOR_CAPTURE_OK = 9
     MODEL_UPDATED = 10
 
+
 class CameraType(Enum):
     CAPTURE = 1
     POSITION = 2
     BOTH_CAPTURE_POSITION = 3
 
+
 class TrainingCMD(object):
-    def __init__(self,cctype,msg,uid=None):
+    def __init__(self, cctype, msg, uid=None):
         self.cctype = cctype
         self.msg = msg
         self.uid = uid
 
-#摄像头命令定义
+
+# 摄像头命令定义
 class CameraCmd(object):
     def __init__(self,
                  cmdType=CameraCmdType.START_CAPTURE,
