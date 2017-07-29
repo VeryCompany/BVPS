@@ -28,7 +28,6 @@ import copy
 
 class TrainingServer(multiprocessing.Process):
     human_map = {
-        "unknown":[]
     }
 
     def __init__(self, in_queue, out_queue):
