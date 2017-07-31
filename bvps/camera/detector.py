@@ -54,11 +54,11 @@ class DetectorProcessor(multiprocessing.Process):
             frame, t0, secs = DetectorProcessor.frame_in.get()
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
-                log.debug("检测到{}个人".format(len(humans)))
+                log.info("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
-            log.info("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(self.camera.cameraId,self.latency.value * 1000, self.frame_interval.value*1000))
+            log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(self.camera.cameraId,self.latency.value * 1000, self.frame_interval.value*1000))
             t = clock()
             self.latency.update(t-t0)
             self.frame_interval.update(t-self.last_frame_time)
