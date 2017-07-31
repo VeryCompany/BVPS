@@ -48,10 +48,10 @@ class SVMRecognizer(multiprocessing.Process):
             if uid is not None:
                 # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
                 SVMRecognizer.out_queue.put((uid, (px, py), t0, sec))
-                log.info(
-                    "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
-                    format(self.camera.cameraId, self.latency.value * 1000,
-                           self.frame_interval.value * 1000))
+            log.info(
+                "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
+                format(self.camera.cameraId, self.latency.value * 1000,
+                       self.frame_interval.value * 1000))
             t = clock()
             self.latency.update(t - t0)
             self.frame_interval.update(t - self.last_frame_time)
