@@ -15,7 +15,7 @@ from bvps.camera.detector import DetectorProcessor
 from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
 from bvps.common import ModelUpdateCmd
-from bvps.common import CameraCmdType
+from bvps.common import CameraCmdType, TrainingCMD
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
