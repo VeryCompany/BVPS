@@ -44,6 +44,9 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
 
     def run(self):
+        self.frame_interval = StatValue()
+        self.last_frame_time = clock()
+        self.latency = StatValue()
         while True:
             """
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
@@ -55,6 +58,12 @@ class DetectorProcessor(multiprocessing.Process):
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
+            log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(self.camera.cameraId,self.latency.value * 1000, self.frame_interval.value*1000))
+            t = clock()
+            self.latency.update(t-t0)
+            self.frame_interval.update(t-self.last_frame_time)
+            self.last_frame_time = t
+
 
     def detect_humans(self, image, t0, secs):
         validHuman = []
