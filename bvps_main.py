@@ -13,7 +13,7 @@ from bvps.common import CameraCmdType, CameraCmd
 try:
 
     asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
-    #serverStart(asys)
+    serverStart(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,

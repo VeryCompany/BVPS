@@ -90,8 +90,9 @@ class Camera(ActorTypeDispatcher):
             log.info(
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """检测器进程启动"""
+            dps_num = 16
             log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, pn))
-            for p in range(0, pn, 1):
+            for p in range(0, dps_num, 1):
                 dps = DetectorProcessor(self, self.human_detector_q,
                                         self.training_dset_q,
                                         self.recognizer_in_q)
@@ -105,8 +106,9 @@ class Camera(ActorTypeDispatcher):
                 tps.start()
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """识别器进程启动"""
+            srz_num = 8
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, pn))
-            for p in range(0, pn, 1):
+            for p in range(0, srz_num, 1):
                 srz = SVMRecognizer(self, self.recognizer_in_q,
                                     self.recognizer_out_q)
                 srz.start()
