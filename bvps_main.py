@@ -6,16 +6,14 @@ import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
-from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD, CameraType
-from bvps.camera.trainer import HumanModelTrainer
+from bvps.camera.camera import Camera, CameraCmdType, CameraCmd, TrainingCMD
 from rpsc.start import serverStart
 
-import cv2
 
 try:
 
     asys = ActorSystem(systemBase="multiprocUDPBase", logDefs=logcfg)
-    serverStart(asys)
+    #serverStart(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,
@@ -26,23 +24,17 @@ try:
         targetActorRequirements=None,
         globalName="CameraPositionActor",
         sourceHash=None)
-    trainor = asys.createActor(
-        HumanModelTrainer,
-        targetActorRequirements=None,
-        globalName="HumanModelTrainer",
-        sourceHash=None)
-    #未来会从数据库或者配置文件中读取
-    #定位摄像头 type == 1
-    #采集摄像头 type == 2
+    # 未来会从数据库或者配置文件中读取
+    # 定位摄像头 type == 1
+    # 采集摄像头 type == 2
     from bvps.config import cameras
-    #启动采集摄像头
-    #todo:消息反馈处理和异常处理
+    # 启动采集摄像头
+    # todo:消息反馈处理和异常处理
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE".format(camId))
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
-        asys.tell(cama, TrainingCMD(CameraCmdType.TRAINOR_INIT, trainor))
 
 except KeyboardInterrupt:
     print 'Interrupted'

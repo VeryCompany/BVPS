@@ -40,28 +40,28 @@ if __name__ == '__main__':
     tasks = multiprocessing.JoinableQueue()
     results = multiprocessing.Queue()
     Consumer(tasks, results).start()
-    # Start consumers
-    # num_consumers = multiprocessing.cpu_count() * 2
-    # print 'Creating %d consumers' % num_consumers
-    # consumers = [ Consumer(tasks, results)
-    #               for i in xrange(num_consumers) ]
-    # for w in consumers:
-    #     w.start()
-    #
-    # # Enqueue jobs
-    # num_jobs = 10
-    # for i in xrange(num_jobs):
-    #     tasks.put(Task(i, i))
-    #
-    # # Add a poison pill for each consumer
-    # for i in xrange(num_consumers):
-    #     tasks.put(None)
-    #
-    # # Wait for all of the tasks to finish
-    # tasks.join()
-    #
-    # # Start printing results
-    # while num_jobs:
-    #     result = results.get()
-    #     print 'Result:', result
-    #     num_jobs -= 1
+    # 8 Start consumers
+    num_consumers = multiprocessing.cpu_count() * 2
+    print 'Creating %d consumers' % num_consumers
+    consumers = [ Consumer(tasks, results)
+                  for i in xrange(num_consumers) ]
+    for w in consumers:
+        w.start()
+
+    # Enqueue jobs
+    num_jobs = 10
+    for i in xrange(num_jobs):
+        tasks.put(Task(i, i))
+
+    # Add a poison pill for each consumer
+    for i in xrange(num_consumers):
+        tasks.put(None)
+
+    # Wait for all of the tasks to finish
+    tasks.join()
+
+    # Start printing results
+    while num_jobs:
+        result = results.get()
+        print 'Result:', result
+        num_jobs -= 1
