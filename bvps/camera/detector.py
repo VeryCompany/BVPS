@@ -23,6 +23,7 @@ net = openface.TorchNeuralNet(
 
 
 class DetectorProcessor(multiprocessing.Process):
+    
     def __init__(self, camera, frame_in, frame_out, frame_out_2):
         multiprocessing.Process.__init__(self, name="video_human_detector")
         DetectorProcessor.frame_in = frame_in
@@ -51,8 +52,8 @@ class DetectorProcessor(multiprocessing.Process):
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
                 for human in humans:
-                    DetectorProcessor.frame_out.put(human)
-                    DetectorProcessor.frame_out2.put(human)
+                    DetectorProcessor.frame_out.put(human)  # for 识别器
+                    DetectorProcessor.frame_out2.put(human)  # for Trainor
 
     def detect_humans(self, image, t0, secs):
         validHuman = []

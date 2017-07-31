@@ -32,7 +32,7 @@ spg = [{
 class TrainingProcessor(multiprocessing.Process):
     human_map = {}  # 应该持久化的map,持久化后可以使用多线程提高性能
     model_updated = False
-    
+
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self)
         TrainingServer.in_queue = in_queue
@@ -57,10 +57,8 @@ class TrainingProcessor(multiprocessing.Process):
     def receive_samples(self, inqueue, hm, uid, start_time):
         num = 0
         while num < tc["cap_nums"]:
-            message = TrainingServer.in_queue.get()
+            message, t0, sec = TrainingServer.in_queue.get()
             human = message[0][0]
-            t0 = message[1]
-            sec = message[2]
             if t0 < start_time or t0 - start_time > 1000000:
                 continue
             if uid not in self.human_map:

@@ -10,11 +10,12 @@ import time
 from enum import Enum
 
 import cv2
-from bvps.camera.cameraServer import CameraServer
 from bvps.camera.common import StatValue, clock
-from bvps.camera.detectorthread import HumanDetector as detector
-from bvps.camera.recognizer import OpenFaceRecognizer as recognizer
 from thespian.actors import ActorTypeDispatcher
+from bvps.camera.pre_processor import PreProcessor
+from bvps.camera.detector import DetectorProcessor
+from bvps.camera.trainer import TrainingProcessor
+from bvps.camera.recognizer import SVMRecognizer
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
@@ -40,13 +41,11 @@ class Camera(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         """Init camera setting up."""
         super(Camera, self).__init__(*args, **kw)
-        self.frameQueue = multiprocessing.Queue(64)  #
+        self.frame_queue = multiprocessing.Queue(64)  #
 
         self.pre_process_queue = multiprocessing.Queue(64)  # 图像预处理Queue
-        self.pre_process_out_queue = multiprocessing.Queue(64)
 
         self.human_detector_q = multiprocessing.Queue(64)  # 人脸和人体识别器
-        self.human_detector_out_q = multiprocessing.Queue(64)  # 人脸和人体识别器输出
 
         self.training_dset_q = multiprocessing.Queue(
             64)  # frame queue for trainer
@@ -69,26 +68,61 @@ class Camera(ActorTypeDispatcher):
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 return
+
+            """视频采集线程"""
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
                                            cmd.values["device"], self.cps, cmd)
             self.cct.setDaemon(True)
             self.cct.start()
+
+            """监控视频Web服务器"""
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
-            self.webserver = WebServer(self.frameQueue, cmd.values["port"])
+            self.webserver = WebServer(self.frame_queue, cmd.values["port"])
             self.webserver.start()
             log.info("摄像头web服务器启动完成...")
-            log.info("启动摄像头[{}]图像处理服务器......".format(cmd.cameraName))
-            pn = cmd.values["processNum"]
+
+            pn = cmd.values["processNum"]  # 多进程处理进程数量
+
+            """图像预处理启动"""
+            log.info("启动摄像头[{}]图像预处理进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
-                cams = CameraServer(self.pre_process_queue,
-                                    self.pre_process_out_queue, cmd,
-                                    Camera.user_queue, self.cct)
-                cams.start()
+                pps = PreProcessor(self, self.pre_process_queue,
+                                   self.human_detector_q)
+                pps.setDaemon()
+                pps.start()
             log.info(
-                "启动摄像头[{}]图像处理服务器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+                "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+
+            """检测器进程启动"""
+            log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, pn))
+            for p in range(0, pn, 1):
+                dps = DetectorProcessor(self, self.human_detector_q,
+                                        self.training_dset_q,
+                                        self.recognizer_in_q)
+                dps.setDaemon()
+                dps.start()
+            log.info("启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+
+            """训练器进程启动"""
+            log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, pn))
+            for p in range(0, pn, 1):
+                tps = TrainingProcessor(self.training_dset_q,
+                                        self.training_model_oq)
+                tps.setDaemon()
+                tps.start()
+            log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+
+            """识别器进程启动"""
+            log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, pn))
+            for p in range(0, pn, 1):
+                srz = SVMRecognizer(self.recognizer_in_q,
+                                    self.recognizer_out_q)
+                srz.setDaemon()
+                srz.start()
+            log.info("启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
 
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
