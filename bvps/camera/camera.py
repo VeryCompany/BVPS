@@ -101,14 +101,14 @@ class Camera(ActorTypeDispatcher):
             """训练器进程启动"""
             log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, pn))
             for p in range(0, 1, 1):
-                tps = TrainingProcessor(self.training_dset_q,
+                tps = TrainingProcessor(self, self.training_dset_q,
                                         self.training_model_oq)
                 tps.start()
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """识别器进程启动"""
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
-                srz = SVMRecognizer(self.recognizer_in_q,
+                srz = SVMRecognizer(self, self.recognizer_in_q,
                                     self.recognizer_out_q)
                 srz.start()
             log.info("启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))

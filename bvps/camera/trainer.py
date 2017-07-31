@@ -31,11 +31,12 @@ class TrainingProcessor(multiprocessing.Process):
     human_map = {}  # 应该持久化的map,持久化后可以使用多线程提高性能
     model_updated = False
 
-    def __init__(self, in_queue, out_queue):
+    def __init__(self, camera, in_queue, out_queue):
         multiprocessing.Process.__init__(self, name="training_processor")
         TrainingProcessor.in_queue = in_queue
         TrainingProcessor.out_queue = out_queue
-
+        self.camera = camera
+        
     def run(self):
         global tc
         trth = threading.Thread(target=self.auto_training, args=())

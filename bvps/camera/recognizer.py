@@ -23,11 +23,11 @@ class ModelUpdateCmd(object):
 
 class SVMRecognizer(multiprocessing.Process):
 
-    def __init__(self, in_queue, out_queue):
+    def __init__(self, camera, in_queue, out_queue):
         multiprocessing.Process.__init__(self, name="video_human_recognizer")
         SVMRecognizer.in_queue = in_queue
         SVMRecognizer.out_queue = out_queue
-
+        self.camera = camera
     def whoru(self, human):
         if self.svm is None:
             return None
