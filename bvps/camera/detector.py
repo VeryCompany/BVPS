@@ -44,9 +44,7 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
 
     def run(self):
-        self.frame_interval = StatValue()
-        self.last_frame_time = clock()
-        self.latency = StatValue()
+
         while True:
             """
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
