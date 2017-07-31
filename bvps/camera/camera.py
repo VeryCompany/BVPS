@@ -4,7 +4,7 @@
 
 import logging as log
 import multiprocessing
-import sys
+import sys, traceback
 import threading
 import time
 from enum import Enum
@@ -42,9 +42,9 @@ class Camera(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         """Init camera setting up."""
         super(Camera, self).__init__(*args, **kw)
-        self.frame_queue = multiprocessing.Queue(64)  #
+        self.frame_queue = multiprocessing.Queue(128)  #
 
-        self.pre_process_queue = multiprocessing.Queue(64)  # 图像预处理Queue
+        self.pre_process_queue = multiprocessing.Queue(128)  # 图像预处理Queue
 
         self.human_detector_q = multiprocessing.Queue(64)  # 人脸和人体识别器
 
@@ -100,7 +100,7 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """训练器进程启动"""
             log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, pn))
-            for p in range(0, pn, 1):
+            for p in range(0, 1, 1):
                 tps = TrainingProcessor(self.training_dset_q,
                                         self.training_model_oq)
                 tps.start()
@@ -148,6 +148,9 @@ class Camera(ActorTypeDispatcher):
         model = in_queue.get()
         out_queue.put(ModelUpdateCmd(model))
 
+    def send_model_to_all_camera(self, model):
+        pass
+
     def receiveMsg_TrainingCMD(self, cmd, sender):
         if cmd.cctype == CameraCmdType.TRAINOR_START:
             # self.training_start_time = int(cmd.msg)
@@ -173,16 +176,16 @@ class Camera(ActorTypeDispatcher):
             self.send(self.pa, um)
 
 
+from multiprocessing.pool import ThreadPool
+from collections import deque
+
+
 class CameraCaptureThread(threading.Thread):
     """
     摄像头抓取线程类，比较初级，健壮性不足，未来需要重写
     """
 
-    def __init__(self,
-                 camera,
-                 cameraName,
-                 cameraDevice,
-                 initCmd=None):
+    def __init__(self, camera, cameraName, cameraDevice, initCmd=None):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
@@ -219,7 +222,8 @@ class CameraCaptureThread(threading.Thread):
             log.info("曝光:{}".format(video.get(cv2.CAP_PROP_EXPOSURE)))
             log.info("ISO:{}".format(video.get(cv2.CAP_PROP_ISO_SPEED)))
             log.info("RGB?:{}".format(video.get(cv2.CAP_PROP_CONVERT_RGB)))
-
+            """
+            # 处理方式 1
             frame_interval = StatValue()
             last_frame_time = clock()
             num = 10
@@ -250,8 +254,41 @@ class CameraCaptureThread(threading.Thread):
                     num += 1
                 except Exception, e:
                     log.info(e.message)
+            """
+            """处理方式2"""
+
+            def process_frame(frame, t0, fts):
+                if not self.camera.pre_process_queue.full():
+                    self.camera.pre_process_queue.put((frame, t, fts))
+                if not self.camera.frame_queue.full():
+                    self.camera.frame_queue.put((frame, t, fts))
+                return frame, t0, fts
+
+            threadn = cv2.getNumberOfCPUs()
+            pool = ThreadPool(processes=threadn * 2)
+            pending = deque()
+
+            latency = StatValue()
+            frame_interval = StatValue()
+            last_frame_time = clock()
+            while True:
+                while len(pending) > 0 and pending[0].ready():
+                    frame, t0, fts = pending.popleft().get()
+                    latency.update(clock() - t0)
+                if len(pending) < threadn:
+                    frame_time = time.time()
+                    ret, frame = video.read()
+                    t = clock()
+                    frame_interval.update(t - last_frame_time)
+                    last_frame_time = t
+                    if ret:
+                        task = pool.apply_async(process_frame, (frame.copy(),
+                                                                t, frame_time))
+                        pending.append(task)
         except Exception, e:
-            log.info(e.message)
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
 
     def run(self):
         self.startCapture()

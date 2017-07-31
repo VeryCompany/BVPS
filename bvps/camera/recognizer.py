@@ -29,7 +29,6 @@ class SVMRecognizer(multiprocessing.Process):
         SVMRecognizer.out_queue = out_queue
 
     def whoru(self, human):
-        log.info(self.svm)
         if self.svm is None:
             return None
         face = human[0][0]

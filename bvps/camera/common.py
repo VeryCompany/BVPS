@@ -153,7 +153,7 @@ def Timer(msg):
 
 class StatValue:
     def __init__(self, smooth_coef = 0.5):
-        self.value = None
+        self.value = 0
         self.smooth_coef = smooth_coef
     def update(self, v):
         if self.value is None:

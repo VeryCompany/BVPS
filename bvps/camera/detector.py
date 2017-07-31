@@ -51,6 +51,7 @@ class DetectorProcessor(multiprocessing.Process):
             frame, t0, secs = DetectorProcessor.frame_in.get()
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
+                log.debug("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
