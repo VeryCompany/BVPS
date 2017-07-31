@@ -91,7 +91,7 @@ class Camera(ActorTypeDispatcher):
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """检测器进程启动"""
             dps_num = 16
-            log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, pn))
+            log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, dps_num))
             for p in range(0, dps_num, 1):
                 dps = DetectorProcessor(self, self.human_detector_q,
                                         self.training_dset_q,
@@ -107,7 +107,7 @@ class Camera(ActorTypeDispatcher):
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """识别器进程启动"""
             srz_num = 8
-            log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, pn))
+            log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
             for p in range(0, srz_num, 1):
                 srz = SVMRecognizer(self, self.recognizer_in_q,
                                     self.recognizer_out_q)
@@ -148,6 +148,8 @@ class Camera(ActorTypeDispatcher):
     def model_process(self, in_queue, out_queue):
         model = in_queue.get()
         out_queue.put(ModelUpdateCmd(model))
+        # for camid in ....
+        # send to all camera
 
     def send_model_to_all_camera(self, model):
         pass
@@ -158,7 +160,7 @@ class Camera(ActorTypeDispatcher):
             # self.training_end_time = int(cmd.msg + 10)
             # self.training_uid = cmd.uid
             # 将开始指令发送至训练器
-            self.self.training_dset_q.put(
+            self.training_dset_q.put(
                 TrainingCMD(CameraCmdType.TRAINOR_START, clock(), cmd.uid))
             log.info("用户{},时间{}".format(cmd.uid, cmd.msg))
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
@@ -168,7 +170,7 @@ class Camera(ActorTypeDispatcher):
             self.svm_model = cmd.msg
             self.svm_model_updated = True
 
-    def receiveMsg_PositionActorMsg(self, cmd, sender):
+    def receiveMsg_ModelUpdateCmd(self, cmd, sender):
         pass
 
     def process_user(self, uq):
