@@ -25,6 +25,7 @@ class SVMRecognizer(multiprocessing.Process):
         SVMRecognizer.in_queue = in_queue
         SVMRecognizer.out_queue = out_queue
         self.camera = camera
+        self.model = None
     def whoru(self, human):
         if self.model is None:
             return None
@@ -38,7 +39,7 @@ class SVMRecognizer(multiprocessing.Process):
         while True:
             msg = SVMRecognizer.in_queue.get()
             if msg.__class__ == ModelUpdateCmd.__class__:
-                self.svm = msg.model
+                self.model = msg.model
                 continue
             frame, t0, sec = msg
             human, px, py = frame

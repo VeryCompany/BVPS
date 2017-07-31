@@ -28,7 +28,7 @@ def Handle_exception(exc_type, exc_value, exc_traceback):
         "Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 
-sys.excepthook = Handle_exception
+# sys.excepthook = Handle_exception
 
 
 class Camera(ActorTypeDispatcher):
