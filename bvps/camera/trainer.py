@@ -14,7 +14,9 @@ import multiprocessing
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
+
 from bvps.camera.camera import TrainingCMD
+
 # from bvps.config import svm_param_grid as spg
 
 spg = [{

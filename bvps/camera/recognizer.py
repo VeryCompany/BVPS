@@ -5,6 +5,8 @@ import multiprocessing
 import numpy as np
 import openface
 from sklearn.svm import SVC
+from bvps.common import ModelUpdateCmd
+
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
@@ -13,12 +15,7 @@ net = openface.TorchNeuralNet(
     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 
-class ModelUpdateCmd(object):
-    u"""如果模型发生变更，通知识别器."""
 
-    def __init__(self, model):
-        u"""构造函数."""
-        self.model = model
 
 
 class SVMRecognizer(multiprocessing.Process):

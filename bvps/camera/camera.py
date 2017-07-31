@@ -7,8 +7,6 @@ import multiprocessing
 import sys, traceback
 import threading
 import time
-from enum import Enum
-
 import cv2
 from bvps.camera.common import StatValue, clock
 from thespian.actors import ActorTypeDispatcher
@@ -16,7 +14,8 @@ from bvps.camera.pre_processor import PreProcessor
 from bvps.camera.detector import DetectorProcessor
 from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
-from bvps.camera.recognizer import ModelUpdateCmd
+from bvps.common import ModelUpdateCmd
+from bvps.common import CameraCmdType
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
@@ -301,38 +300,3 @@ class CameraCaptureThread(threading.Thread):
 
 
 # 摄像头命令类型定义
-class CameraCmdType(Enum):
-    START_CAPTURE = 1
-    STOP_CAPTURE = 2
-    RESTART_CAPTURE = 3
-    START_CAPTURE_FOR_COLLECTION = 4
-    TRAINOR_INIT = 5
-    TRAINOR_START = 6
-    TRAINOR_END = 7
-    PERSON_LEAVE = 8
-    TRAINOR_CAPTURE_OK = 9
-    MODEL_UPDATED = 10
-
-
-class CameraType(Enum):
-    CAPTURE = 1
-    POSITION = 2
-    BOTH_CAPTURE_POSITION = 3
-
-
-class TrainingCMD(object):
-    def __init__(self, cctype, msg, uid=None):
-        self.cctype = cctype
-        self.msg = msg
-        self.uid = uid
-
-
-# 摄像头命令定义
-class CameraCmd(object):
-    def __init__(self,
-                 cmdType=CameraCmdType.START_CAPTURE,
-                 cameraName=None,
-                 values={}):
-        self.cmdType = cmdType
-        self.values = values
-        self.cameraName = cameraName
