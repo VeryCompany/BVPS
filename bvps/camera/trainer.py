@@ -10,6 +10,8 @@ from sklearn.svm import SVC
 from bvps.config import training_config as tc
 from bvps.config import svm_param_grid as spg
 import copy
+import threading
+from bvps.camera.camera import clock
 
 tc = {"cap_nums": 10}
 
@@ -28,8 +30,9 @@ spg = [{
 
 
 class TrainingProcessor(multiprocessing.Process):
-    human_map = {}  # 应该持久化的map
-
+    human_map = {}  # 应该持久化的map,持久化后可以使用多线程提高性能
+    model_updated = False
+    
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self)
         TrainingServer.in_queue = in_queue
@@ -37,36 +40,52 @@ class TrainingProcessor(multiprocessing.Process):
 
     def run(self):
         global tc
-        last_uid = None
+        trth = threading.thread(target=self.auto_training, args=())
+        trth.setDaemon()
+        trth.start()
+
         while True:
-            """
-            接收N张照片，如果接收到足够数量的样本，返回消息
-            """
-            log.info("-------------------")
             message = TrainingServer.in_queue.get()
-            human = message[0][0][0]
-            uid = message[1]
-            t0 = message[0][2]
-            log.info("receive uid:{},faces".format(uid))
-            if uid == last_uid:
+            if message.__class__ == TrainingCMD.__class__:
+                receiver = threading.thread(
+                    target=self.receive_samples,
+                    args=(TrainingServer.in_queue, self.human_map, message.uid,
+                          message.msg))
+                receiver.start()
+                receiver.join()
+
+    def receive_samples(self, inqueue, hm, uid, start_time):
+        num = 0
+        while num < tc["cap_nums"]:
+            message = TrainingServer.in_queue.get()
+            human = message[0][0]
+            t0 = message[1]
+            sec = message[2]
+            if t0 < start_time or t0 - start_time > 1000000:
                 continue
-            log.info("newuser {}".format(uid))
             if uid not in self.human_map:
                 self.human_map[uid] = []
             if len(self.human_map[uid]) < tc["cap_nums"]:
                 self.human_map[uid].append(human)
-                log.info("msg")
+            num += 1
+        if num < tc["cap_nums"]:
+            # todo://样板数据搜集失败，应该返回不能开门
+            log.info("用户{}的样本数量{}！".format(uid, len(self.human_map[uid])))
+            pass
+        self.model_updated = True
+        log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
 
-            log.info(
-                "接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
-            if len(self.human_map[uid]) >= tc["cap_nums"]:
-                if len(self.human_map) > 1:
-                    log.info("开始训练样品。。。")
-                    self.train()
-                    log.info(self.svm)
-                    log.info("训练样本完成。。。")
-                    TrainingServer.out_queue.put_nowait(self.svm)
-                last_uid = uid
+    def auto_training(self):
+        while self.model_updated:
+            if len(self.human_map) < 2:
+                continue
+            hums = copy.deepcopy(self.human_map)
+            for uid, imgs in hums.items():
+                if len(imgs) != tc["cap_nums"]:
+                    log.error("msg")
+            svm = self.train()
+            TrainingServer.out_queue.put(svm)
+            time.sleep(1)
 
     def train(self):
         try:
@@ -85,6 +104,6 @@ class TrainingProcessor(multiprocessing.Process):
             y = np.array(uids)
             log.info("typeX:{}---typey:{}---lenx:{},leny:{}".format(
                 type(X), type(y), len(X), len(y)))
-            self.svm = GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
+            return GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
         except Exception as e:
             log.error(e)

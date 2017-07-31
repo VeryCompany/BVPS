@@ -108,9 +108,12 @@ class Camera(ActorTypeDispatcher):
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
         if cmd.cctype == CameraCmdType.TRAINOR_START:
-            self.training_start_time = int(cmd.msg)
-            self.training_end_time = int(cmd.msg + 10)
-            self.training_uid = cmd.uid
+            # self.training_start_time = int(cmd.msg)
+            # self.training_end_time = int(cmd.msg + 10)
+            # self.training_uid = cmd.uid
+            # 将开始指令发送至训练器
+            self.human_detector_out_q.put(
+                TrainingCMD(CameraCmdType.TRAINOR_START, clock(), cmd.uid))
             log.info("用户{},时间{}".format(cmd.uid, cmd.msg))
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:
             self.training_start_time, self.training_end_time = None, None
