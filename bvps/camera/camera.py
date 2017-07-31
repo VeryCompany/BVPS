@@ -16,6 +16,7 @@ from bvps.camera.pre_processor import PreProcessor
 from bvps.camera.detector import DetectorProcessor
 from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
+from bvps.camera.recognizer import ModelUpdateCmd
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
@@ -68,7 +69,6 @@ class Camera(ActorTypeDispatcher):
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 return
-
             """视频采集线程"""
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             self.cameraId = cmd.cameraName
@@ -76,7 +76,6 @@ class Camera(ActorTypeDispatcher):
                                            cmd.values["device"], self.cps, cmd)
             self.cct.setDaemon(True)
             self.cct.start()
-
             """监控视频Web服务器"""
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
@@ -85,44 +84,50 @@ class Camera(ActorTypeDispatcher):
             log.info("摄像头web服务器启动完成...")
 
             pn = cmd.values["processNum"]  # 多进程处理进程数量
-
             """图像预处理启动"""
             log.info("启动摄像头[{}]图像预处理进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
                 pps = PreProcessor(self, self.pre_process_queue,
                                    self.human_detector_q)
-                pps.setDaemon()
+                pps.setDaemon(True)
                 pps.start()
             log.info(
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
-
             """检测器进程启动"""
             log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
                 dps = DetectorProcessor(self, self.human_detector_q,
                                         self.training_dset_q,
                                         self.recognizer_in_q)
-                dps.setDaemon()
+                dps.setDaemon(True)
                 dps.start()
             log.info("启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
-
             """训练器进程启动"""
             log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
                 tps = TrainingProcessor(self.training_dset_q,
                                         self.training_model_oq)
-                tps.setDaemon()
+                tps.setDaemon(True)
                 tps.start()
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
-
             """识别器进程启动"""
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, pn))
             for p in range(0, pn, 1):
                 srz = SVMRecognizer(self.recognizer_in_q,
                                     self.recognizer_out_q)
-                srz.setDaemon()
+                srz.setDaemon(True)
                 srz.start()
             log.info("启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+            """
+            检查有新的模型输出
+            training_model_oq if have update then --> recognizer_in_q
+            """
+            mtp = threading.Thread(
+                target=self.model_process,
+                args=(self.training_model_oq, self.recognizer_in_q, ),
+                name="model_update_processor")
+            mtp.setDaemon(True)
+            mtp.start()
 
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
@@ -130,15 +135,25 @@ class Camera(ActorTypeDispatcher):
                 targetActorRequirements=None,
                 globalName="CameraPositionActor",
                 sourceHash=None)
-
-            userThread = threading.Thread(
-                target=self.process_user, args=(Camera.user_queue, ))
-            userThread.start()
+            """
+            检查有新的用户定位输出
+            recognizer_out_q if have then --> PositionActor
+            """
+            utp = threading.Thread(
+                target=self.process_user,
+                args=(self.recognizer_out_q, ),
+                name="user_position_sender")
+            utp.setDaemon(True)
+            utp.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 self.cct.stop()
                 self.cct.join(timeout=10)
             self.send(sender, "camera stopped!")
+
+    def model_process(self, in_queue, out_queue):
+        model = in_queue.get()
+        out_queue.put(ModelUpdateCmd(model))
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
         if cmd.cctype == CameraCmdType.TRAINOR_START:
@@ -146,7 +161,7 @@ class Camera(ActorTypeDispatcher):
             # self.training_end_time = int(cmd.msg + 10)
             # self.training_uid = cmd.uid
             # 将开始指令发送至训练器
-            self.human_detector_out_q.put(
+            self.self.training_dset_q.put(
                 TrainingCMD(CameraCmdType.TRAINOR_START, clock(), cmd.uid))
             log.info("用户{},时间{}".format(cmd.uid, cmd.msg))
         elif cmd.cctype == CameraCmdType.TRAINOR_CAPTURE_OK:

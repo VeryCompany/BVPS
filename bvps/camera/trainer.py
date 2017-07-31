@@ -34,7 +34,7 @@ class TrainingProcessor(multiprocessing.Process):
     model_updated = False
 
     def __init__(self, in_queue, out_queue):
-        multiprocessing.Process.__init__(self)
+        multiprocessing.Process.__init__(self, name="training_processor")
         TrainingServer.in_queue = in_queue
         TrainingServer.out_queue = out_queue
 
@@ -50,7 +50,7 @@ class TrainingProcessor(multiprocessing.Process):
                 receiver = threading.thread(
                     target=self.receive_samples,
                     args=(TrainingServer.in_queue, self.human_map, message.uid,
-                          message.msg))
+                          message.msg,))
                 receiver.start()
                 receiver.join()
 
