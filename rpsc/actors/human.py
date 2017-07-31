@@ -4,7 +4,8 @@ from rpsc.models import HumanModel, ShoppingCartProductModel
 from rpsc.actors.core import *
 
 from bvps.config import cameras
-from bvps.camera.camera import Camera, CameraType, TrainingCMD, CameraCmdType
+from bvps.camera.camera import Camera
+from bvps.common import CameraType, TrainingCMD, CameraCmdType
 
 import time
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from bvps.camera.camera import CameraType
+from bvps.common import CameraType
 
 """摄像头配置信息"""
 cameras = {
