@@ -2,7 +2,7 @@
 """camera script."""
 import logging as log
 import multiprocessing
-from bvps.config import cameras as ca
+
 import cv2
 
 
@@ -14,6 +14,7 @@ class PreProcessor(multiprocessing.Process):
         self.camera = camera
 
     def run(self):
+        from bvps.config import cameras as ca
         scale = ca[self.camera.cameraId]["scale"]
         while True:
             frame, t0, ts = PreProcessor.frame_in.get()
@@ -21,4 +22,4 @@ class PreProcessor(multiprocessing.Process):
 
             if scale is not None and scale != 1:
                 frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
-            PreProcessor.out_queue.put(frame)
+            PreProcessor.frame_out.put((frame, t0, ts))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging as log
 import os
-import multiprocessing.Process
+import multiprocessing
 import numpy as np
 import openface
 from sklearn.svm import SVC

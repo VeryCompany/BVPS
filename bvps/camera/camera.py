@@ -58,9 +58,7 @@ class Camera(ActorTypeDispatcher):
 
         Camera.user_queue = multiprocessing.Queue(64)
         self.webserver = None
-        self.cameraServer = None
         self.cct = None
-        self.cps = []
 
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
@@ -73,7 +71,7 @@ class Camera(ActorTypeDispatcher):
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
-                                           cmd.values["device"], self.cps, cmd)
+                                           cmd.values["device"], cmd)
             self.cct.setDaemon(True)
             self.cct.start()
             """监控视频Web服务器"""
@@ -89,7 +87,6 @@ class Camera(ActorTypeDispatcher):
             for p in range(0, pn, 1):
                 pps = PreProcessor(self, self.pre_process_queue,
                                    self.human_detector_q)
-                pps.setDaemon(True)
                 pps.start()
             log.info(
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
@@ -99,7 +96,6 @@ class Camera(ActorTypeDispatcher):
                 dps = DetectorProcessor(self, self.human_detector_q,
                                         self.training_dset_q,
                                         self.recognizer_in_q)
-                dps.setDaemon(True)
                 dps.start()
             log.info("启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """训练器进程启动"""
@@ -107,7 +103,6 @@ class Camera(ActorTypeDispatcher):
             for p in range(0, pn, 1):
                 tps = TrainingProcessor(self.training_dset_q,
                                         self.training_model_oq)
-                tps.setDaemon(True)
                 tps.start()
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """识别器进程启动"""
@@ -115,7 +110,6 @@ class Camera(ActorTypeDispatcher):
             for p in range(0, pn, 1):
                 srz = SVMRecognizer(self.recognizer_in_q,
                                     self.recognizer_out_q)
-                srz.setDaemon(True)
                 srz.start()
             log.info("启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """
@@ -128,17 +122,16 @@ class Camera(ActorTypeDispatcher):
                 name="model_update_processor")
             mtp.setDaemon(True)
             mtp.start()
-
+            """
+            检查有新的用户定位输出
+            recognizer_out_q if have then --> PositionActor
+            """
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
                 PositionActor,
                 targetActorRequirements=None,
                 globalName="CameraPositionActor",
                 sourceHash=None)
-            """
-            检查有新的用户定位输出
-            recognizer_out_q if have then --> PositionActor
-            """
             utp = threading.Thread(
                 target=self.process_user,
                 args=(self.recognizer_out_q, ),
@@ -189,16 +182,12 @@ class CameraCaptureThread(threading.Thread):
                  camera,
                  cameraName,
                  cameraDevice,
-                 processors=[],
                  initCmd=None):
         threading.Thread.__init__(self)
         self._stop_event = threading.Event()
         self.camera = camera
         self.cameraName = cameraName
         self.cameraDevice = cameraDevice
-        self.processors = processors
-        self.detector = detector()
-        self.recognizer = recognizer(None)
         self.threadn = cv2.getNumberOfCPUs() * 4
         self.pools = {}
         self.initCmd = initCmd
@@ -254,8 +243,8 @@ class CameraCaptureThread(threading.Thread):
                             if not self.camera.pre_process_queue.full():
                                 self.camera.pre_process_queue.put_nowait(
                                     (frame, t, frame_time))
-                            if not self.camera.frameQueue.full():
-                                self.camera.frameQueue.put_nowait((frame, t,
+                            if not self.camera.frame_queue.full():
+                                self.camera.frame_queue.put_nowait((frame, t,
                                                                    frame_time))
                         last_frame_time = t
                     num += 1

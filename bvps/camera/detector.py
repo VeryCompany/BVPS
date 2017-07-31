@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import openface
 from bvps.camera.common import StatValue, clock, draw_str
-from bvps.config import cameras as ca
+
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
@@ -23,12 +23,12 @@ net = openface.TorchNeuralNet(
 
 
 class DetectorProcessor(multiprocessing.Process):
-    
+
     def __init__(self, camera, frame_in, frame_out, frame_out_2):
         multiprocessing.Process.__init__(self, name="video_human_detector")
         DetectorProcessor.frame_in = frame_in
         DetectorProcessor.frame_out = frame_out
-        DetectorProcessor.frame_out2 = frame_out2
+        DetectorProcessor.frame_out2 = frame_out_2
         self.camera = camera
         self.hog = cv2.HOGDescriptor()
         self.hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -60,11 +60,6 @@ class DetectorProcessor(multiprocessing.Process):
         faces = self.faceDetector(image)
         for face in faces:
             validHuman.append((face, t0, secs))
-        self.num += 1
-        t = clock()
-        self.latency.update(t - t0)
-        self.frame_interval.update(t - self.last_frame_time)
-        self.last_frame_time = t
         return validHuman
 
     def fullBodyDetector(self, image):

@@ -7,13 +7,10 @@ from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
 from sklearn.manifold import TSNE
 from sklearn.svm import SVC
-from bvps.config import training_config as tc
-from bvps.config import svm_param_grid as spg
 import copy
 import threading
 from bvps.camera.camera import clock
-
-tc = {"cap_nums": 10}
+import multiprocessing
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
@@ -27,6 +24,7 @@ spg = [{
     'gamma': [0.001, 0.0001],
     'kernel': ['rbf']
 }]
+tc = {"cap_nums": 10}
 
 
 class TrainingProcessor(multiprocessing.Process):
@@ -35,22 +33,22 @@ class TrainingProcessor(multiprocessing.Process):
 
     def __init__(self, in_queue, out_queue):
         multiprocessing.Process.__init__(self, name="training_processor")
-        TrainingServer.in_queue = in_queue
-        TrainingServer.out_queue = out_queue
+        TrainingProcessor.in_queue = in_queue
+        TrainingProcessor.out_queue = out_queue
 
     def run(self):
         global tc
-        trth = threading.thread(target=self.auto_training, args=())
-        trth.setDaemon()
+        trth = threading.Thread(target=self.auto_training, args=())
+        trth.setDaemon(True)
         trth.start()
 
         while True:
-            message = TrainingServer.in_queue.get()
+            message = TrainingProcessor.in_queue.get()
             if message.__class__ == TrainingCMD.__class__:
                 receiver = threading.thread(
                     target=self.receive_samples,
                     args=(TrainingServer.in_queue, self.human_map, message.uid,
-                          message.msg,))
+                          message.msg, ))
                 receiver.start()
                 receiver.join()
 
