@@ -14,6 +14,7 @@ import multiprocessing
 
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
+from bvps.camera.camera import TrainingCMD
 # from bvps.config import svm_param_grid as spg
 
 spg = [{
@@ -36,7 +37,7 @@ class TrainingProcessor(multiprocessing.Process):
         TrainingProcessor.in_queue = in_queue
         TrainingProcessor.out_queue = out_queue
         self.camera = camera
-        
+
     def run(self):
         global tc
         trth = threading.Thread(target=self.auto_training, args=())

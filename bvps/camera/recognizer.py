@@ -29,7 +29,7 @@ class SVMRecognizer(multiprocessing.Process):
         SVMRecognizer.out_queue = out_queue
         self.camera = camera
     def whoru(self, human):
-        if self.svm is None:
+        if self.model is None:
             return None
         face = human[0][0]
         X = face.flatten()  # 需要图片扁平化处理
