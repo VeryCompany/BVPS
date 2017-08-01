@@ -13,7 +13,7 @@ fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
 net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=False)
 
 
 class SVMRecognizer(multiprocessing.Process):
@@ -31,15 +31,15 @@ class SVMRecognizer(multiprocessing.Process):
         if self.model is None:
             return None
         face = human[0][0]
-        X = face.flatten()  # 需要图片扁平化处理
-        rep = net.forward(X)
+        # X = face.flatten()  # 需要图片扁平化处理
+        rep = net.forward(face)
         identity = self.svm.predict(rep)[0]
         return identity
 
     def run(self):
         while True:
             msg = SVMRecognizer.in_queue.get()
-            if msg.__class__ == ModelUpdateCmd.__class__:
+            if isinstance(msg, ModelUpdateCmd):
                 self.model = msg.model
                 continue
             frame, t0, sec = msg
@@ -48,10 +48,10 @@ class SVMRecognizer(multiprocessing.Process):
             if uid is not None:
                 # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
                 SVMRecognizer.out_queue.put((uid, (px, py), t0, sec))
-            log.info(
-                "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
-                format(self.camera.cameraId, self.latency.value * 1000,
-                       self.frame_interval.value * 1000))
+            # log.info(
+            #    "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
+            #    format(self.camera.cameraId, self.latency.value * 1000,
+            #           self.frame_interval.value * 1000))
             t = clock()
             self.latency.update(t - t0)
             self.frame_interval.update(t - self.last_frame_time)

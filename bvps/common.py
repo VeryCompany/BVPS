@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
+import os
+import openface
 
+fileDir = os.path.dirname(os.path.realpath(__file__))
+modelDir = os.path.join(fileDir,  'models')
+dlibModelDir = os.path.join(modelDir, 'dlib')
+harrsDir = os.path.join(fileDir, 'haars')
+openfaceModelDir = os.path.join(modelDir, 'openface')
+
+align = openface.AlignDlib(
+    os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
+net = openface.TorchNeuralNet(
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 class CameraCmdType(Enum):
     START_CAPTURE = 1

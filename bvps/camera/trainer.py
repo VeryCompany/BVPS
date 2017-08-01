@@ -2,6 +2,7 @@
 from thespian.actors import *
 from thespian.troupe import troupe
 import logging as log
+import sys, traceback, os
 
 from sklearn.decomposition import PCA
 from sklearn.grid_search import GridSearchCV
@@ -11,13 +12,17 @@ import copy
 import threading
 from bvps.camera.camera import clock
 import multiprocessing
-
+import inspect
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
 
 from bvps.common import TrainingCMD
-
+import time
+import numpy as np
+import openface
 # from bvps.config import svm_param_grid as spg
+
+from bvps.common import net
 
 spg = [{
     'C': [1, 10, 100, 1000],
@@ -48,43 +53,56 @@ class TrainingProcessor(multiprocessing.Process):
 
         while True:
             message = TrainingProcessor.in_queue.get()
-            if message.__class__ == TrainingCMD.__class__:
-                receiver = threading.thread(
+            if isinstance(message, TrainingCMD):
+                receiver = threading.Thread(
                     target=self.receive_samples,
-                    args=(TrainingServer.in_queue, self.human_map, message.uid,
-                          message.msg, ))
+                    args=(TrainingProcessor.in_queue, self.human_map,
+                          message.uid, message.msg, ))
                 receiver.start()
                 receiver.join()
 
     def receive_samples(self, inqueue, hm, uid, start_time):
+        log.info("receive_samples called!!")
         num = 0
         while num < tc["cap_nums"]:
-            message, t0, sec = TrainingServer.in_queue.get()
-            human = message[0][0]
+            message, t0, sec = TrainingProcessor.in_queue.get()
+            human, px, py = message
             if t0 < start_time or t0 - start_time > 1000000:
                 continue
             if uid not in self.human_map:
                 self.human_map[uid] = []
             if len(self.human_map[uid]) < tc["cap_nums"]:
                 self.human_map[uid].append(human)
+            log.info("human.size():{} {}".format(len(human), human.shape))
             num += 1
         if num < tc["cap_nums"]:
             # todo://样板数据搜集失败，应该返回不能开门
             log.info("用户{}的样本数量{}！".format(uid, len(self.human_map[uid])))
-            pass
         self.model_updated = True
         log.info("接收到用户{}的样本图片，样本数量{}".format(uid, len(self.human_map[uid])))
 
     def auto_training(self):
-        while self.model_updated:
-            if len(self.human_map) < 2:
-                continue
-            hums = copy.deepcopy(self.human_map)
-            for uid, imgs in hums.items():
-                if len(imgs) != tc["cap_nums"]:
-                    log.error("msg")
-            svm = self.train()
-            TrainingServer.out_queue.put(svm)
+        while True:
+            if self.model_updated:
+                if len(self.human_map) < 2:
+                    continue
+                log.info('ready to process generate model...')
+                hums = copy.deepcopy(self.human_map)
+                ready = False
+                for uid, imgs in hums.items():
+                    if len(imgs) < tc["cap_nums"]:
+                        log.error("wait moments...")
+                        ready = False
+                        break
+                    ready = True
+                    log.info("ready:{},process {}'s images to model.".format(
+                        ready, uid))
+                if ready:
+                    log.info("begin to train svm model....")
+                    svm = self.train()
+                    TrainingProcessor.out_queue.put(svm)
+                    self.model_updated = False
+                    log.info("ending to train svm model....")
             time.sleep(1)
 
     def train(self):
@@ -94,16 +112,22 @@ class TrainingProcessor(multiprocessing.Process):
             hums = copy.deepcopy(self.human_map)
             for uid, imgs in hums.items():
                 for img in imgs:
-                    log.info("msg--type:{}".format(type(img)))
-                    images.append(img.flatten())
+                    # im = img.flatten()
+                    rep = net.forward(img)
+                    images.append(rep)
+                    log.info(
+                        "-----------------img.size():{}".format(rep.shape))
                 log.info("type:{}".format(type(imgs)))
                 log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
-
+            log.info("{} {}".format(images, uid))
             X = np.vstack(images)
             y = np.array(uids)
-            log.info("typeX:{}---typey:{}---lenx:{},leny:{}".format(
-                type(X), type(y), len(X), len(y)))
+            log.info(
+                "typeX:{}---typey:{}---lenx:{},leny:{}, X.shape:{}, y.shape:{}".
+                format(type(X), type(y), len(X), len(y), X.shape, y.shape))
             return GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
-        except Exception as e:
-            log.error(e)
+        except Exception, e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))

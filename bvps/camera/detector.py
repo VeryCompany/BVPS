@@ -9,17 +9,10 @@ import cv2
 import numpy as np
 import openface
 from bvps.camera.common import StatValue, clock, draw_str
+from bvps.common import align, net, harrsDir
 
 
-fileDir = os.path.dirname(os.path.realpath(__file__))
-modelDir = os.path.join(fileDir, '..', 'models')
-dlibModelDir = os.path.join(modelDir, 'dlib')
-harrsDir = os.path.join(fileDir, '..', 'haars')
-openfaceModelDir = os.path.join(modelDir, 'openface')
-align = openface.AlignDlib(
-    os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
-net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+
 
 
 class DetectorProcessor(multiprocessing.Process):
@@ -52,7 +45,7 @@ class DetectorProcessor(multiprocessing.Process):
             frame, t0, secs = DetectorProcessor.frame_in.get()
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
-                log.info("检测到{}个人".format(len(humans)))
+                log.debug("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
