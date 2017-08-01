@@ -117,7 +117,7 @@ class DetectorProcessor(multiprocessing.Process):
                 continue
 
             roi = frame.copy()[bb.top():bb.bottom(), bb.left():bb.right()]
-            faces.append((roi, bb.dcenter().x, bb.dcenter().y))
+            faces.append((alignedFace, roi, bb.dcenter().x, bb.dcenter().y))
         return faces
 
     def inside(self, r, q):

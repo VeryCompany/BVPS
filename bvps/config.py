@@ -79,7 +79,7 @@ cameras = {
             "camera_matrix": []
         },
         "scale": 1.0/2.0,
-        "device": "rtsp://192.168.0.80:554",
+        "device": 0,
         "user": "",
         "password": "",
         "cameraType": CameraType.CAPTURE,

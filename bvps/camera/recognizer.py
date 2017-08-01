@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging as log
 import multiprocessing
-import os
+import os, sys, traceback
 
 import numpy as np
 import openface
@@ -30,29 +30,42 @@ class SVMRecognizer(multiprocessing.Process):
     def whoru(self, human):
         if self.model is None:
             return None
-        face = human[0][0]
+        face = human
+
         # X = face.flatten()  # 需要图片扁平化处理
+        # log.info("face.shape:{}".format(face.shape))
+        # log.info(face)
+        # log.info(human)
         rep = net.forward(face)
-        identity = self.svm.predict(rep)[0]
+        identity = self.model.predict(rep)[0]
         return identity
 
     def run(self):
         while True:
-            msg = SVMRecognizer.in_queue.get()
-            if isinstance(msg, ModelUpdateCmd):
-                self.model = msg.model
-                continue
-            frame, t0, sec = msg
-            human, px, py = frame
-            uid = self.whoru(human)
-            if uid is not None:
-                # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
-                SVMRecognizer.out_queue.put((uid, (px, py), t0, sec))
-            # log.info(
-            #    "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
-            #    format(self.camera.cameraId, self.latency.value * 1000,
-            #           self.frame_interval.value * 1000))
-            t = clock()
-            self.latency.update(t - t0)
-            self.frame_interval.update(t - self.last_frame_time)
-            self.last_frame_time = t
+            try:
+                msg = SVMRecognizer.in_queue.get()
+                if isinstance(msg, ModelUpdateCmd):
+                    self.model = msg.model
+                    continue
+                frame, t0, sec = msg
+                human, roi, px, py = frame
+                uid = self.whoru(human)
+                if uid is not None:
+                    # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
+                    log.info(
+                        "user:{},px:{},py:{},sec:{}".format(uid, px, py, sec))
+                    SVMRecognizer.out_queue.put((self.camera.cameraId, uid,
+                                                 (px, py), t0, sec))
+                # log.info(
+                #    "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
+                #    format(self.camera.cameraId, self.latency.value * 1000,
+                #           self.frame_interval.value * 1000))
+                t = clock()
+                self.latency.update(t - t0)
+                self.frame_interval.update(t - self.last_frame_time)
+                self.last_frame_time = t
+            except Exception, e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                log.error(
+                    traceback.format_exception(exc_type, exc_value,
+                                               exc_traceback))

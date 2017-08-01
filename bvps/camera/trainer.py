@@ -66,7 +66,7 @@ class TrainingProcessor(multiprocessing.Process):
         num = 0
         while num < tc["cap_nums"]:
             message, t0, sec = TrainingProcessor.in_queue.get()
-            human, px, py = message
+            human, roi, px, py = message
             if t0 < start_time or t0 - start_time > 1000000:
                 continue
             if uid not in self.human_map:
@@ -115,15 +115,10 @@ class TrainingProcessor(multiprocessing.Process):
                     # im = img.flatten()
                     rep = net.forward(img)
                     images.append(rep)
-                    log.info(
-                        "-----------------img.size():{}".format(rep.shape))
-                log.info("type:{}".format(type(imgs)))
-                log.info("images-type:{}".format(type(images)))
                 uids.extend([uid for x in range(len(imgs))])
-            log.info("{} {}".format(images, uid))
             X = np.vstack(images)
             y = np.array(uids)
-            log.info(
+            log.debug(
                 "typeX:{}---typey:{}---lenx:{},leny:{}, X.shape:{}, y.shape:{}".
                 format(type(X), type(y), len(X), len(y), X.shape, y.shape))
             return GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)

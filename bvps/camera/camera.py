@@ -16,6 +16,7 @@ from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
 from bvps.common import ModelUpdateCmd
 from bvps.common import CameraCmdType, TrainingCMD
+from bvps.config import cameras as cams
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
@@ -148,11 +149,15 @@ class Camera(ActorTypeDispatcher):
     def model_process(self, in_queue, out_queue):
         model = in_queue.get()
         out_queue.put(ModelUpdateCmd(model))
-        # for camid in ....
-        # send to all camera
+        log.info("有新的识别模型，发送给定位摄像头！")
+        self.send_model_to_all_camera(ModelUpdateCmd(model))
+        log.info("识别模型同步完成！")
 
     def send_model_to_all_camera(self, model):
-        pass
+        for camId, params in cams.items():
+            if self.cameraId != camId and params["cameraType"] == CameraType.POSITION:
+                cam = self.createActor(Camera, globalName=camId)
+                self.send(cam, model)
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
         if cmd.cctype == CameraCmdType.TRAINOR_START:
@@ -171,7 +176,8 @@ class Camera(ActorTypeDispatcher):
             self.svm_model_updated = True
 
     def receiveMsg_ModelUpdateCmd(self, cmd, sender):
-        pass
+        self.recognizer_in_q.put(cmd)
+
 
     def process_user(self, uq):
         while True:

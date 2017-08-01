@@ -29,10 +29,10 @@ class PositionActor(ActorTypeDispatcher):
             time.sleep(1)
 
     def receiveMsg_tuple(self, message, sender):
-        cameraId, uid, x, y, image, resolution, t0, sec = message
-
+        cameraId, uid, px, t0, sec = message
+        x, y = px
         cgid = None
-        for gid, params in cg:
+        for gid, params in cg.items():
             if cameraId in params["members"]:
                 cgid = gid
         if cgid is not None:
