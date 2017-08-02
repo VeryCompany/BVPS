@@ -5,6 +5,7 @@ from bvps.config import cameras as cms
 from bvps.config import camera_group as cg
 import threading
 import time
+import sys, traceback
 from multiprocessing.dummy import Pool as ThreadPool
 import numpy as np
 
@@ -14,11 +15,9 @@ class PositionActorMsg(object):
         pass
 
 
-lock = threading.Lock()
-
-
 class PositionActor(ActorTypeDispatcher):
     position_cache = {}
+    self.lock = threading.Lock()
 
     def __init__(self, *args, **kw):
         super(PositionActor, self).__init__(*args, **kw)
@@ -26,7 +25,16 @@ class PositionActor(ActorTypeDispatcher):
 
     def processPosition(self):
         while True:
-            self.process_position()
+            try:
+                self.lock.acquire()
+                self.process_position()
+            except Exception, e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                log.error(
+                    traceback.format_exception(exc_type, exc_value,
+                                               exc_traceback))
+            finally:
+                self.lock.release()
             time.sleep(1)
 
     def receiveMsg_tuple(self, message, sender):
@@ -40,19 +48,28 @@ class PositionActor(ActorTypeDispatcher):
                 cgid = gid
         log.info("stero camera group {}".format(cgid))
         if cgid is not None:
-            baseline_mm = cg["baseline_mm"]
+            baseline_mm = cg[cgid]["baseline_mm"]
             cx = cg["cx"]
             cy = cg["cy"]
-            if uid not in self.position_cache:
-                self.position_cache[uid] = {}
-            if sec not in self.position_cache[uid]:
-                self.position_cache[uid][sec] = {}
-            if cgid not in self.position_cache[uid][sec]:
-                self.position_cache[uid][sec][cgid] = {}
-            if cameraId not in self.position_cache[uid][sec][cgid]:
-                self.position_cache[uid][sec][cgid][cameraId] = []
-            self.position_cache[uid][sec][cgid][cameraId].append([x, y])
-            """Xpx,Ypx,centreX,centreY,baseline_mm,pixel_per_mm"""
+            try:
+                self.lock.acquire()
+                if uid not in self.position_cache:
+                    self.position_cache[uid] = {}
+                if sec not in self.position_cache[uid]:
+                    self.position_cache[uid][sec] = {}
+                if cgid not in self.position_cache[uid][sec]:
+                    self.position_cache[uid][sec][cgid] = {}
+                if cameraId not in self.position_cache[uid][sec][cgid]:
+                    self.position_cache[uid][sec][cgid][cameraId] = []
+                self.position_cache[uid][sec][cgid][cameraId].append([x, y])
+                """Xpx,Ypx,centreX,centreY,baseline_mm,pixel_per_mm"""
+            except Exception, e:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                log.error(
+                    traceback.format_exception(exc_type, exc_value,
+                                               exc_traceback))
+            finally:
+                self.lock.release()
 
 # """
 # position_cache = {
