@@ -133,7 +133,7 @@ class TrainingProcessor(multiprocessing.Process):
             log.debug(
                 "typeX:{}---typey:{}---lenx:{},leny:{}, X.shape:{}, y.shape:{}".
                 format(type(X), type(y), len(X), len(y), X.shape, y.shape))
-            return GridSearchCV(SVC(C=1), spg, cv=5).fit(X, y)
+            return GridSearchCV(SVC(C=1), spg, cv=5, n_jobs=4).fit(X, y)
         except Exception, e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
