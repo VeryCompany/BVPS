@@ -67,7 +67,11 @@ class PositionActor(ActorTypeDispatcher):
                     self.position_cache[uid][sec][cgid][cameraId] = []
                 self.position_cache[uid][sec][cgid][cameraId].append([x, y])
                 """Xpx,Ypx,centreX,centreY,baseline_mm,pixel_per_mm"""
-                log.info(self.position_cache)
+
+                for uid, pxy in self.position_cache.items():
+                    for sec, groups in pxy.items():
+                        if len(groups) >= 2:
+                            log.info("sec:{},{}".format(sec, groups))
             except Exception, e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
