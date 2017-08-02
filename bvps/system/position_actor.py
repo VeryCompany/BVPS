@@ -27,9 +27,12 @@ class PositionActor(ActorTypeDispatcher):
         while True:
             try:
                 self.lock.acquire()
+                log.info("开始处理世界坐标！")
                 self.process_position()
+                log.info("处理世界坐标结束！")
             except Exception, e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
+                log.error(e)
                 log.error(
                     traceback.format_exception(exc_type, exc_value,
                                                exc_traceback))
