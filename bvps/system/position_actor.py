@@ -17,7 +17,7 @@ class PositionActorMsg(object):
 
 class PositionActor(ActorTypeDispatcher):
     position_cache = {}
-    self.lock = threading.Lock()
+    lock = threading.Lock()
 
     def __init__(self, *args, **kw):
         super(PositionActor, self).__init__(*args, **kw)
