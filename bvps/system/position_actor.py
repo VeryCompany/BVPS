@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from thespian.actors import *
-import logging
+import logging as log
 from bvps.config import cameras as cms
 from bvps.config import camera_group as cg
 import threading
