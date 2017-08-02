@@ -181,6 +181,10 @@ class Camera(ActorTypeDispatcher):
                         training_dset_q_stat.value / count_times,
                         recognizer_in_q_stat.value / count_times))
                 count_times = 1
+                pre_queue_stat.update(0)
+                human_detector_q_stat.update(0)
+                training_dset_q_stat.update(0)
+                recognizer_in_q_stat.update(0)
             count_times += 1
             time.sleep(1)
 
