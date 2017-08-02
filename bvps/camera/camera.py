@@ -121,7 +121,7 @@ class Camera(ActorTypeDispatcher):
                 name="model_update_processor")
             mtp.setDaemon(True)
             mtp.start()
-            if cmd["cameraType"] == CameraType.CAPTURE:
+            if cmd.values["cameraType"] == CameraType.CAPTURE:
                 """训练器进程启动"""
                 log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
                 for p in range(0, 1, 1):
