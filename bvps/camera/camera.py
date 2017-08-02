@@ -61,7 +61,7 @@ class Camera(ActorTypeDispatcher):
         self.webserver = None
         self.cct = None
         self.cameraType = None
-        
+
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
@@ -180,7 +180,7 @@ class Camera(ActorTypeDispatcher):
                                         self.recognizer_in_q.qsize())
             if count_times > 10:
                 log.info(
-                    "{}预处理堆积{:0.1f},识别器堆积{:0.1f},训练器堆积{:0.1f},识别器堆积{:0.1f}".format(
+                    "{}预处理堆积{:0.1f},探测器堆积{:0.1f},训练器堆积{:0.1f},识别器堆积{:0.1f}".format(
                         self.cameraId, pre_queue_stat.value / count_times,
                         human_detector_q_stat.value / count_times,
                         training_dset_q_stat.value / count_times,
