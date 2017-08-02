@@ -96,7 +96,7 @@ cameras = {
 """双目摄像头分组信息"""
 camera_group = {
     "group_1": {
-        "members": ["camera4", "camera5"],
+        "members": ["camera1", "camera2"],
         "primary": "camera4",
         "baseline_mm": 220,
         "cx": 0,
