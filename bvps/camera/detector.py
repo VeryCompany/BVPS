@@ -53,6 +53,8 @@ class DetectorProcessor(multiprocessing.Process):
             else:
                 brt_times += 1
                 log.info("没有检测到人，跳过{}帧".format(brt_times))
+            if brt_times > 20:
+                brt_times = -2
             log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
                       format(self.camera.cameraId, self.latency.value * 1000,
                              self.frame_interval.value * 1000))
