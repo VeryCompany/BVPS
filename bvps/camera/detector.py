@@ -50,6 +50,7 @@ class DetectorProcessor(multiprocessing.Process):
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     log.info("self.camera.cameraType:{}".format(self.camera.cameraType))
                     if self.camera.cameraType == CameraType.CAPTURE:
+                        log.info("add {}".format(self.camera.cameraType))
                         DetectorProcessor.frame_out2.put(human)  # for Trainor
                 brt_times = -5
             else:
