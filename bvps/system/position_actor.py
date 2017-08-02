@@ -66,6 +66,7 @@ class PositionActor(ActorTypeDispatcher):
                     self.position_cache[uid][sec][cgid][cameraId] = []
                 self.position_cache[uid][sec][cgid][cameraId].append([x, y])
                 """Xpx,Ypx,centreX,centreY,baseline_mm,pixel_per_mm"""
+                log.info(self.position_cache)
             except Exception, e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
