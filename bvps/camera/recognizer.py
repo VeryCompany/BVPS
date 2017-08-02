@@ -22,8 +22,12 @@ class SVMRecognizer(multiprocessing.Process):
         SVMRecognizer.in_queue = in_queue
         SVMRecognizer.out_queue = out_queue
         self.camera = camera
-        with open("./svm_model.pk", 'rb') as infile:
-            self.model = pickle.load(infile)
+        try:
+            with open("./svm_model.pk", 'rb') as infile:
+                self.model = pickle.load(infile)
+        except Exception, e:
+            log.error(e)
+            self.model = None
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
