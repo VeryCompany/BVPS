@@ -70,8 +70,8 @@ class PositionActor(ActorTypeDispatcher):
 
                 for uid, pxy in self.position_cache.items():
                     for sec, groups in pxy.items():
-                        if len(groups) >= 2:
-                            log.info("sec:{},{}".format(sec, groups))
+
+                        log.info("sec:{},{}".format(sec, groups))
             except Exception, e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
