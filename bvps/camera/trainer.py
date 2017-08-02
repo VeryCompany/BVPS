@@ -44,6 +44,12 @@ class TrainingProcessor(multiprocessing.Process):
         TrainingProcessor.in_queue = in_queue
         TrainingProcessor.out_queue = out_queue
         self.camera = camera
+        try:
+            with open("./samples.pk", 'rb') as infile:
+                self.human_map = pickle.load(infile)
+                self.model_updated = True
+        except Exception, e:
+            log.error(e)
 
     def run(self):
         global tc
@@ -102,8 +108,8 @@ class TrainingProcessor(multiprocessing.Process):
                     svm = self.train()
                     TrainingProcessor.out_queue.put(svm)
                     self.model_updated = False
-                    with open("./svm_model.pk", 'wb') as outfile:
-                        pickle.dump(svm, outfile)
+                    with open("./samples.pk", 'wb') as outfile:
+                        pickle.dump(self.human_map, outfile)
                     log.info("ending to train svm model....")
             time.sleep(1)
 
