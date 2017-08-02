@@ -51,7 +51,7 @@ class PositionActor(ActorTypeDispatcher):
                 cgid = gid
         log.info("stero camera group {}".format(cgid))
         if cgid is not None:
-            sec = int(sec)
+            sec = int(round(sec))
             baseline_mm = cg[cgid]["baseline_mm"]
             cx = cg[cgid]["cx"]
             cy = cg[cgid]["cy"]
