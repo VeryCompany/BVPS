@@ -37,8 +37,10 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
 
     def run(self):
-
+        count_times = 0
         while True:
+            if count_times % 2 == 0:
+                continue
             """
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
             """
@@ -55,6 +57,7 @@ class DetectorProcessor(multiprocessing.Process):
             self.frame_interval.update(t-self.last_frame_time)
             self.last_frame_time = t
 
+            count_times += 1
 
     def detect_humans(self, image, t0, secs):
         validHuman = []
