@@ -33,7 +33,7 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
 
     def run(self):
-        count_times = 0
+        count_times = 1
         while True:
             """
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
