@@ -47,9 +47,9 @@ class DetectorProcessor(multiprocessing.Process):
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
-                brt_times = 0
+                brt_times = -5
             else:
-                brt_times += 2
+                brt_times += 1
                 log.info("没有检测到人，跳过{}帧".format(brt_times))
             log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
                       format(self.camera.cameraId, self.latency.value * 1000,
