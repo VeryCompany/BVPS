@@ -121,15 +121,15 @@ class Camera(ActorTypeDispatcher):
                 name="model_update_processor")
             mtp.setDaemon(True)
             mtp.start()
+            if cmd["cameraType"] == CameraType.CAPTURE:
+                """训练器进程启动"""
+                log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
+                for p in range(0, 1, 1):
+                    tps = TrainingProcessor(self, self.training_dset_q,
+                                            self.training_model_oq)
+                    tps.start()
+                log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
 
-            """训练器进程启动"""
-            log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
-            for p in range(0, 1, 1):
-                tps = TrainingProcessor(self, self.training_dset_q,
-                                        self.training_model_oq)
-                tps.start()
-            log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
-            
             """
             检查有新的用户定位输出
             recognizer_out_q if have then --> PositionActor
