@@ -40,7 +40,7 @@ class DetectorProcessor(multiprocessing.Process):
             """
             frame, t0, secs = DetectorProcessor.frame_in.get()
             for bt in range(min(brt_times,
-                                DetectorProcessor.frame_in.qsize()/2):
+                                DetectorProcessor.frame_in.qsize()/2)):
                 frame, t0, secs = DetectorProcessor.frame_in.get()
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
