@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import openface
 from bvps.camera.common import StatValue, clock, draw_str
-from bvps.common import align, net, harrsDir
+from bvps.common import align, net, harrsDir, CameraType
 
 
 class DetectorProcessor(multiprocessing.Process):
@@ -48,7 +48,7 @@ class DetectorProcessor(multiprocessing.Process):
                 log.debug("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
-                    if not DetectorProcessor.frame_out2.full():
+                    if self.camera.cameraType == CameraType.CAPTURE:
                         DetectorProcessor.frame_out2.put(human)  # for Trainor
                 brt_times = -5
             else:

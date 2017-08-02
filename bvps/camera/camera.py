@@ -60,7 +60,8 @@ class Camera(ActorTypeDispatcher):
         Camera.user_queue = multiprocessing.Queue(64)
         self.webserver = None
         self.cct = None
-
+        self.cameraType = None
+        
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
@@ -68,6 +69,7 @@ class Camera(ActorTypeDispatcher):
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 return
+            self.cameraType = cmd.values["cameraType"]
             """视频采集线程"""
             log.info("摄像头 {} 接收到 START_CAPTURE 命令".format(cmd.cameraName))
             self.cameraId = cmd.cameraName
