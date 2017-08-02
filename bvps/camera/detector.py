@@ -40,6 +40,7 @@ class DetectorProcessor(multiprocessing.Process):
             """
             frame, t0, secs = DetectorProcessor.frame_in.get()
             if DetectorProcessor.frame_in.qsize() > 20:
+                log.info("{}丢弃1...".format(self.camera.cameraId))
                 continue
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
