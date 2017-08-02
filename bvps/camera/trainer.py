@@ -21,7 +21,7 @@ import time
 import numpy as np
 import openface
 # from bvps.config import svm_param_grid as spg
-
+import pickle
 from bvps.common import net
 
 spg = [{
@@ -102,6 +102,8 @@ class TrainingProcessor(multiprocessing.Process):
                     svm = self.train()
                     TrainingProcessor.out_queue.put(svm)
                     self.model_updated = False
+                    with open("./svm_model.pk", 'wb') as outfile:
+                        pickle.dump(svm, outfile)
                     log.info("ending to train svm model....")
             time.sleep(1)
 
