@@ -39,8 +39,8 @@ class DetectorProcessor(multiprocessing.Process):
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
             """
             frame, t0, secs = DetectorProcessor.frame_in.get()
-            #if count_times % 3 == 0:
-            #    continue
+            if DetectorProcessor.frame_in.qsize() > 20:
+                continue
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
                 log.debug("检测到{}个人".format(len(humans)))
