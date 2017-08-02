@@ -141,6 +141,15 @@ class Camera(ActorTypeDispatcher):
                 name="user_position_sender")
             utp.setDaemon(True)
             utp.start()
+            """
+            队列平均性能检查
+            """
+            mnt = threading.Thread(
+                target=self.queue_monitor,
+                args=(),
+                name="minitor_thread")
+            mnt.setDaemon(True)
+            mnt.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 self.cct.stop()
