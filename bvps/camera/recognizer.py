@@ -14,8 +14,7 @@ import pickle
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
-net = openface.TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+
 
 
 class SVMRecognizer(multiprocessing.Process):
@@ -38,13 +37,15 @@ class SVMRecognizer(multiprocessing.Process):
         if self.model is None:
             return None
         face = human
-
+        net = openface.TorchNeuralNet(
+            os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
         # X = face.flatten()  # 需要图片扁平化处理
         # log.info("face.shape:{}".format(face.shape))
         # log.info(face)
         # log.info(human)
-        rep = net.forward(face)
-        identity = self.model.predict(rep)[0]
+        with net:
+            rep = net.forward(face)
+            identity = self.model.predict(rep)[0]
         return identity
 
     def run(self):
