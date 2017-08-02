@@ -49,8 +49,8 @@ class PositionActor(ActorTypeDispatcher):
         log.info("stero camera group {}".format(cgid))
         if cgid is not None:
             baseline_mm = cg[cgid]["baseline_mm"]
-            cx = cg["cx"]
-            cy = cg["cy"]
+            cx = cg[cgid]["cx"]
+            cy = cg[cgid]["cy"]
             try:
                 self.lock.acquire()
                 if uid not in self.position_cache:
