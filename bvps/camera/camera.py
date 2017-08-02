@@ -175,7 +175,7 @@ class Camera(ActorTypeDispatcher):
                                         self.recognizer_in_q.qsize())
             if count_times > 10:
                 log.info(
-                    "{}预处理队列平均堆积{},识别器队列平均堆积{},训练器平均评价堆积{},识别器队列平均堆积{}".format(
+                    "{}预处理堆积{:0.1f},识别器堆积{:0.1f},训练器堆积{:0.1f},识别器堆积{:0.1f}".format(
                         self.cameraId, pre_queue_stat.value / count_times,
                         human_detector_q_stat.value / count_times,
                         training_dset_q_stat.value / count_times,
