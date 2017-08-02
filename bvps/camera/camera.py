@@ -92,21 +92,22 @@ class Camera(ActorTypeDispatcher):
             log.info(
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """检测器进程启动"""
-            dps_num = 16
+            dps_num = 8
             log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, dps_num))
             for p in range(0, dps_num, 1):
                 dps = DetectorProcessor(self, self.human_detector_q,
                                         self.training_dset_q,
                                         self.recognizer_in_q)
                 dps.start()
-            log.info("启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+            log.info(
+                "启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, dps_num))
             """训练器进程启动"""
-            log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, pn))
+            log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
             for p in range(0, 1, 1):
                 tps = TrainingProcessor(self, self.training_dset_q,
                                         self.training_model_oq)
                 tps.start()
-            log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+            log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
             """识别器进程启动"""
             srz_num = 8
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
@@ -114,7 +115,8 @@ class Camera(ActorTypeDispatcher):
                 srz = SVMRecognizer(self, self.recognizer_in_q,
                                     self.recognizer_out_q)
                 srz.start()
-            log.info("启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
+            log.info(
+                "启动摄像头[{}]图像识别器成功！启动了[{}]个实例.".format(cmd.cameraName, srz_num))
             """
             检查有新的模型输出
             training_model_oq if have update then --> recognizer_in_q
@@ -145,9 +147,7 @@ class Camera(ActorTypeDispatcher):
             队列平均性能检查
             """
             mnt = threading.Thread(
-                target=self.queue_monitor,
-                args=(),
-                name="minitor_thread")
+                target=self.queue_monitor, args=(), name="minitor_thread")
             mnt.setDaemon(True)
             mnt.start()
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
@@ -160,21 +160,26 @@ class Camera(ActorTypeDispatcher):
 
     def queue_monitor(self):
         pre_queue_stat = StatValue()
+        human_detector_q_stat = StatValue()
         training_dset_q_stat = StatValue()
         recognizer_in_q_stat = StatValue()
         count_times = 1
         while True:
             pre_queue_stat.update(pre_queue_stat.value +
                                   self.pre_process_queue.qsize())
+            human_detector_q_stat.update(human_detector_q_stat.value +
+                                         self.human_detector_q.qsize())
             training_dset_q_stat.update(training_dset_q_stat.value +
                                         self.training_dset_q.qsize())
             recognizer_in_q_stat.update(recognizer_in_q_stat.value +
                                         self.recognizer_in_q.qsize())
-            if count_times > 20:
-                log.info("预处理队列平均堆积{},训练器队列评价堆积{},识别器队列平均堆积{}".format(
-                    pre_queue_stat.value / count_times,
-                    training_dset_q_stat.value / count_times,
-                    recognizer_in_q_stat.value / count_times))
+            if count_times > 10:
+                log.info(
+                    "{}预处理队列平均堆积{},识别器队列平均堆积{},训练器队列评价堆积{},识别器队列平均堆积{}".format(
+                        self.cameraId, pre_queue_stat.value / count_times,
+                        human_detector_q_stat.value / count_times,
+                        training_dset_q_stat.value / count_times,
+                        recognizer_in_q_stat.value / count_times))
                 count_times = 1
             count_times += 1
             time.sleep(1)
