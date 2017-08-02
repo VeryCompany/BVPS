@@ -148,7 +148,7 @@ class Camera(ActorTypeDispatcher):
 
     def model_process(self, in_queue, out_queue):
         model = in_queue.get()
-        out_queue.put(ModelUpdateCmd(model))
+        # out_queue.put(ModelUpdateCmd(model))
         log.info("有新的识别模型，发送给定位摄像头！")
         self.send_model_to_all_camera(ModelUpdateCmd(model))
         log.info("识别模型同步完成！")
