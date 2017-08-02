@@ -44,19 +44,19 @@ class TrainingProcessor(multiprocessing.Process):
         TrainingProcessor.in_queue = in_queue
         TrainingProcessor.out_queue = out_queue
         self.camera = camera
-        try:
-            with open("./samples.pk", 'rb') as infile:
-                self.human_map = pickle.load(infile)
-                self.model_updated = True
-        except Exception, e:
-            log.error(e)
+
 
     def run(self):
         global tc
         trth = threading.Thread(target=self.auto_training, args=())
         trth.setDaemon(True)
         trth.start()
-
+        try:
+            with open("./samples.pk", 'rb') as infile:
+                self.human_map = pickle.load(infile)
+                self.model_updated = True
+        except Exception, e:
+            log.error(e)
         while True:
             message = TrainingProcessor.in_queue.get()
             if isinstance(message, TrainingCMD):
