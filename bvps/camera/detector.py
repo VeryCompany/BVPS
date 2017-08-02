@@ -48,7 +48,8 @@ class DetectorProcessor(multiprocessing.Process):
                 log.debug("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
-                    DetectorProcessor.frame_out2.put(human)  # for Trainor
+                    if not DetectorProcessor.frame_out2.full():
+                        DetectorProcessor.frame_out2.put(human)  # for Trainor
                 brt_times = -5
             else:
                 brt_times += 1
