@@ -57,6 +57,7 @@ class TrainingProcessor(multiprocessing.Process):
                 self.model_updated = True
         except Exception, e:
             log.error(e)
+
         while True:
             message = TrainingProcessor.in_queue.get()
             if isinstance(message, TrainingCMD):
@@ -89,30 +90,33 @@ class TrainingProcessor(multiprocessing.Process):
 
     def auto_training(self):
         while True:
-            if self.model_updated:
-                if len(self.human_map) < 2:
-                    continue
-                log.info('ready to process generate model...')
-                hums = copy.deepcopy(self.human_map)
-                ready = False
-                for uid, imgs in hums.items():
-                    if len(imgs) < tc["cap_nums"]:
-                        log.error("wait moments...")
-                        ready = False
-                        break
-                    ready = True
-                    log.info("ready:{},process {}'s images to model.".format(
-                        ready, uid))
-                if ready:
-                    log.info("begin to train svm model....")
-                    svm = self.train()
-                    TrainingProcessor.out_queue.put(svm)
-                    self.model_updated = False
-                    with open("./samples.pk", 'wb') as outfile:
-                        pickle.dump(self.human_map, outfile)
-                    log.info("ending to train svm model....")
-            time.sleep(1)
+            try:
+                if self.model_updated:
+                    if len(self.human_map) < 2:
+                        continue
+                    log.info('ready to process generate model...')
+                    hums = copy.deepcopy(self.human_map)
+                    ready = False
+                    for uid, imgs in hums.items():
+                        if len(imgs) < tc["cap_nums"]:
+                            log.error("wait moments...")
+                            ready = False
+                            break
+                        ready = True
+                        log.info("ready:{},process {}'s images to model.".format(
+                            ready, uid))
+                    if ready:
+                        log.info("begin to train svm model....")
+                        svm = self.train()
+                        TrainingProcessor.out_queue.put(svm)
+                        self.model_updated = False
+                        with open("./samples.pk", 'wb') as outfile:
+                            pickle.dump(self.human_map, outfile, 1)
+                        log.info("ending to train svm model....")
 
+                time.sleep(1)
+            except Exception, e:
+                log.error(e)
     def train(self):
         try:
             global spg
