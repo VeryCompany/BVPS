@@ -22,7 +22,7 @@ class PositionActor(ActorTypeDispatcher):
 
     def __init__(self, *args, **kw):
         super(PositionActor, self).__init__(*args, **kw)
-        logging.info("system actor started")
+        log.info("system actor started")
 
     def processPosition(self):
         while True:
@@ -81,7 +81,7 @@ class PositionActor(ActorTypeDispatcher):
         for uId, datas in self.position_cache:
             """发送用户Id，世界坐标x，世界坐标y，位置时间到定位中心"""
             positions = self.process_user_position(datas)
-            logging.info("user:{} positions->:{}".format(uId, positions))
+            log.info("user:{} positions->:{}".format(uId, positions))
 
     def process_user_position(self, datas):
         pool = ThreadPool(8)
