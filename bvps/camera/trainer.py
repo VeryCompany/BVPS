@@ -32,7 +32,7 @@ spg = [{
     'gamma': [0.001, 0.0001],
     'kernel': ['rbf']
 }]
-tc = {"cap_nums": 10}
+tc = {"cap_nums": 20}
 
 
 class TrainingProcessor(multiprocessing.Process):
