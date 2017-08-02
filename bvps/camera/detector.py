@@ -33,30 +33,34 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
 
     def run(self):
-        count_times = 1
+        brt_times = 0
         while True:
             """
             todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
             """
             frame, t0, secs = DetectorProcessor.frame_in.get()
-            if DetectorProcessor.frame_in.qsize() > 20:
-                log.info("{}丢弃1...".format(self.camera.cameraId))
-                continue
+            for bt in range(brt_times):
+                frame, t0, secs = DetectorProcessor.frame_in.get()
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
                 log.debug("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
+                brt_times = 0
+            else:
+                brt_times += 2
+                log.info("没有检测到人，跳过{}帧".format(brt_times))
             log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
                       format(self.camera.cameraId, self.latency.value * 1000,
                              self.frame_interval.value * 1000))
+
             t = clock()
             self.latency.update(t - t0)
             self.frame_interval.update(t - self.last_frame_time)
             self.last_frame_time = t
 
-            count_times += 1
+
 
     def detect_humans(self, image, t0, secs):
         validHuman = []
