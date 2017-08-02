@@ -8,6 +8,8 @@ import openface
 from bvps.camera.camera import clock, StatValue
 from bvps.common import ModelUpdateCmd
 from sklearn.svm import SVC
+import pickle
+
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
