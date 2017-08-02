@@ -109,7 +109,7 @@ class Camera(ActorTypeDispatcher):
                 tps.start()
             log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
             """识别器进程启动"""
-            srz_num = 16
+            srz_num = 8
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
             for p in range(0, srz_num, 1):
                 srz = SVMRecognizer(self, self.recognizer_in_q,
