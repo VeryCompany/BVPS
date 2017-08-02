@@ -156,8 +156,10 @@ class Camera(ActorTypeDispatcher):
     def send_model_to_all_camera(self, model):
         for camId, params in cams.items():
             if self.cameraId != camId and params["cameraType"] == CameraType.POSITION:
+                log.info("新的识别模型发送给{}".format(camId))
                 cam = self.createActor(Camera, globalName=camId)
                 self.send(cam, model)
+                log.info("新的识别模型发送给{}完成！".format(camId))
 
     def receiveMsg_TrainingCMD(self, cmd, sender):
         if cmd.cctype == CameraCmdType.TRAINOR_START:
@@ -176,6 +178,7 @@ class Camera(ActorTypeDispatcher):
             self.svm_model_updated = True
 
     def receiveMsg_ModelUpdateCmd(self, cmd, sender):
+        log.info("{}收到新的识别模型".format(self.cameraId))
         self.recognizer_in_q.put(cmd)
 
 
