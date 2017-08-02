@@ -42,6 +42,7 @@ class Camera(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         """Init camera setting up."""
         super(Camera, self).__init__(*args, **kw)
+
         self.frame_queue = multiprocessing.Queue(128)  #
 
         self.pre_process_queue = multiprocessing.Queue(128)  # 图像预处理Queue
@@ -146,6 +147,29 @@ class Camera(ActorTypeDispatcher):
                 self.cct.join(timeout=10)
             self.send(sender, "camera stopped!")
 
+    last_count_time = time.time()
+
+    def queue_monitor(self):
+        pre_queue_stat = StatValue()
+        training_dset_q_stat = StatValue()
+        recognizer_in_q_stat = StatValue()
+        count_times = 1
+        while True:
+            pre_queue_stat.update(pre_queue_stat.value +
+                                  self.pre_process_queue.qsize())
+            training_dset_q_stat.update(training_dset_q_stat.value +
+                                        self.training_dset_q.qsize())
+            recognizer_in_q_stat.update(recognizer_in_q_stat.value +
+                                        self.recognizer_in_q.qsize())
+            if count_times > 20:
+                log.info("预处理队列平均堆积{},训练器队列评价堆积{},识别器队列平均堆积{}".format(
+                    pre_queue_stat.value / count_times,
+                    training_dset_q_stat.value / count_times,
+                    recognizer_in_q_stat.value / count_times))
+                count_times = 1
+            count_times += 1
+            time.sleep(1)
+
     def model_process(self, in_queue, out_queue):
         model = in_queue.get()
         # out_queue.put(ModelUpdateCmd(model))
@@ -180,7 +204,6 @@ class Camera(ActorTypeDispatcher):
     def receiveMsg_ModelUpdateCmd(self, cmd, sender):
         log.info("{}收到新的识别模型".format(self.cameraId))
         self.recognizer_in_q.put(cmd)
-
 
     def process_user(self, uq):
         while True:
