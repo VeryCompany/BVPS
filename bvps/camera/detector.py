@@ -49,7 +49,6 @@ class DetectorProcessor(multiprocessing.Process):
                 for human in humans:
                     DetectorProcessor.frame_out2.put(human)  # for 识别器
                     if self.camera.cameraType == CameraType.CAPTURE:
-                        log.info("add {}".format(self.camera.cameraType))
                         DetectorProcessor.frame_out.put(human)  # for Trainor
                 brt_times = -5
             else:
