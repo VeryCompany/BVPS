@@ -12,11 +12,7 @@ from bvps.camera.common import StatValue, clock, draw_str
 from bvps.common import align, net, harrsDir
 
 
-
-
-
 class DetectorProcessor(multiprocessing.Process):
-
     def __init__(self, camera, frame_in, frame_out, frame_out_2):
         multiprocessing.Process.__init__(self, name="video_human_detector")
         DetectorProcessor.frame_in = frame_in
@@ -47,14 +43,16 @@ class DetectorProcessor(multiprocessing.Process):
                 continue
             humans = self.detect_humans(frame, t0, secs)
             if len(humans) > 0:
-                log.debug("检测到{}个人".format(len(humans)))
+                log.info("检测到{}个人".format(len(humans)))
                 for human in humans:
                     DetectorProcessor.frame_out.put(human)  # for 识别器
                     DetectorProcessor.frame_out2.put(human)  # for Trainor
-            log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(self.camera.cameraId,self.latency.value * 1000, self.frame_interval.value*1000))
+            log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
+                      format(self.camera.cameraId, self.latency.value * 1000,
+                             self.frame_interval.value * 1000))
             t = clock()
-            self.latency.update(t-t0)
-            self.frame_interval.update(t-self.last_frame_time)
+            self.latency.update(t - t0)
+            self.frame_interval.update(t - self.last_frame_time)
             self.last_frame_time = t
 
             count_times += 1
