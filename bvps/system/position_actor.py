@@ -33,9 +33,12 @@ class PositionActor(ActorTypeDispatcher):
         cameraId, uid, px, t0, sec = message
         x, y = px
         cgid = None
+        log.info("cameraId:{},user:{},px:{},py:{},t0:{},sec:{}".format(
+            cameraId, uid, x, y, t0, sec))
         for gid, params in cg.items():
             if cameraId in params["members"]:
                 cgid = gid
+        log.info("stero camera group {}".format(cgid))
         if cgid is not None:
             baseline_mm = cg["baseline_mm"]
             cx = cg["cx"]
