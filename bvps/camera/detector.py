@@ -83,7 +83,7 @@ class DetectorProcessor(multiprocessing.Process):
                                 human)  # for Trainor
                 if len(pending) < threadn:
                     frame, t0, secs = DetectorProcessor.frame_in.get()
-                    task = pool.apply_async(self.detect_humans, (frame, t,
+                    task = pool.apply_async(self.detect_humans, (frame, t0,
                                                                  secs))
                     pending.append(task)
             except Exception, e:
