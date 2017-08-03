@@ -40,7 +40,7 @@ class DetectorProcessor(multiprocessing.Process):
     def run(self):
         # brt_times = 0
         threadn = cv2.getNumberOfCPUs()
-        pool = ThreadPool(processes=threadn)
+        pool = ThreadPool(processes=threadn * 2)
         pending = deque()
 
         while True:
@@ -86,6 +86,15 @@ class DetectorProcessor(multiprocessing.Process):
                     task = pool.apply_async(self.detect_humans, (frame, t0,
                                                                  secs))
                     pending.append(task)
+
+                log.debug(
+                    "detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
+                    format(self.camera.cameraId, self.latency.value * 1000,
+                           self.frame_interval.value * 1000))
+                t = clock()
+                self.latency.update(t - t0)
+                self.frame_interval.update(t - self.last_frame_time)
+                self.last_frame_time = t
             except Exception, e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
