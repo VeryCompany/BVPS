@@ -43,11 +43,11 @@ class Camera(ActorTypeDispatcher):
         """Init camera setting up."""
         super(Camera, self).__init__(*args, **kw)
 
-        self.frame_queue = multiprocessing.Queue(128)  #
+        self.frame_queue = multiprocessing.Queue(16)  #
 
-        self.pre_process_queue = multiprocessing.Queue(128)  # 图像预处理Queue
+        self.pre_process_queue = multiprocessing.Queue(256)  # 图像预处理Queue
 
-        self.human_detector_q = multiprocessing.Queue(64)  # 人脸和人体识别器
+        self.human_detector_q = multiprocessing.Queue(256)  # 人脸和人体识别器
 
         self.training_dset_q = multiprocessing.Queue(
             64)  # frame queue for trainer
@@ -323,7 +323,7 @@ class CameraCaptureThread(threading.Thread):
                 return frame, t0, fts
 
             threadn = cv2.getNumberOfCPUs()
-            pool = ThreadPool(processes=threadn * 2)
+            pool = ThreadPool(processes=threadn)
             pending = deque()
 
             latency = StatValue()
