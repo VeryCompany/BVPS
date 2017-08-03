@@ -40,7 +40,7 @@ class DetectorProcessor(multiprocessing.Process):
     def run(self):
         # brt_times = 0
         threadn = cv2.getNumberOfCPUs()
-        pool = ThreadPool(processes=threadn * 8)
+        pool = ThreadPool(processes=threadn)
         pending = deque()
 
         while True:
