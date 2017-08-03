@@ -22,7 +22,7 @@ class PreProcessor(multiprocessing.Process):
         from bvps.config import cameras as ca
         scale = ca[self.camera.cameraId]["scale"]
         threadn = cv2.getNumberOfCPUs()
-        pool = ThreadPool(processes=threadn * 4)
+        pool = ThreadPool(processes=threadn * 8)
         pending = deque()
         while True:
             while len(pending) > 0 and pending[0].ready():
