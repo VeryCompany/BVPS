@@ -87,7 +87,7 @@ class DetectorProcessor(multiprocessing.Process):
                                                                  secs))
                     pending.append(task)
 
-                log.debug(
+                log.info(
                     "detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
                     format(self.camera.cameraId, self.latency.value * 1000,
                            self.frame_interval.value * 1000))
