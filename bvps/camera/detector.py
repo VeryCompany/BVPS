@@ -90,7 +90,7 @@ class DetectorProcessor(multiprocessing.Process):
                     self.latency.update(t - t0)
                     self.frame_interval.update(t - self.last_frame_time)
                     self.last_frame_time = t
-                log.info(
+                log.debug(
                     "detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
                     format(self.camera.cameraId, self.latency.value * 1000,
                            self.frame_interval.value * 1000))
