@@ -89,7 +89,7 @@ class TorchNeuralNet:
         self._tensor[0][2] = torch.fromNumpyArray(b)
 
         if self._cuda:
-            self._cuda_tensor = self._cuda_tensor._copy(self._tensor)
+            self._cuda_tensor._copy(self._tensor)
             rep = self._net._forward(self._cuda_tensor)._float()
         else:
             rep = self._net.forward(self._net, self._tensor)
