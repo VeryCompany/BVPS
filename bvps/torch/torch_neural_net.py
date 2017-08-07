@@ -27,7 +27,6 @@ import cv2
 import os
 import logging as log
 
-
 torch = lua.require('torch')
 nn = lua.require('nn')
 dpnn = lua.require('dpnn')
