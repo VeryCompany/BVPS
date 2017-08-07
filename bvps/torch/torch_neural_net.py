@@ -87,6 +87,8 @@ class TorchNeuralNet:
         assert rgbImg is not None
         rgbImg_norm = (np.float32(rgbImg)) / 255
         r, g, b = cv2.split(rgbImg_norm)
+        print r, g, b
+        
         self._tensor[0][0] = torch.fromNumpyArray(r)
         self._tensor[0][1] = torch.fromNumpyArray(g)
         self._tensor[0][2] = torch.fromNumpyArray(b)
