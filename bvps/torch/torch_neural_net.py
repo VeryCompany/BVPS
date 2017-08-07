@@ -82,7 +82,6 @@ class TorchNeuralNet:
         :rtype: numpy.ndarray
         """
         assert rgbImg is not None
-        log.info("received forward!!!")
         rgbImg_norm = (np.float32(rgbImg)) / 255
         r, g, b = cv2.split(rgbImg_norm)
         self._tensor[0][0] = torch.fromNumpyArray(r)
