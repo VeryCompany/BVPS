@@ -89,9 +89,11 @@ class TorchNeuralNet:
         self._tensor[0][0] = torch.fromNumpyArray(r)
         self._tensor[0][1] = torch.fromNumpyArray(g)
         self._tensor[0][2] = torch.fromNumpyArray(b)
-
+        log.info("process images!!!!!!!!!")
         if self._cuda:
+            log.info("copy _copyto gpu!!!!")
             self._cuda_tensor._copy(self._tensor)
+            log.info("copyOK!!!!!")
             rep = self._net._forward(self._cuda_tensor)._float()
         else:
             rep = self._net.forward(self._net, self._tensor)
