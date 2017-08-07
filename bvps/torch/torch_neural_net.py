@@ -41,8 +41,8 @@ class TorchNeuralNet:
     #: The default Torch model to use.
     defaultModel = os.path.join(myDir, '..', 'models', 'openface',
                                 'nn4.small2.v1.t7')
-    log.info(defaultModel)
-    log.info("-"*100)
+    print(defaultModel)
+    print("-"*100)
 
     def __init__(self, model=defaultModel, imgDim=96, cuda=False):
         """__init__(self, model=defaultModel, imgDim=96, cuda=False)
