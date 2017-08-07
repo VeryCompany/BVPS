@@ -75,6 +75,7 @@ class TorchNeuralNet:
         self._imgDim = imgDim
 
     def forward(self, rgbImg):
+        print(type(rgbImg))
         """
         Perform a forward network pass of an RGB image.
 
