@@ -18,7 +18,6 @@
 # additional dependency.
 # More details are available on this mailing list thread:
 # https://groups.google.com/forum/#!topic/cmu-openface/Jj68LJBdN-Y
-
 """Module for Torch-based neural network usage."""
 
 import lutorpy as lua
@@ -26,12 +25,13 @@ import numpy as np
 import binascii
 import cv2
 import os
+import logging as log
+
 
 torch = lua.require('torch')
 nn = lua.require('nn')
 dpnn = lua.require('dpnn')
 image = lua.require('image')
-
 
 myDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -40,8 +40,8 @@ class TorchNeuralNet:
     """Use a `Torch <http://torch.ch>` and `Lutorpy <https://github.com/imodpasteur/lutorpy>`."""
 
     #: The default Torch model to use.
-    defaultModel = os.path.join(
-        myDir, '..', 'models', 'openface', 'nn4.small2.v1.t7')
+    defaultModel = os.path.join(myDir, '..', 'models', 'openface',
+                                'nn4.small2.v1.t7')
 
     def __init__(self, model=defaultModel, imgDim=96, cuda=False):
         """__init__(self, model=defaultModel, imgDim=96, cuda=False)
@@ -83,9 +83,9 @@ class TorchNeuralNet:
         :rtype: numpy.ndarray
         """
         assert rgbImg is not None
-
+        log.info("received forward!!!")
         rgbImg_norm = (np.float32(rgbImg)) / 255
-        r,g,b = cv2.split(rgbImg_norm)
+        r, g, b = cv2.split(rgbImg_norm)
         self._tensor[0][0] = torch.fromNumpyArray(r)
         self._tensor[0][1] = torch.fromNumpyArray(g)
         self._tensor[0][2] = torch.fromNumpyArray(b)
@@ -96,4 +96,5 @@ class TorchNeuralNet:
         else:
             rep = self._net.forward(self._net, self._tensor)
         rep = rep.asNumpyArray().astype(np.float64)
+        log.info(rep)
         return rep
