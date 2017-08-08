@@ -41,9 +41,6 @@ class TorchNeuralNet:
     #: The default Torch model to use.
     defaultModel = os.path.join(myDir, '..', 'models', 'openface',
                                 'nn4.small2.v1.t7')
-    print(defaultModel)
-    print("-"*100)
-
     def __init__(self, model=defaultModel, imgDim=96, cuda=False):
         """__init__(self, model=defaultModel, imgDim=96, cuda=False)
 
@@ -75,7 +72,6 @@ class TorchNeuralNet:
         self._imgDim = imgDim
 
     def forward(self, rgbImg):
-        print(type(rgbImg))
         """
         Perform a forward network pass of an RGB image.
 
