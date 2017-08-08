@@ -6,7 +6,7 @@ import os, sys, traceback
 import numpy as np
 import openface
 from bvps.camera.camera import clock, StatValue
-from bvps.common import ModelUpdateCmd
+from bvps.common import ModelUpdateCmd, net
 from sklearn.svm import SVC
 import pickle
 from bvps.torch.torch_neural_net import TorchNeuralNet
@@ -16,8 +16,8 @@ fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
 
-net = TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+# net = TorchNeuralNet(
+#     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 
 class SVMRecognizer(multiprocessing.Process):
