@@ -58,7 +58,7 @@ class TorchNeuralNet:
         assert cuda is not None
 
         torch.setdefaulttensortype('torch.FloatTensor')
-        torch.setDevice(2)
+
         self._net = torch.load(model)
         self._net.evaluate(self._net)
 
@@ -67,6 +67,7 @@ class TorchNeuralNet:
         if cuda:
             lua.require('cutorch')
             lua.require('cunn')
+            torch.setDevice(2)
             self._net = self._net._cuda()
             self._cuda_tensor = torch.CudaTensor(1, 3, imgDim, imgDim)
         self._cuda = cuda
