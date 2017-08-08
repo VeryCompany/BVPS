@@ -70,6 +70,7 @@ class TorchNeuralNet:
             self._cuda_tensor = torch.CudaTensor(1, 3, imgDim, imgDim)
         self._cuda = cuda
         self._imgDim = imgDim
+        log.info("run recognize with GPU: {}".format(cuda))
 
     def forward(self, rgbImg):
         """

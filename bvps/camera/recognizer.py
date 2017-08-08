@@ -35,6 +35,7 @@ class SVMRecognizer(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
+        
 
     def whoru(self, human):
         if self.model is None:
