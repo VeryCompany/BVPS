@@ -59,7 +59,7 @@ class TorchNeuralNet:
 
         torch.setdefaulttensortype('torch.FloatTensor')
 
-        self._net = torch.load(model,map_location={'cuda:2':'cuda:1'})
+        self._net = torch.load(model)
         self._net.evaluate(self._net)
 
         self._tensor = torch.Tensor(1, 3, imgDim, imgDim)
