@@ -65,9 +65,9 @@ class TorchNeuralNet:
         self._tensor = torch.Tensor(1, 3, imgDim, imgDim)
         self._cuda_tensor = None
         if cuda:
-            lua.require('cutorch')
+            cutorch = lua.require('cutorch')
             lua.require('cunn')
-            torch.setDevice(2)
+            cutorch.setDevice(2)
             self._net = self._net._cuda()
             self._cuda_tensor = torch.CudaTensor(1, 3, imgDim, imgDim)
         self._cuda = cuda
