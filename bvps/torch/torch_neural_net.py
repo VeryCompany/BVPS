@@ -59,7 +59,7 @@ class TorchNeuralNet:
 
         torch.setdefaulttensortype('torch.FloatTensor')
 
-        self._net = torch.load(model)
+        self._net = torch.load(model,map_location={'cuda:2':'cuda:1'})
         self._net.evaluate(self._net)
 
         self._tensor = torch.Tensor(1, 3, imgDim, imgDim)
@@ -67,7 +67,7 @@ class TorchNeuralNet:
         if cuda:
             cutorch = lua.require('cutorch')
             lua.require('cunn')
-            self._net = self._net._cuda(2)
+            self._net = self._net._cuda()
             self._cuda_tensor = torch.CudaTensor(1, 3, imgDim, imgDim)
         self._cuda = cuda
         self._imgDim = imgDim
