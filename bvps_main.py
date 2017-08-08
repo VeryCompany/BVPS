@@ -13,7 +13,7 @@ from bvps.common import CameraCmdType, CameraCmd
 try:
 
     asys = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
-    serverStart(asys)
+    #serverStart(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,
@@ -37,7 +37,7 @@ try:
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
 except KeyboardInterrupt:
-    print 'Interrupted'
+    print ('Interrupted')
     try:
         asys.shutdown()
         sys.exit(0)
