@@ -74,7 +74,7 @@ class WebServer(multiprocessing.Process):
     def run(self):
         server_address = ('', self.port)
         httpd = HTTPServer(server_address, VideoHandler)
-        print 'Starting httpd...'
+        log.info('Starting httpd...')
         httpd.serve_forever()
 
 
