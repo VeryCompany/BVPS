@@ -58,6 +58,7 @@ class TorchNeuralNet:
         assert cuda is not None
 
         torch.setdefaulttensortype('torch.FloatTensor')
+        torch.setDevice(2)
         self._net = torch.load(model)
         self._net.evaluate(self._net)
 
