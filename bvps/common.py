@@ -12,8 +12,8 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 
 align = AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
-net = TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+# net = TorchNeuralNet(
+#     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 class CameraCmdType(Enum):
     START_CAPTURE = 1
