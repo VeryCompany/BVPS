@@ -8,7 +8,7 @@ from enum import Enum
 import cv2
 import numpy as np
 from bvps.camera.common import StatValue, clock, draw_str
-from bvps.common import align, net, harrsDir, CameraType
+from bvps.common import align, harrsDir, CameraType
 
 import sys, traceback, time
 import threading
@@ -47,7 +47,7 @@ class DetectorProcessor(multiprocessing.Process):
                 """
                 todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
                 """
-                
+
                 while len(pending) > 0 and pending[0].ready():
                     humans = pending.popleft().get()
                     for human in humans:
