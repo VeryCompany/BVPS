@@ -19,7 +19,6 @@ from sklearn.svm import SVC
 from bvps.common import TrainingCMD
 import time
 import numpy as np
-import openface
 # from bvps.config import svm_param_grid as spg
 import pickle
 from bvps.common import net
