@@ -4,7 +4,6 @@ import os
 import logging as log
 import multiprocessing
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import SocketServer
 import cv2
 
 
