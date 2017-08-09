@@ -343,7 +343,7 @@ class CameraCaptureThread(threading.Thread):
                         task = pool.apply_async(process_frame, (frame.copy(),
                                                                 t, frame_time))
                         pending.append(task)
-        except Exception, e:
+        except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
                 traceback.format_exception(exc_type, exc_value, exc_traceback))

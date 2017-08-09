@@ -190,7 +190,7 @@ class CameraServer(multiprocessing.Process):
                        human[0][0], self.cct.resolution, 0, int(secs))
                 self.user_queue.put_nowait(msg)
             return human, uid
-        except Exception, e:
+        except Exception as e:
             log.info(e.message)
             return human, None
 

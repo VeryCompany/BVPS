@@ -55,7 +55,7 @@ class TrainingProcessor(multiprocessing.Process):
             with open("./samples.pk", 'rb') as infile:
                 self.human_map = pickle.load(infile)
                 self.model_updated = True
-        except Exception, e:
+        except Exception as  e:
             log.error(e)
 
         while True:
@@ -115,7 +115,7 @@ class TrainingProcessor(multiprocessing.Process):
                         log.info("ending to train svm model....")
 
                 time.sleep(1)
-            except Exception, e:
+            except Exception as  e:
                 log.error(e)
     def train(self):
         try:
@@ -134,7 +134,7 @@ class TrainingProcessor(multiprocessing.Process):
                 "typeX:{}---typey:{}---lenx:{},leny:{}, X.shape:{}, y.shape:{}".
                 format(type(X), type(y), len(X), len(y), X.shape, y.shape))
             return GridSearchCV(SVC(C=1), spg, cv=5, n_jobs=4).fit(X, y)
-        except Exception, e:
+        except Exception as  e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
                 traceback.format_exception(exc_type, exc_value, exc_traceback))

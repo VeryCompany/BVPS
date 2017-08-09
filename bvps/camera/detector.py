@@ -95,7 +95,7 @@ class DetectorProcessor(multiprocessing.Process):
                     format(self.camera.cameraId, self.latency.value * 1000,
                            self.frame_interval.value * 1000))
 
-            except Exception, e:
+            except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
                     traceback.format_exception(exc_type, exc_value,
@@ -125,7 +125,7 @@ class DetectorProcessor(multiprocessing.Process):
                 bodys.append((roi, max(x1, x2) - abs(x1 - x2) / 2,
                               max(y1, y2) - abs(y1 - y2) / 2))
             return bodys
-        except Exception, e:
+        except Exception as e:
             log.info(e.message)
             return []
 

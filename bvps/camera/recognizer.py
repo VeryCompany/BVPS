@@ -35,7 +35,7 @@ class SVMRecognizer(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        
+
 
     def whoru(self, human):
         if self.model is None:
@@ -74,7 +74,7 @@ class SVMRecognizer(multiprocessing.Process):
                 self.latency.update(t - t0)
                 self.frame_interval.update(t - self.last_frame_time)
                 self.last_frame_time = t
-            except Exception, e:
+            except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 log.error(
                     traceback.format_exception(exc_type, exc_value,
