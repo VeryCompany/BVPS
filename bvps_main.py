@@ -7,7 +7,7 @@ from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.camera.camera import Camera
-from rpsc.start import serverStart
+#from rpsc.start import serverStart
 from bvps.common import CameraCmdType, CameraCmd
 
 try:
