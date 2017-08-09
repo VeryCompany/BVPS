@@ -7,7 +7,6 @@ from enum import Enum
 
 import cv2
 import numpy as np
-import openface
 from bvps.camera.common import StatValue, clock, draw_str
 from bvps.common import align, net, harrsDir, CameraType
 
