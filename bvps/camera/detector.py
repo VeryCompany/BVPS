@@ -47,32 +47,7 @@ class DetectorProcessor(multiprocessing.Process):
                 """
                 todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
                 """
-                # frame, t0, secs = DetectorProcessor.frame_in.get()
-                # for bt in range(
-                #         min(brt_times, DetectorProcessor.frame_in.qsize())):
-                #     frame, t0, secs = DetectorProcessor.frame_in.get()
-                #
-                # humans = self.detect_humans(frame, t0, secs)
-                # if len(humans) > 0:
-                #     log.debug("检测到{}个人".format(len(humans)))
-                #     for human in humans:
-                #         DetectorProcessor.frame_out2.put(human)  # for 识别器
-                #         if self.camera.cameraType == CameraType.CAPTURE:
-                #             DetectorProcessor.frame_out.put(human)  # for Trainor
-                #     brt_times = -5
-                # else:
-                #     brt_times += 1
-                #     log.debug("没有检测到人，跳过{}帧".format(brt_times))
-                # if brt_times > 2:
-                #     brt_times = -5
-                # log.debug("detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
-                #           format(self.camera.cameraId, self.latency.value * 1000,
-                #                  self.frame_interval.value * 1000))
-                #
-                # t = clock()
-                # self.latency.update(t - t0)
-                # self.frame_interval.update(t - self.last_frame_time)
-                # self.last_frame_time = t
+                
                 while len(pending) > 0 and pending[0].ready():
                     humans = pending.popleft().get()
                     for human in humans:
