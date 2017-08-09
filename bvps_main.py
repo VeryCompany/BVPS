@@ -9,7 +9,7 @@ from bvps.system.position_actor import PositionActor
 from bvps.camera.camera import Camera
 #from rpsc.start import serverStart
 from bvps.common import CameraCmdType, CameraCmd
-
+import time
 try:
 
     asys = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
@@ -34,6 +34,7 @@ try:
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE".format(camId))
+        time.sleep(1)
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
 except KeyboardInterrupt:
