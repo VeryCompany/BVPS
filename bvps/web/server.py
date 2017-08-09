@@ -3,7 +3,7 @@ import sys
 import os
 import logging as log
 import multiprocessing
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import SocketServer
 import cv2
 
