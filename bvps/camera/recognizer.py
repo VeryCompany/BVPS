@@ -4,7 +4,6 @@ import multiprocessing
 import os, sys, traceback
 
 import numpy as np
-import openface
 from bvps.camera.camera import clock, StatValue
 from bvps.common import ModelUpdateCmd, net
 from sklearn.svm import SVC
