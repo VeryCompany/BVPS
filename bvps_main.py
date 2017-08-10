@@ -36,7 +36,8 @@ try:
         cameras[camId]["address"] = cama
         log.info("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
-        asys.tell(cama, "start camera:{}!!!!".format(camId))
+        log.info("camera:{}".format(camId))
+        log.info("{}".format(params))
         asys.tell(cama, "start camera:{}!!!!".format(camId))
         #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
