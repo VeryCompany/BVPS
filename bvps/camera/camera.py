@@ -161,6 +161,7 @@ class Camera(ActorTypeDispatcher):
                 target=self.queue_monitor, args=(), name="minitor_thread")
             mnt.setDaemon(True)
             mnt.start()
+            self.send(sender, "camera :{} started!".format(cmd.cameraName))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
                 self.cct.stop()

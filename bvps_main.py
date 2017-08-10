@@ -36,9 +36,10 @@ try:
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
-        asys.ask(cama, "start camera:{}!!!!".format(camId),5)
-        #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
-
+        msg = asys.ask(cama,
+                       CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
+                       10)
+        print(msg)
 except KeyboardInterrupt:
     print('Interrupted')
     try:
