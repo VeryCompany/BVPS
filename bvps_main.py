@@ -30,16 +30,15 @@ try:
     from bvps.config import cameras
     # 启动采集摄像头
     # todo:消息反馈处理和异常处理
-    for camId, params in cameras.items():
-        cama = asys.createActor(Camera, globalName=camId)
-        asys.tell(cama, "start camera!!!!")
-    time.sleep(5)
-
+    
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
+        asys.tell(cama, "start camera!!!!")
+        asys.tell(cama, "start camera!!!!")
+        asys.tell(cama, "start camera!!!!")
         asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
 except KeyboardInterrupt:
