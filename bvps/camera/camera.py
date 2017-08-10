@@ -63,7 +63,9 @@ class Camera(ActorTypeDispatcher):
         self.cct = None
         self.cameraType = None
         log.info("初始化camera完成。")
-
+    def receiveMsg_str(self, message, sender):
+        logging.info("received msg {}".format(message))
+        
     def receiveMsg_CameraCmd(self, cmd, sender):
         if self.webserver is not None:
             log.info(self.webserver.pid)
