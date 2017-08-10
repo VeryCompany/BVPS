@@ -15,7 +15,7 @@ from bvps.camera.detector import DetectorProcessor
 from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
 from bvps.common import ModelUpdateCmd
-from bvps.common import CameraCmdType, TrainingCMD, CameraType
+from bvps.common import CameraCmdType, TrainingCMD, CameraType, CameraCmd
 from bvps.config import cameras as cams
 
 
