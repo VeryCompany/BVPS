@@ -66,6 +66,7 @@ class Camera(ActorTypeDispatcher):
 
     def receiveMsg_str(self, message, sender):
         log.info("received msg {}".format(message))
+        self.send(sender, "ok!")
 
     def receiveMsg_CameraCmd(self, cmd, sender):
 

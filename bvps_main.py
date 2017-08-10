@@ -32,13 +32,13 @@ try:
     # todo:消息反馈处理和异常处理
 
     for camId, params in cameras.items():
-        cama = asys.createActor(SystemActor, globalName=camId)
+        cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
-        asys.tell(cama, "start camera:{}!!!!".format(camId))
+        asys.ask(cama, "start camera:{}!!!!".format(camId),5)
         #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
-    time.sleep(10)
+
 except KeyboardInterrupt:
     print('Interrupted')
     try:
