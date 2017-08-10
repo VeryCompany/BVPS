@@ -67,11 +67,11 @@ class Camera(ActorTypeDispatcher):
         log.info("received msg {}".format(message))
 
     def receiveMsg_CameraCmd(self, cmd, sender):
-        if self.webserver is not None:
-            log.info(self.webserver.pid)
+        
         # todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
+                log.info("camera:{} already started!!!!!!!!!!!".format(cmd.cameraName))
                 return
             self.cameraType = cmd.values["cameraType"]
             """视频采集线程"""
