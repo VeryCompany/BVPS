@@ -34,10 +34,10 @@ try:
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
-        log.info("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
+        print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
-        log.info("camera:{}".format(camId))
-        log.info("{}".format(params))
+        print("camera:{}".format(camId))
+        print("{}".format(params))
         asys.tell(cama, "start camera:{}!!!!".format(camId))
         #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
