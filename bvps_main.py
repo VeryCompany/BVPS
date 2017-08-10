@@ -39,7 +39,7 @@ try:
         asys.tell(cama, "start camera!!!!")
         asys.tell(cama, "start camera!!!!")
         asys.tell(cama, "start camera!!!!")
-        asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
+        #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
 except KeyboardInterrupt:
     print('Interrupted')
