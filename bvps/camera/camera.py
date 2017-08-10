@@ -63,15 +63,17 @@ class Camera(ActorTypeDispatcher):
         self.cct = None
         self.cameraType = None
         log.info("初始化camera完成。")
+
     def receiveMsg_str(self, message, sender):
         log.info("received msg {}".format(message))
 
     def receiveMsg_CameraCmd(self, cmd, sender):
-        
+
         # todo:异常处理！！！！！
         if CameraCmdType.START_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
-                log.info("camera:{} already started!!!!!!!!!!!".format(cmd.cameraName))
+                log.info("camera:{} already started!!!!!!!!!!!".format(
+                    cmd.cameraName))
                 return
             self.cameraType = cmd.values["cameraType"]
             """视频采集线程"""
@@ -107,7 +109,6 @@ class Camera(ActorTypeDispatcher):
                 dps.start()
             log.info(
                 "启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, dps_num))
-
             """识别器进程启动"""
             srz_num = 1
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
@@ -134,8 +135,8 @@ class Camera(ActorTypeDispatcher):
                     tps = TrainingProcessor(self, self.training_dset_q,
                                             self.training_model_oq)
                     tps.start()
-                log.info("启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
-
+                log.info(
+                    "启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
             """
             检查有新的用户定位输出
             recognizer_out_q if have then --> PositionActor
@@ -184,11 +185,11 @@ class Camera(ActorTypeDispatcher):
                                         self.recognizer_in_q.qsize())
             if count_times > 10:
                 log.info(
-                    "{}预处理堆积{:0.1f},探测器堆积{:0.1f},训练器堆积{:0.1f},识别器堆积{:0.1f}".format(
-                        self.cameraId, pre_queue_stat.value / count_times,
-                        human_detector_q_stat.value / count_times,
-                        training_dset_q_stat.value / count_times,
-                        recognizer_in_q_stat.value / count_times))
+                    "{}预处理堆积{:0.1f},探测器堆积{:0.1f},训练器堆积{:0.1f},识别器堆积{:0.1f}".
+                    format(self.cameraId, pre_queue_stat.value / count_times,
+                           human_detector_q_stat.value / count_times,
+                           training_dset_q_stat.value / count_times,
+                           recognizer_in_q_stat.value / count_times))
                 count_times = 1
                 pre_queue_stat.update(0)
                 human_detector_q_stat.update(0)
