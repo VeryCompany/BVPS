@@ -35,7 +35,7 @@ try:
     asys.createActor(Camera, globalName="camera3")
 
     for camId, params in cameras.items():
-        cama = asys.createActor(Camera, globalName=camId)
+        cama = asys.createActor(SystemActor, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
