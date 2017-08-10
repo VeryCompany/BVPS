@@ -32,8 +32,8 @@ try:
     # todo:消息反馈处理和异常处理
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
-        cameras[camId]["address"] = cama
-        
+    time.sleep(5)
+
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
