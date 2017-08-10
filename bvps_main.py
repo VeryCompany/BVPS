@@ -38,8 +38,8 @@ try:
             camId, cama))
         msg = asys.ask(cama,
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
-                       10)
-        print(msg)
+                       60)
+        print("camera:{} result:{}".format(camid, msg))
 except KeyboardInterrupt:
     print('Interrupted')
     try:
