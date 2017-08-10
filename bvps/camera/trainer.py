@@ -51,7 +51,6 @@ class TrainingProcessor(multiprocessing.Process):
         TrainingProcessor.out_queue = out_queue
         self.camera = camera
 
-
     def run(self):
         global tc
         trth = threading.Thread(target=self.auto_training, args=())
@@ -61,7 +60,7 @@ class TrainingProcessor(multiprocessing.Process):
             with open("./samples.pk", 'rb') as infile:
                 self.human_map = pickle.load(infile)
                 self.model_updated = True
-        except Exception as  e:
+        except Exception as e:
             log.error(e)
 
         while True:
@@ -109,8 +108,8 @@ class TrainingProcessor(multiprocessing.Process):
                             ready = False
                             break
                         ready = True
-                        log.info("ready:{},process {}'s images to model.".format(
-                            ready, uid))
+                        log.info("ready:{},process {}'s images to model.".
+                                 format(ready, uid))
                     if ready:
                         log.info("begin to train svm model....")
                         svm = self.train()
@@ -121,8 +120,9 @@ class TrainingProcessor(multiprocessing.Process):
                         log.info("ending to train svm model....")
 
                 time.sleep(1)
-            except Exception as  e:
+            except Exception as e:
                 log.error(e)
+
     def train(self):
         try:
             global spg
@@ -140,7 +140,7 @@ class TrainingProcessor(multiprocessing.Process):
                 "typeX:{}---typey:{}---lenx:{},leny:{}, X.shape:{}, y.shape:{}".
                 format(type(X), type(y), len(X), len(y), X.shape, y.shape))
             return GridSearchCV(SVC(C=1), spg, cv=5, n_jobs=4).fit(X, y)
-        except Exception as  e:
+        except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
                 traceback.format_exception(exc_type, exc_value, exc_traceback))
