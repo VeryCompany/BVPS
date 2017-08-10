@@ -30,14 +30,15 @@ try:
     from bvps.config import cameras
     # 启动采集摄像头
     # todo:消息反馈处理和异常处理
+    asys.createActor(Camera, globalName="camera1")
+    asys.createActor(Camera, globalName="camera2")
+    asys.createActor(Camera, globalName="camera3")
 
     for camId, params in cameras.items():
         cama = asys.createActor(Camera, globalName=camId)
         cameras[camId]["address"] = cama
         print("启动摄像头{}，命令CameraCmdType.START_CAPTURE,address:{}".format(
             camId, cama))
-        print("camera:{}".format(camId))
-        print("{}".format(params))
         asys.tell(cama, "start camera:{}!!!!".format(camId))
         #asys.tell(cama, CameraCmd(CameraCmdType.START_CAPTURE, camId, params))
 
