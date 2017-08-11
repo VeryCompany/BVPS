@@ -1,51 +1,52 @@
 class ShoppingCartProductModel(dict):
-
     def __init__(self, count):
         dict.__init__(self)
         self.default = None
         self.count = count
 
-    def getCart(self, key):
-        if key is None: return None,0;
+    def get_cart(self, key):
+        if key is None:
+            return None, 0
 
-        if self.get(key) is None: return None,0;
+        if self.get(key) is None:
+            return None, 0
+
         return self.get(key)
 
     def __getitem__(self, key):
         try:
             return dict.__getitem__(self, key)
-        except Exception as KeyError:
+        except Exception as cartKeyError:
+            print("ERROR:", cartKeyError)
             return self.default
 
-    def addProduct(self, product):
-        if product is None: return ;
+    def add_product(self, product):
+        if product is None:
+            return
 
-        productDict,count = self.getCart(product.productId)
-        if productDict is None:
-            productDict = product
+        product_dict, count = self.get_cart(product.productId)
+        if product_dict is None:
+            product_dict = product
             count = 1
             self.count += 1
-            dict.__setitem__(self, productDict.productId, (productDict, count))
+            dict.__setitem__(self, product_dict.productId, (product_dict, count))
         else:
             count += 1
-            dict.__setitem__(self, productDict.productId, (productDict, count))
+            dict.__setitem__(self, product_dict.productId, (product_dict, count))
             self.count += 1
-        print count
 
-    def removeProduct(self, productId):
+    def remove_product(self, product_id):
 
-        productDict, count = self.getCart(productId)
-        if productDict is not None:
+        product_dict, count = self.get_cart(product_id)
+        if product_dict is not None:
             if count > 1:
                 count -= 1
-                dict.__setitem__(self, productDict.productId, (productDict, count))
+                dict.__setitem__(self, product_dict.productId, (product_dict, count))
                 self.count -= 1
             elif count == 1:
-                self.pop(productId)
+                self.pop(product_id)
                 self.count -= 1
 
-    # def __str__(self):
-    #     return "ShoppingCartProduct[" + ",".join("{" + str(self[product][0])+",count=%s}"%str(self[product][1]) for product in self) +"], ShoppingCartCount=" + str(self.count)
-
     def __str__(self):
-        return "[" + ",".join("{" + str(self[product][0])+",\"count\":%s}"%str(self[product][1]) for product in self) + "]"
+        return "[" + ",".join("{" + str(self[product][0]) + ",\"count\":%s}"
+                              % str(self[product][1]) for product in self) + "]"

@@ -3,80 +3,93 @@ from rpsc.models import RackModel
 
 racks = dict()
 
-def addRack(rack=None):
+
+def add_rack(rack=None):
     global racks
 
-    if rack == None: return;
-    if rack.rackId in racks: return;
-
+    if rack is None:
+        return
+    if rack.rackId in racks:
+        return
     racks[rack.rackId] = rack
 
-def addProduct(rackId, product):
+
+def add_product(rack_id, product):
     global racks
 
-    if not (rackId in racks): racks[rackId] = RackModel(rackId);
+    if not (rack_id in racks):
+        racks[rack_id] = RackModel(rack_id)
     msg = "error"
     try:
-        product.setProduct2Rack(rackId)
-        racks[rackId].addProductList(product)
+        product.set_product2rack(rack_id)
+        racks[rack_id].add_product_list(product)
         msg = "success"
     except Exception as addProductErr:
-        print addProductErr
+        print(addProductErr)
         msg = "error"
     finally:
-        #print racks[rackId]
+        # print racks[rack_id]
         return msg
 
-def removeLocProduct(rackId, productLoc):
+
+def remove_loc_product(rack_id, product_loc):
     global racks
-    if not (rackId in racks): return ;
+    if not (rack_id in racks):
+        return
 
     product = None
     msg = "error"
     try:
-        for pro in racks[rackId].productList:
-            if pro.productLoc == productLoc:
+        for pro in racks[rack_id].productList:
+            if pro.productLoc == product_loc:
                 product = pro
-                racks[rackId].productList.remove(pro)
+                racks[rack_id].productList.remove(pro)
                 break
-        msg = "success"
+        if product is None:
+            msg = "error"
+        else:
+            msg = "success"
     except Exception as removeProductErr:
-        print removeProductErr
+        print(removeProductErr)
         msg = "error"
     finally:
-        #print racks[rackId]
+        # print racks[rackId]
         return msg, product
 
-def removeWeightProduct(rackId, productWeight):
+
+def remove_weight_product(rack_id, product_weight):
     global racks
-    if not (rackId in racks): return ;
+    if not (rack_id in racks):
+        return
 
     product = None
     msg = "error"
     try:
-        for pro in racks[rackId].productList:
-            if pro.weight == productWeight:
+        for pro in racks[rack_id].productList:
+            if pro.weight == product_weight:
                 product = pro
-                racks[rackId].productList.remove(pro)
+                racks[rack_id].productList.remove(pro)
                 break
         msg = "success"
     except Exception as removeProductErr:
-        print removeProductErr
+        print(removeProductErr)
         msg = "error"
     finally:
-        #print racks[rackId]
+        # print(racks[rack_id])
         return msg, product
 
-def getRack(rackid, loc):
-    if not (rackid in racks): return False;
-    rack = racks[rackid]
-    print rack.getProductSize()
 
-    if rack.getProductSize() > 0:
+def get_rack(rack_id, loc):
+    if not (rack_id in racks):
+        return False
+    rack = racks[rack_id]
+    print(rack.get_product_size())
+
+    if rack.get_product_size() > 0:
         product = None
         for prod in rack.productList:
             if prod.productLoc == loc:
-                print "位置", loc, "已经有产品 ->:", prod
+                print("位置", loc, "已经有产品 ->:", prod)
                 product = prod
                 break
         if product is None:

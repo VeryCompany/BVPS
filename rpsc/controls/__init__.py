@@ -1,2 +1,2 @@
-import rackController
-from controlCenter import ControlCenter
+from .controlCenter import ControlCenter
+from .rackController import *

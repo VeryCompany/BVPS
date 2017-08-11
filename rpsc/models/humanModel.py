@@ -1,30 +1,31 @@
+class HumanModel:
+    def __init__(self, human_id, human_loc, shopping_cart):
+        self.humanId = human_id
+        self.humanLoc = human_loc
+        self.shoppingCart = shopping_cart
+        self.humanLocHistory = None
+        self.inTime = None
 
-class HumanModel():
+    def set_come_time(self, time):
+        self.inTime = time
 
-    def __init__(self, humanId, humanLoc, shoppingCart):
-        self.humanId=humanId
-        self.humanLoc= humanLoc
-        self.shoppingCart=shoppingCart
-        self.humanLocHistroy = None
+    def set_human_loc(self, human_loc):
+        self.humanLoc = human_loc
+        if self.humanLocHistory is None:
+            self.humanLocHistory = dict()
+        self.humanLocHistory[human_loc[0]] = human_loc
 
-    def setComeTime(self, time):
-        self.intime=time
+    def get_human_loc(self, time):
+        if self.humanLocHistory is None:
+            return None
+        return self.humanLocHistory[time]
 
-    def setHumanLoc(self, humanLoc):
-        self.humanLoc=humanLoc
-        if self.humanLocHistroy is None:
-            self.humanLocHistroy = dict()
-        self.humanLocHistroy[humanLoc[0]]=humanLoc
-
-    def getHumanLoc(self, time):
-        if self.humanLocHistroy is None: return None;
-        return self.humanLocHistroy[time]
-
-    def addProductToCart(self, product):
+    def add_product_to_cart(self, product):
         self.shoppingCart.append(product)
 
-    def removeProductFromCart(self, product):
+    def remove_product_from_cart(self, product):
         self.shoppingCart.remove(product)
 
     def __str__(self):
-        return "Human[humanId=" + self.humanId + ", humanLoc=" + str(self.humanLoc) + ", ShoppingCart=" + str(self.shoppingCart) + "]"
+        return "Human[humanId=" + self.humanId + ", humanLoc=" + str(self.humanLoc) + ", ShoppingCart=" + str(
+            self.shoppingCart) + "]"

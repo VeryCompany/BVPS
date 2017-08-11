@@ -1,1 +1,1 @@
-import rackConfig as RackConfig
+from .rackConfig import *

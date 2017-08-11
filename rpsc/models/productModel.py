@@ -1,25 +1,22 @@
-
-class ProductModel():
-
-    def __init__(self, productId, productName, weight=0, productLoc=[], price=0):
-        self.productId = productId
-        self.productName = productName
+class ProductModel:
+    def __init__(self, product_id, product_name, weight=0, product_loc=list(), price=0):
+        self.productId = product_id
+        self.productName = product_name
         self.weight = weight
-        self.productLoc = productLoc
+        self.productLoc = product_loc
         self.rackId = None
-        self.price=price
+        self.price = price
 
-    def setProductWeight(self, weight):
+    def set_product_weight(self, weight):
         self.weight = weight
 
-    def setProductLoc(self, productLoc=[]):
-        self.productLoc = productLoc
+    def set_product_loc(self, product_loc=list()):
+        self.productLoc = product_loc
 
-    def setProduct2Rack(self, rackId):
-        self.rackId = rackId
+    def set_product2rack(self, rack_id):
+        self.rackId = rack_id
 
     def __str__(self):
-        extStr = ''
-        # if self.rackId is not None:
-        #     extStr = ", \"rackId\" : " + self.rackId + ", \"weigth\":" + str(self.weight) + ", \"productLoc\":" + str(self.productLoc)
-        return "\"product\":{\"productId\":\"" + str(self.productId) + "\", \"productName\":\"" + str(self.productName) + "\", \"price\":" + str(self.price) + extStr + "}"
+        ext_str = ''
+        return "\"product\":{\"productId\":\"" + str(self.productId) + "\", \"productName\":\"" + str(
+            self.productName) + "\", \"price\":" + str(self.price) + ext_str + "}"

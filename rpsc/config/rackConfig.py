@@ -47,3 +47,14 @@ productList=[
     {"productId": "2_7", "productName": "产品2_7", "weight": 700, "rackId": "2", "price": 210},
     {"productId": "2_8", "productName": "产品2_8", "weight": 800, "rackId": "2", "price": 240}
 ]
+
+beaconList = [
+    0x5A02, 0x5783, 0x5920, 0x58C3, 0x5967
+]
+
+regions = [{"id":"COMFAST", "uuid":"FDA50693-A4E2-4FB1-AFCF-C6EB07647825"}]
+
+rack_loc = [
+    {"rackId":"1", "beaconLoc":[1, 5]},
+    {"rackId":"2", "beaconLoc":[4]}
+]
