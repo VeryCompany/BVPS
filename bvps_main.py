@@ -7,13 +7,13 @@ from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.camera.camera import Camera
-#from rpsc.start import serverStart
+from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
 import time
 try:
 
     asys = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
-    #serverStart(asys)
+    server_start(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,
