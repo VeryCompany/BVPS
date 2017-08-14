@@ -1,5 +1,5 @@
 import mxnet as mx
-
+import logging as log
 
 def load_checkpoint(prefix, epoch):
     """
@@ -12,6 +12,8 @@ def load_checkpoint(prefix, epoch):
     aux_params : dict of str to NDArray
         Model parameter, dict of name to NDArray of net's auxiliary states.
     """
+
+    log.info('load model params:%s-%04d.params' % (prefix, epoch))
     save_dict = mx.nd.load('%s-%04d.params' % (prefix, epoch))
     arg_params = {}
     aux_params = {}
