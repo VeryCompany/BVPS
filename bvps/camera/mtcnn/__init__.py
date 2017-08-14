@@ -22,7 +22,7 @@ print("init mtcnn common")
 print("_" * 100)
 
 
-def test_net():
+def test_net(gpuId):
     prefix = [
         os.path.join(mtnnDir, 'pnet'),
         os.path.join(mtnnDir, 'rnet'),
@@ -30,7 +30,7 @@ def test_net():
     ]
     epoch = [16, 16, 16]
     batch_size = [2048, 256, 16]
-    ctx = mx.gpu(0)
+    ctx = mx.gpu(gpuId)
     thresh = [0.5, 0.5, 0.7]
     min_face_size = 40
     stride = 2

@@ -104,14 +104,14 @@ class Camera(ActorTypeDispatcher):
             dps_num = cmd.values["DProcessNum"]
             log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, dps_num))
             for p in range(0, dps_num, 1):
-                dps = DetectorProcessor(self, self.human_detector_q,
-                                        self.training_dset_q,
-                                        self.recognizer_in_q)
+                dps = DetectorProcessor(
+                    self, self.human_detector_q, self.training_dset_q,
+                    self.recognizer_in_q, cmd.values["gpuId"])
                 dps.start()
             log.info(
                 "启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, dps_num))
             """识别器进程启动"""
-            srz_num = 1
+            srz_num = cmd.values["RProcessNum"]
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
             for p in range(0, srz_num, 1):
                 srz = SVMRecognizer(self, self.recognizer_in_q,

@@ -8,16 +8,14 @@ from bvps.camera.camera import clock, StatValue
 from bvps.common import ModelUpdateCmd  # , net
 from sklearn.svm import SVC
 import pickle
-#from bvps.torch.torch_neural_net import TorchNeuralNet
-
+from bvps.torch.torch_neural_net import TorchNeuralNet
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
+net = TorchNeuralNet(
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
-#net = TorchNeuralNet(
-    #os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
-net = None
 
 class SVMRecognizer(multiprocessing.Process):
     def __init__(self, camera, in_queue, out_queue):
@@ -25,26 +23,15 @@ class SVMRecognizer(multiprocessing.Process):
         SVMRecognizer.in_queue = in_queue
         SVMRecognizer.out_queue = out_queue
         self.camera = camera
-        # try:
-        #     with open("./svm_model.pk", 'rb') as infile:
-        #         self.model = pickle.load(infile)
-        # except Exception, e:
-        #     log.error(e)
         self.model = None
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
 
-
     def whoru(self, human):
         if self.model is None:
             return None
         face = human
-
-        # X = face.flatten()  # 需要图片扁平化处理
-        # log.info("face.shape:{}".format(face.shape))
-        # log.info(face)
-        # log.info(human)
         rep = net.forward(face)
         identity = self.model.predict(rep)[0]
         return identity

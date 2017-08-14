@@ -21,7 +21,7 @@ import time
 import numpy as np
 # from bvps.config import svm_param_grid as spg
 import pickle
-#from bvps.common import net
+from bvps.common import net
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
@@ -29,7 +29,7 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 
 # net = TorchNeuralNet(
 #     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
-net = None
+#net = None
 spg = [{
     'C': [1, 10, 100, 1000],
     'kernel': ['linear']
@@ -38,7 +38,7 @@ spg = [{
     'gamma': [0.001, 0.0001],
     'kernel': ['rbf']
 }]
-tc = {"cap_nums": 20}
+tc = {"cap_nums": 50}
 
 
 class TrainingProcessor(multiprocessing.Process):
