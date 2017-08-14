@@ -145,12 +145,14 @@ class DetectorProcessor(multiprocessing.Process):
             if self.mtcnn_detector is None:
                 log.error("mtcnn error!")
                 return validHuman
-            log.info("image.shape:{}".format(image.shape))
+            # log.info("image.shape:{}".format(image.shape))
             boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
             boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
             boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
 
             if boxes_c is not None:
+                log.info(boxes)
+                
                 for b in boxes_c:
                     # cv2.rectangle(draw, (int(b[0]), int(b[1])),
                     #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
