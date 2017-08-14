@@ -11,11 +11,9 @@ from bvps.common import CameraType, mtnnDir
 import sys, traceback, time
 from multiprocessing.pool import ThreadPool
 from collections import deque
-import bvps.camera.mtcnn
-from bvps.camera.mtcnn import PNet, RNet, ONet
-from bvps.camera.mtcnn import ctx, min_face_size, stride, thresh
-# MtcnnDetector: concatenate the three networks
-from core.MtcnnDetector import MtcnnDetector
+from bvps.camera.mtcnn import test_net
+
+
 
 class DetectorProcessor(multiprocessing.Process):
     def __init__(self, camera, frame_in, frame_out, frame_out_2):
@@ -27,13 +25,7 @@ class DetectorProcessor(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        self.mtcnn_detector = MtcnnDetector(
-            detectors=[PNet, RNet, ONet],
-            ctx=ctx,
-            min_face_size=min_face_size,
-            stride=stride,
-            threshold=thresh,
-            slide_window=False)
+        self.mtcnn_detector = test_net
 
     def run(self):
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
