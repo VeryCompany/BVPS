@@ -41,7 +41,7 @@ class DetectorProcessor(multiprocessing.Process):
         prefix = ['../../model/pnet', '../../model/rnet', '../../model/onet']
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
-        ctx = mx.gpu(1)
+        ctx = mx.gpu(2)
         thresh = [0.6, 0.6, 0.7]
         min_face_size = 24
         stride = 2
