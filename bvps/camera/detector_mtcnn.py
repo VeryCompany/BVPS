@@ -77,10 +77,6 @@ class DetectorProcessor(multiprocessing.Process):
                 traceback.format_exception(exc_type, exc_value, exc_traceback))
 
     def run(self):
-        # brt_times = 0
-        threadn = cv2.getNumberOfCPUs()
-        pool = ThreadPool(processes=threadn)
-        pending = deque()
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
             self.camera.cameraId))
         self.test_net(
