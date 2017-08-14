@@ -125,9 +125,7 @@ class DetectorProcessor(multiprocessing.Process):
                 for human in humans:
                     DetectorProcessor.frame_out2.put(human)  # for 识别器
                     if self.camera.cameraType == CameraType.CAPTURE:
-                        DetectorProcessor.frame_out.put(
-                            human)  # for Trainor
-
+                        DetectorProcessor.frame_out.put(human)  # for Trainor
 
             except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -147,14 +145,16 @@ class DetectorProcessor(multiprocessing.Process):
             boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
 
             if boxes_c is not None:
-                log.info("{} detected！".format(self.camera.cameraId))
-
+                log.debug("{} detected！".format(self.camera.cameraId))
                 for b in boxes_c:
                     # cv2.rectangle(draw, (int(b[0]), int(b[1])),
                     #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
                     # crop image and resize....
                     # return faces......
-                    log.info(b)
+                    center_x, center_y = (
+                        (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
+                        (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
+                    log.info("{}:{}".format(center_x, center_y))
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
