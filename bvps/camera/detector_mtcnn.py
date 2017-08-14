@@ -54,15 +54,15 @@ class DetectorProcessor(multiprocessing.Process):
         # load pnet model
         args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
         self.PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
-
+        log.info(self.PNet)
         # load rnet model
         args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
         self.RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
-
+        log.info(self.RNet)
         # load onet model
         args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
         self.ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
-
+        log.info(self.ONet)
         self.mtcnn_detector = MtcnnDetector(
             detectors=[self.PNet, self.RNet, self.ONet],
             ctx=ctx,
