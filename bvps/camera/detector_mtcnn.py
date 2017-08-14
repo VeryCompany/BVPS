@@ -50,7 +50,11 @@ class DetectorProcessor(multiprocessing.Process):
             thresh=[0.5, 0.5, 0.7],
             min_face_size=40,
             stride=2)
+        log.info("_"*50)
+        log.info(self.mtcnn_detector)
+        log.info("_"*50)
 
+        
     def test_net(self,
                  prefix=[
                      os.path.join(mtnnDir, 'pnet'),
