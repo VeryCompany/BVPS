@@ -97,6 +97,7 @@ class DetectorProcessor(multiprocessing.Process):
             stride=2)
         log.info("camera:{}'s' mtcnn detector successfully startup......".
                  format(self.camera.cameraId))
+        log.info(self.mtcnn_detector)
         while True:
             try:
                 """
@@ -133,7 +134,7 @@ class DetectorProcessor(multiprocessing.Process):
     def detect_humans(self, image, t0, secs):
         if self.mtcnn_detector is None:
             log.error("mtcnn error!")
-            return
+            return None
         boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
         boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
         boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
