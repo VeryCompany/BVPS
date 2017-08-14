@@ -154,10 +154,12 @@ class DetectorProcessor(multiprocessing.Process):
                     center_x, center_y = (
                         (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
                         (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
-                    log.info("{}:{}".format(center_x, center_y))
+                    log.info("{}->{}:{}".format(self.camera.cameraId, center_x,
+                                                center_y))
                     w, h = (abs(int(b[0]) - int(b[2])) / 2,
                             int(b[1]) + abs(int(b[1]) - int(b[3])) / 2)
-                    log.info("w:{},h:{}".format(w, h))
+                    log.info(
+                        "{}->w:{},h:{}".format(self.camera.cameraId, w, h))
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
