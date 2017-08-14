@@ -4,9 +4,6 @@ import os
 from bvps.dlib.align_dlib import AlignDlib
 #from bvps.torch.torch_neural_net import TorchNeuralNet
 
-print("_"*100)
-print("init common")
-print("_"*100)
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, 'models')
