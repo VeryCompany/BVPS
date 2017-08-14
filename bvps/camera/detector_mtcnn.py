@@ -108,10 +108,12 @@ class DetectorProcessor(multiprocessing.Process):
         boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
         boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
         boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
-
+        log.info(boxes)
+        log.info(boxes_c)
         if boxes_c is not None:
             for b in boxes_c:
-                cv2.rectangle(draw, (int(b[0]), int(b[1])),
-                              (int(b[2]), int(b[3])), (0, 255, 255), 1)
+                # cv2.rectangle(draw, (int(b[0]), int(b[1])),
+                #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
                 # crop image and resize....
                 # return faces......
+                log.info(b)
