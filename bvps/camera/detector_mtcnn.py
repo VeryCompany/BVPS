@@ -137,6 +137,7 @@ class DetectorProcessor(multiprocessing.Process):
             if self.mtcnn_detector is None:
                 log.error("mtcnn error!")
                 return validHuman
+            log.info("image.shape:{}".format(image.shape))
             boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
             boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
             boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
