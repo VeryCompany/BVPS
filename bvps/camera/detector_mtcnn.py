@@ -13,6 +13,21 @@ from multiprocessing.pool import ThreadPool
 from collections import deque
 import bvps.camera.mtcnn
 
+# numpy: image and matice computation
+import numpy as np
+# mxnet: deep learning
+import mxnet as mx
+# symbol: define the network structure
+from core.symbol import P_Net, R_Net, O_Net
+# detector: bind weight with structure and create a detector class
+from core.detector import Detector
+# fcn_detector: bind weight with structure and create a detector class
+from core.fcn_detector import FcnDetector
+# load_model: load model from .param file
+from tools.load_model import load_param
+# MtcnnDetector: concatenate the three networks
+from core.MtcnnDetector import MtcnnDetector
+
 
 class DetectorProcessor(multiprocessing.Process):
     def __init__(self, camera, frame_in, frame_out, frame_out_2):
