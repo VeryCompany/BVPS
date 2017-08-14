@@ -133,19 +133,25 @@ class DetectorProcessor(multiprocessing.Process):
 
     def detect_humans(self, image, t0, secs):
         validHuman = []
-        if self.mtcnn_detector is None:
-            log.error("mtcnn error!")
+        try:
+            if self.mtcnn_detector is None:
+                log.error("mtcnn error!")
+                return validHuman
+            boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
+            boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
+            boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
+
+            if boxes_c is not None:
+                for b in boxes_c:
+                    # cv2.rectangle(draw, (int(b[0]), int(b[1])),
+                    #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
+                    # crop image and resize....
+                    # return faces......
+                    log.info(b)
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value,
+                                           exc_traceback))
+        finally:
             return validHuman
-        boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
-        boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
-        boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
-        log.info(boxes)
-        log.info(boxes_c)
-        if boxes_c is not None:
-            for b in boxes_c:
-                # cv2.rectangle(draw, (int(b[0]), int(b[1])),
-                #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
-                # crop image and resize....
-                # return faces......
-                log.info(b)
-        return validHuman
