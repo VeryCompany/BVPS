@@ -54,7 +54,7 @@ class DetectorProcessor(multiprocessing.Process):
         log.info(self.mtcnn_detector)
         log.info("_"*50)
 
-        
+
     def test_net(self,
                  prefix=[
                      os.path.join(mtnnDir, 'pnet'),
@@ -66,29 +66,32 @@ class DetectorProcessor(multiprocessing.Process):
                  ctx=mx.gpu(0),
                  thresh=[0.5, 0.5, 0.7],
                  min_face_size=40,
-                 stride=2,
-                 camera_path='0'):
+                 stride=2):
+        try:
+            # load pnet model
+            args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
+            PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
 
-        # load pnet model
-        args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
-        PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
+            # load rnet model
+            args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
+            RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
 
-        # load rnet model
-        args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
-        RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
+            # load onet model
+            args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
+            ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
 
-        # load onet model
-        args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
-        ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
-
-        mtcnn_detector = MtcnnDetector(
-            detectors=[PNet, RNet, ONet],
-            ctx=ctx,
-            min_face_size=min_face_size,
-            stride=stride,
-            threshold=thresh,
-            slide_window=False)
-        return mtcnn_detector
+            mtcnn_detector = MtcnnDetector(
+                detectors=[PNet, RNet, ONet],
+                ctx=ctx,
+                min_face_size=min_face_size,
+                stride=stride,
+                threshold=thresh,
+                slide_window=False)
+            return mtcnn_detector
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
 
     def run(self):
         # brt_times = 0
