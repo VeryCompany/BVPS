@@ -38,41 +38,53 @@ class DetectorProcessor(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
+        self.mtcnn_detector = self.test_net(
+            prefix=[
+                os.path.join(mtnnDir, 'pnet'),
+                os.path.join(mtnnDir, 'rnet'),
+                os.path.join(mtnnDir, 'onet')
+            ],
+            epoch=[16, 16, 16],
+            batch_size=[2048, 256, 16],
+            ctx=mx.cpu(0),
+            thresh=[0.5, 0.5, 0.7],
+            min_face_size=40,
+            stride=2)
 
-        # prefix = [
-        #     os.path.join(mtnnDir, 'pnet'),
-        #     os.path.join(mtnnDir, 'rnet'),
-        #     os.path.join(mtnnDir, 'onet')
-        # ]
-        prefix = ['model/pnet', 'model/rnet', 'model/onet']
-        log.info(prefix)
-        epoch = [16, 16, 16]
-        batch_size = [2048, 256, 16]
-        ctx = mx.gpu(0)
-        thresh = [0.5, 0.5, 0.7]
-        min_face_size = 40
-        stride = 2
+    def test_net(self,
+                 prefix=[
+                     os.path.join(mtnnDir, 'pnet'),
+                     os.path.join(mtnnDir, 'rnet'),
+                     os.path.join(mtnnDir, 'onet')
+                 ],
+                 epoch=[16, 16, 16],
+                 batch_size=[2048, 256, 16],
+                 ctx=mx.gpu(0),
+                 thresh=[0.5, 0.5, 0.7],
+                 min_face_size=40,
+                 stride=2,
+                 camera_path='0'):
+
         # load pnet model
         args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
-        log.info(args)
-        log.info(auxs)
-        self.PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
-        log.info(self.PNet)
-        # # load rnet model
-        # args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
-        # self.RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
-        # log.info(self.RNet)
-        # # load onet model
-        # args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
-        # self.ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
-        # log.info(self.ONet)
-        # self.mtcnn_detector = MtcnnDetector(
-        #     detectors=[self.PNet, self.RNet, self.ONet],
-        #     ctx=ctx,
-        #     min_face_size=min_face_size,
-        #     stride=stride,
-        #     threshold=thresh,
-        #     slide_window=False)
+        PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
+
+        # load rnet model
+        args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
+        RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
+
+        # load onet model
+        args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
+        ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
+
+        mtcnn_detector = MtcnnDetector(
+            detectors=[PNet, RNet, ONet],
+            ctx=ctx,
+            min_face_size=min_face_size,
+            stride=stride,
+            threshold=thresh,
+            slide_window=False)
+        return mtcnn_detector
 
     def run(self):
         # brt_times = 0

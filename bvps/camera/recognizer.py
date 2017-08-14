@@ -8,7 +8,7 @@ from bvps.camera.camera import clock, StatValue
 from bvps.common import ModelUpdateCmd  # , net
 from sklearn.svm import SVC
 import pickle
-from bvps.torch.torch_neural_net import TorchNeuralNet
+#from bvps.torch.torch_neural_net import TorchNeuralNet
 
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
