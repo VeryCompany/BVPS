@@ -55,7 +55,7 @@ class DetectorProcessor(multiprocessing.Process):
         # log.info("_"*50)
         x = mx.nd.array([[1, 2, 3], [4, 5, 6]])
         z = x.as_in_context(mx.gpu(0))
-        print z
+        print(z)
 
     def test_net(self,
                  prefix=[
