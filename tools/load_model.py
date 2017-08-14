@@ -17,7 +17,7 @@ def load_checkpoint(prefix, epoch):
     save_dict = mx.nd.load('%s-%04d.params' % (prefix, epoch))
     log.info("-"*100)
     log.info(save_dict)
-    log.info("-"*100)
+
     arg_params = {}
     aux_params = {}
     for k, v in save_dict.items():
@@ -26,6 +26,9 @@ def load_checkpoint(prefix, epoch):
             arg_params[name] = v
         if tp == 'aux':
             aux_params[name] = v
+    log.info(arg_params)
+    log.info(aux_params)
+    log.info("-"*100)
     return arg_params, aux_params
 
 
