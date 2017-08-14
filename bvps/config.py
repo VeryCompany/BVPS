@@ -48,7 +48,7 @@ cameras = {
             "distortion_ceof": {},
             "camera_matrix": []
         },
-        "scale": 1.0 / 4.0,
+        "scale": 1.0,
         "device": "rtsp://192.168.0.82:554",
         "user": "",
         "password": "",
@@ -77,7 +77,7 @@ cameras = {
             "distortion_ceof": {},
             "camera_matrix": []
         },
-        "scale": 1.0 / 4.0,
+        "scale": 1.0,
         "device": "rtsp://192.168.0.80:554",
         "user": "",
         "password": "",
