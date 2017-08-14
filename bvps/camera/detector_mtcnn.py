@@ -46,7 +46,7 @@ class DetectorProcessor(multiprocessing.Process):
         ]
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
-        ctx = mx.gpu(2)
+        ctx = mx.gpu(1)
         thresh = [0.6, 0.6, 0.7]
         min_face_size = 24
         stride = 2
