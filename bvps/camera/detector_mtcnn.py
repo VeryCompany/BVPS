@@ -2,10 +2,11 @@
 """camera script."""
 import logging as log
 import multiprocessing
+import os
 
 import cv2
 from bvps.camera.common import StatValue, clock
-from bvps.common import CameraType
+from bvps.common import CameraType, mtnnDir
 
 import sys, traceback, time
 from multiprocessing.pool import ThreadPool
@@ -38,7 +39,11 @@ class DetectorProcessor(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
 
-        prefix = ['../../model/pnet', '../../model/rnet', '../../model/onet']
+        prefix = [
+            os.path.join(mtnnDir, 'pnet'),
+            os.path.join(mtnnDir, 'rnet'),
+            os.path.join(mtnnDir, 'onet')
+        ]
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
         ctx = mx.gpu(2)
