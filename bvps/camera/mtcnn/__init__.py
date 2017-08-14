@@ -13,7 +13,7 @@ from tools.load_model import load_param
 # MtcnnDetector: concatenate the three networks
 from core.MtcnnDetector import MtcnnDetector
 from bvps.common import CameraType, mtnnDir
-import traceback
+import traceback, os
 import logging as log
 
 print("_"*100)
