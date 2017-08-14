@@ -38,24 +38,6 @@ class DetectorProcessor(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        # self.mtcnn_detector = self.test_net(
-        #     prefix=[
-        #         os.path.join(mtnnDir, 'pnet'),
-        #         os.path.join(mtnnDir, 'rnet'),
-        #         os.path.join(mtnnDir, 'onet')
-        #     ],
-        #     epoch=[16, 16, 16],
-        #     batch_size=[2048, 256, 16],
-        #     ctx=mx.gpu(0),
-        #     thresh=[0.5, 0.5, 0.7],
-        #     min_face_size=40,
-        #     stride=2)
-        # log.info("_"*50)
-        # log.info(self.mtcnn_detector)
-        # log.info("_"*50)
-        x = mx.nd.array([[1, 2, 3], [4, 5, 6]])
-        z = x.as_in_context(mx.gpu(0))
-        print(z)
 
     def test_net(self,
                  prefix=[
@@ -100,7 +82,22 @@ class DetectorProcessor(multiprocessing.Process):
         threadn = cv2.getNumberOfCPUs()
         pool = ThreadPool(processes=threadn)
         pending = deque()
-
+        log.info("ready to startup camera:{}'s' mtcnn detector".format(
+            self.camera.cameraId))
+        self.mtcnn_detector = self.test_net(
+            prefix=[
+                os.path.join(mtnnDir, 'pnet'),
+                os.path.join(mtnnDir, 'rnet'),
+                os.path.join(mtnnDir, 'onet')
+            ],
+            epoch=[16, 16, 16],
+            batch_size=[2048, 256, 16],
+            ctx=mx.gpu(0),
+            thresh=[0.5, 0.5, 0.7],
+            min_face_size=40,
+            stride=2)
+        log.info("camera:{}'s' mtcnn detector successfully startup......".
+                 format(self.camera.cameraId))
         while True:
             try:
                 """
