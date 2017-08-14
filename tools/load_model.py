@@ -36,8 +36,14 @@ def convert_context(params, ctx):
     """
     new_params = dict()
     for k, v in params.items():
-        log.info("k:{},v:{}".format(k, v))
-        new_params[k] = v.as_in_context(ctx)
+
+        try:
+            log.info("k:{},v:{}".format(k, v))
+            new_params[k] = v.as_in_context(ctx)
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
 
     return new_params
 
