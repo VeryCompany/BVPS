@@ -12,7 +12,7 @@ import sys, traceback, time
 from multiprocessing.pool import ThreadPool
 from collections import deque
 import bvps.camera.mtcnn
-from bvps.camera.mtcnn import PNet, RNet, ONet,
+from bvps.camera.mtcnn import PNet, RNet, ONet
 from bvps.camera.mtcnn import ctx, min_face_size, stride, threshold
 
 
