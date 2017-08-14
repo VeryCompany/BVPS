@@ -39,11 +39,12 @@ class DetectorProcessor(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
 
-        prefix = [
-            os.path.join(mtnnDir, 'pnet'),
-            os.path.join(mtnnDir, 'rnet'),
-            os.path.join(mtnnDir, 'onet')
-        ]
+        # prefix = [
+        #     os.path.join(mtnnDir, 'pnet'),
+        #     os.path.join(mtnnDir, 'rnet'),
+        #     os.path.join(mtnnDir, 'onet')
+        # ]
+        prefix = ['model/pnet', 'model/rnet', 'model/onet']
         log.info(prefix)
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
