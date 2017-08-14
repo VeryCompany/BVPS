@@ -132,9 +132,10 @@ class DetectorProcessor(multiprocessing.Process):
                                                exc_traceback))
 
     def detect_humans(self, image, t0, secs):
+        validHuman = []
         if self.mtcnn_detector is None:
             log.error("mtcnn error!")
-            return None
+            return validHuman
         boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
         boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
         boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
@@ -147,3 +148,4 @@ class DetectorProcessor(multiprocessing.Process):
                 # crop image and resize....
                 # return faces......
                 log.info(b)
+        return validHuman
