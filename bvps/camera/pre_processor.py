@@ -22,12 +22,13 @@ class PreProcessor(multiprocessing.Process):
         from bvps.config import cameras as ca
         scale = ca[self.camera.cameraId]["scale"]
         threadn = cv2.getNumberOfCPUs()
-        pool = ThreadPool(processes=threadn*2)
+        pool = ThreadPool(processes=threadn * 2)
         pending = deque()
         while True:
             while len(pending) > 0 and pending[0].ready():
                 frame, t0, ts = pending.popleft().get()
-                PreProcessor.frame_out.put((frame, t0, ts))
+                if not PreProcessor.frame_out.full():
+                    PreProcessor.frame_out.put((frame, t0, ts))
             if len(pending) < threadn:
                 frame, t0, ts = PreProcessor.frame_in.get()
                 task = pool.apply_async(self.resize_frame, (frame, scale, t0,
@@ -43,5 +44,7 @@ class PreProcessor(multiprocessing.Process):
 
     def resize_frame(self, frame, scale, t0, ts):
         h, w, d = frame.shape
+        if scale == 1:
+            return (frame, t0, ts)
         f = cv2.resize(frame, (int(w * scale), int(h * scale)))
         return (f, t0, ts)
