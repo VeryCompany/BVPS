@@ -2,7 +2,7 @@
 from enum import Enum
 import os
 from bvps.dlib.align_dlib import AlignDlib
-from bvps.torch.torch_neural_net import TorchNeuralNet
+#from bvps.torch.torch_neural_net import TorchNeuralNet
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, 'models')
