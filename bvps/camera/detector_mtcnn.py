@@ -104,26 +104,34 @@ class DetectorProcessor(multiprocessing.Process):
                 todo://比较画面是否有变化，如果没有变化可以不进行处理，提高效率！
                 """
 
-                while len(pending) > 0 and pending[0].ready():
-                    humans = pending.popleft().get()
-                    for human in humans:
-                        DetectorProcessor.frame_out2.put(human)  # for 识别器
-                        if self.camera.cameraType == CameraType.CAPTURE:
-                            DetectorProcessor.frame_out.put(
-                                human)  # for Trainor
-                if len(pending) < threadn:
-                    frame, t0, secs = DetectorProcessor.frame_in.get()
-                    task = pool.apply_async(self.detect_humans, (frame, t0,
-                                                                 secs))
-                    pending.append(task)
-                    t = clock()
-                    self.latency.update(t - t0)
-                    self.frame_interval.update(t - self.last_frame_time)
-                    self.last_frame_time = t
-                log.debug(
-                    "detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
-                    format(self.camera.cameraId, self.latency.value * 1000,
-                           self.frame_interval.value * 1000))
+                # while len(pending) > 0 and pending[0].ready():
+                #     humans = pending.popleft().get()
+                #     for human in humans:
+                #         DetectorProcessor.frame_out2.put(human)  # for 识别器
+                #         if self.camera.cameraType == CameraType.CAPTURE:
+                #             DetectorProcessor.frame_out.put(
+                #                 human)  # for Trainor
+                # if len(pending) < threadn:
+                #     frame, t0, secs = DetectorProcessor.frame_in.get()
+                #     task = pool.apply_async(self.detect_humans, (frame, t0,
+                #                                                  secs))
+                #     pending.append(task)
+                #     t = clock()
+                #     self.latency.update(t - t0)
+                #     self.frame_interval.update(t - self.last_frame_time)
+                #     self.last_frame_time = t
+                # log.debug(
+                #     "detector_{},latency:{:0.1f}ms,process time:{:0.1f}ms".
+                #     format(self.camera.cameraId, self.latency.value * 1000,
+                #            self.frame_interval.value * 1000))
+                frame, t0, secs = DetectorProcessor.frame_in.get()
+                humans = self.detect_humans(frame, t0, secs)
+                for human in humans:
+                    DetectorProcessor.frame_out2.put(human)  # for 识别器
+                    if self.camera.cameraType == CameraType.CAPTURE:
+                        DetectorProcessor.frame_out.put(
+                            human)  # for Trainor
+
 
             except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -152,7 +160,6 @@ class DetectorProcessor(multiprocessing.Process):
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
-                traceback.format_exception(exc_type, exc_value,
-                                           exc_traceback))
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
         finally:
             return validHuman
