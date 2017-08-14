@@ -10,8 +10,7 @@ from core.detector import Detector
 from core.fcn_detector import FcnDetector
 # load_model: load model from .param file
 from tools.load_model import load_param
-# MtcnnDetector: concatenate the three networks
-from core.MtcnnDetector import MtcnnDetector
+
 from bvps.common import CameraType, mtnnDir
 import traceback
 import os
