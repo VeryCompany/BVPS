@@ -27,8 +27,8 @@ class PreProcessor(multiprocessing.Process):
         while True:
             while len(pending) > 0 and pending[0].ready():
                 frame, t0, ts = pending.popleft().get()
-                if not PreProcessor.frame_out.full():
-                    PreProcessor.frame_out.put((frame, t0, ts))
+                #if not PreProcessor.frame_out.full():
+                PreProcessor.frame_out.put((frame, t0, ts))
             if len(pending) < threadn:
                 frame, t0, ts = PreProcessor.frame_in.get()
                 task = pool.apply_async(self.resize_frame, (frame, scale, t0,
