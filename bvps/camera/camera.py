@@ -135,7 +135,7 @@ class Camera(ActorTypeDispatcher):
                 for p in range(0, 1, 1):
                     tps = TrainingProcessor(self, self.training_dset_q,
                                             self.training_model_oq)
-                    #tps.start()
+                    tps.start()
                 log.info(
                     "启动摄像头[{}]图像训练器成功！启动了[{}]个实例.".format(cmd.cameraName, 1))
             """
