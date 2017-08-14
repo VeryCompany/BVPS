@@ -12,21 +12,8 @@ import sys, traceback, time
 from multiprocessing.pool import ThreadPool
 from collections import deque
 import bvps.camera.mtcnn
-
-# numpy: image and matice computation
-import numpy as np
-# mxnet: deep learning
-import mxnet as mx
-# symbol: define the network structure
-from core.symbol import P_Net, R_Net, O_Net
-# detector: bind weight with structure and create a detector class
-from core.detector import Detector
-# fcn_detector: bind weight with structure and create a detector class
-from core.fcn_detector import FcnDetector
-# load_model: load model from .param file
-from tools.load_model import load_param
-# MtcnnDetector: concatenate the three networks
-from core.MtcnnDetector import MtcnnDetector
+from bvps.camera.mtcnn import PNet, RNet, ONet,
+from bvps.camera.mtcnn import ctx, min_face_size, stride, threshold
 
 
 class DetectorProcessor(multiprocessing.Process):
@@ -39,59 +26,18 @@ class DetectorProcessor(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-
-    def test_net(self,
-                 prefix=[
-                     os.path.join(mtnnDir, 'pnet'),
-                     os.path.join(mtnnDir, 'rnet'),
-                     os.path.join(mtnnDir, 'onet')
-                 ],
-                 epoch=[16, 16, 16],
-                 batch_size=[2048, 256, 16],
-                 ctx=mx.gpu(0),
-                 thresh=[0.5, 0.5, 0.7],
-                 min_face_size=40,
-                 stride=2):
-        try:
-            # load pnet model
-            args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
-            PNet = FcnDetector(P_Net("test"), ctx, args, auxs)
-
-            # load rnet model
-            args, auxs = load_param(prefix[1], epoch[0], convert=True, ctx=ctx)
-            RNet = Detector(R_Net("test"), 24, batch_size[1], ctx, args, auxs)
-
-            # load onet model
-            args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
-            ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
-
-            self.mtcnn_detector = MtcnnDetector(
-                detectors=[PNet, RNet, ONet],
-                ctx=ctx,
-                min_face_size=min_face_size,
-                stride=stride,
-                threshold=thresh,
-                slide_window=False)
-        except Exception as e:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            log.error(
-                traceback.format_exception(exc_type, exc_value, exc_traceback))
+        self.mtcnn_detector = MtcnnDetector(
+            detectors=[PNet, RNet, ONet],
+            ctx=ctx,
+            min_face_size=min_face_size,
+            stride=stride,
+            threshold=threshold,
+            slide_window=False)
 
     def run(self):
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
             self.camera.cameraId))
-        self.test_net(
-            prefix=[
-                os.path.join(mtnnDir, 'pnet'),
-                os.path.join(mtnnDir, 'rnet'),
-                os.path.join(mtnnDir, 'onet')
-            ],
-            epoch=[16, 16, 16],
-            batch_size=[2048, 256, 16],
-            ctx=mx.gpu(1),
-            thresh=[0.5, 0.5, 0.7],
-            min_face_size=40,
-            stride=2)
+
         log.info("camera:{}'s' mtcnn detector successfully startup......".
                  format(self.camera.cameraId))
         log.info(self.mtcnn_detector)
