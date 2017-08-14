@@ -11,7 +11,7 @@ import cv2
 from bvps.camera.common import StatValue, clock
 from thespian.actors import ActorTypeDispatcher
 from bvps.camera.pre_processor import PreProcessor
-from bvps.camera.detector import DetectorProcessor
+from bvps.camera.detector_mtcnn import DetectorProcessor
 from bvps.camera.trainer import TrainingProcessor
 from bvps.camera.recognizer import SVMRecognizer
 from bvps.common import ModelUpdateCmd
@@ -101,7 +101,7 @@ class Camera(ActorTypeDispatcher):
             log.info(
                 "启动摄像头[{}]图像预处理进程成功！启动了[{}]个实例.".format(cmd.cameraName, pn))
             """检测器进程启动"""
-            dps_num = 8
+            dps_num = 1
             log.info("启动摄像头[{}]图像检测器进程{}个".format(cmd.cameraName, dps_num))
             for p in range(0, dps_num, 1):
                 dps = DetectorProcessor(self, self.human_detector_q,
