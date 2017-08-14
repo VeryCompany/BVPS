@@ -15,8 +15,6 @@ def load_checkpoint(prefix, epoch):
 
     log.info('load model params:%s-%04d.params' % (prefix, epoch))
     save_dict = mx.nd.load('%s-%04d.params' % (prefix, epoch))
-    log.info("-"*100)
-    log.info(save_dict)
 
     arg_params = {}
     aux_params = {}
@@ -26,9 +24,6 @@ def load_checkpoint(prefix, epoch):
             arg_params[name] = v
         if tp == 'aux':
             aux_params[name] = v
-    log.info(arg_params)
-    log.info(aux_params)
-    log.info("-"*100)
     return arg_params, aux_params
 
 
@@ -41,6 +36,9 @@ def convert_context(params, ctx):
     new_params = dict()
     for k, v in params.items():
         new_params[k] = v.as_in_context(ctx)
+    log.info("-"*100)
+    log.info(new_params)
+    log.info("-"*100)
     return new_params
 
 
@@ -59,4 +57,8 @@ def load_param(prefix, epoch, convert=False, ctx=None):
             ctx = mx.cpu()
         arg_params = convert_context(arg_params, ctx)
         aux_params = convert_context(aux_params, ctx)
+    log.info("-"*100)
+    log.info(arg_params)
+    log.info(aux_params)
+    log.info("-"*100)
     return arg_params, aux_params
