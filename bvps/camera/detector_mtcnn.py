@@ -48,8 +48,8 @@ class DetectorProcessor(multiprocessing.Process):
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
         ctx = mx.gpu(0)
-        thresh = [0.6, 0.6, 0.7]
-        min_face_size = 24
+        thresh = [0.5, 0.5, 0.7]
+        min_face_size = 40
         stride = 2
         # load pnet model
         args, auxs = load_param(prefix[0], epoch[0], convert=True, ctx=ctx)
