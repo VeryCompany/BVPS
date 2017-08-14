@@ -80,7 +80,7 @@ class DetectorProcessor(multiprocessing.Process):
             args, auxs = load_param(prefix[2], epoch[2], convert=True, ctx=ctx)
             ONet = Detector(O_Net("test"), 48, batch_size[2], ctx, args, auxs)
 
-            mtcnn_detector = MtcnnDetector(
+            self.mtcnn_detector = MtcnnDetector(
                 detectors=[PNet, RNet, ONet],
                 ctx=ctx,
                 min_face_size=min_face_size,
