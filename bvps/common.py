@@ -9,7 +9,7 @@ modelDir = os.path.join(fileDir, 'models')
 dlibModelDir = os.path.join(modelDir, 'dlib')
 harrsDir = os.path.join(fileDir, 'haars')
 openfaceModelDir = os.path.join(modelDir, 'openface')
-mtnnDir = os.path.join(fileDir, "..", "..", "model")
+mtnnDir = os.path.join(fileDir, "..", "model")
 align = AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
 
