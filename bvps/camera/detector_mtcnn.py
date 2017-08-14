@@ -157,7 +157,7 @@ class DetectorProcessor(multiprocessing.Process):
                     log.info("{}->{}:{}".format(self.camera.cameraId, center_x,
                                                 center_y))
                     w, h = (abs(int(b[0]) - int(b[2])) / 2,
-                            int(b[1]) + abs(int(b[1]) - int(b[3])) / 2)
+                            abs(int(b[1]) - int(b[3])) / 2)
                     log.info(
                         "{}->w:{},h:{}".format(self.camera.cameraId, w, h))
         except Exception as e:
