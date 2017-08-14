@@ -25,7 +25,7 @@ class DetectorProcessor(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        self.mtcnn_detector = test_net
+        self.mtcnn_detector = test_net()
 
     def run(self):
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
