@@ -44,6 +44,7 @@ class DetectorProcessor(multiprocessing.Process):
             os.path.join(mtnnDir, 'rnet'),
             os.path.join(mtnnDir, 'onet')
         ]
+        log.info(prefix)
         epoch = [16, 16, 16]
         batch_size = [2048, 256, 16]
         ctx = mx.gpu(0)
