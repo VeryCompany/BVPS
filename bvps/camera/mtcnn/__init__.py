@@ -18,7 +18,7 @@ import os
 import logging as log
 
 print("_" * 100)
-print("init common")
+print("init mtcnn common")
 print("_" * 100)
 
 prefix = [

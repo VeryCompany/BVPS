@@ -13,7 +13,7 @@ from multiprocessing.pool import ThreadPool
 from collections import deque
 import bvps.camera.mtcnn
 from bvps.camera.mtcnn import PNet, RNet, ONet
-from bvps.camera.mtcnn import ctx, min_face_size, stride, threshold
+from bvps.camera.mtcnn import ctx, min_face_size, stride, thresh
 
 
 class DetectorProcessor(multiprocessing.Process):
@@ -31,7 +31,7 @@ class DetectorProcessor(multiprocessing.Process):
             ctx=ctx,
             min_face_size=min_face_size,
             stride=stride,
-            threshold=threshold,
+            threshold=thresh,
             slide_window=False)
 
     def run(self):
