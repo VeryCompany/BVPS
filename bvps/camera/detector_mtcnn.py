@@ -71,7 +71,6 @@ class DetectorProcessor(multiprocessing.Process):
                 stride=stride,
                 threshold=thresh,
                 slide_window=False)
-            return mtcnn_detector
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
@@ -84,7 +83,7 @@ class DetectorProcessor(multiprocessing.Process):
         pending = deque()
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
             self.camera.cameraId))
-        self.mtcnn_detector = self.test_net(
+        self.test_net(
             prefix=[
                 os.path.join(mtnnDir, 'pnet'),
                 os.path.join(mtnnDir, 'rnet'),
@@ -132,6 +131,9 @@ class DetectorProcessor(multiprocessing.Process):
                                                exc_traceback))
 
     def detect_humans(self, image, t0, secs):
+        if self.mtcnn_detector is None:
+            log.error("mtcnn error!")
+            return
         boxes, boxes_c = self.mtcnn_detector.detect_pnet(image)
         boxes, boxes_c = self.mtcnn_detector.detect_rnet(image, boxes_c)
         boxes, boxes_c = self.mtcnn_detector.detect_onet(image, boxes_c)
