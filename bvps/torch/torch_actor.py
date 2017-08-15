@@ -11,7 +11,6 @@ class TorchActor(ActorTypeDispatcher):
         fileDir = os.path.dirname(os.path.realpath(__file__))
         modelDir = os.path.join(fileDir, '..', 'models')
         openfaceModelDir = os.path.join(modelDir, 'openface')
-
         self.net = TorchNeuralNet(
             os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
             imgDim=96,
@@ -19,6 +18,7 @@ class TorchActor(ActorTypeDispatcher):
 
     def receiveMsg_tuple(self, message, sender):
         camId, image = message
+
         rep = self.net.forward(image)
         self.send(sender, rep)
         log.info("received identity request from {}, image.shape:{}".format(

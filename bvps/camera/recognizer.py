@@ -27,7 +27,7 @@ class SVMRecognizer(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-
+        self.net = None
     def whoru(self, human):
         if self.net is None:
             self.net = self.camera.createActor(
