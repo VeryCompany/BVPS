@@ -3,19 +3,20 @@ import sys
 import os
 import logging as log
 
+from bvps.actor_system import actor_system as asys
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.torch.torch_actor import TorchActor
-from .camera.camera import Camera
-# from bvps.camera.camera import Camera
+from bvps.camera.camera import Camera
 from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
 import time
-from bvps.actor_system import actor_system as asys
+
 try:
     # server_start(asys)
     sa = asys.createActor(SystemActor, globalName="SystemActor")
-
+    position = asys.createActor(
+        PositionActor, globalName="CameraPositionActor")
     # 未来会从数据库或者配置文件中读取
     # 定位摄像头 type == 1
     # 采集摄像头 type == 2
@@ -33,8 +34,7 @@ try:
                        600)
         print("camera:{} result:{}".format(camId, msg))
     ta = asys.createActor(TorchActor, globalName="TorchActor")
-    position = asys.createActor(
-        PositionActor, globalName="CameraPositionActor")
+
 
 except KeyboardInterrupt:
     print('Interrupted')
