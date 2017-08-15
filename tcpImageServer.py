@@ -4,20 +4,18 @@ from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 import os
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
-modelDir = os.path.join(fileDir, 'models')
+modelDir = os.path.join(fileDir, 'bvps', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
 
 print("modelDir:{}".format(openfaceModelDir))
 net = TorchNeuralNet(
-    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
-    imgDim=96,
-    cuda=True)
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
+
 
 class ImageHandler(StreamRequestHandler):
     def __init__(self, request, client_address, server):
         self.dataMsg = bytes()
         StreamRequestHandler.__init__(self, request, client_address, server)
-
 
     def setup(self):
         StreamRequestHandler.setup(self)
