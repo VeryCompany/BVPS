@@ -11,40 +11,60 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# This file is Vitalius Parubochyi's modification of `torch_neural_net.py`
-# to use lutorpy instead of calling a Lua subprocess.
-# It's currently not used by default to avoid adding an
-# additional dependency.
-# More details are available on this mailing list thread:
-# https://groups.google.com/forum/#!topic/cmu-openface/Jj68LJBdN-Y
+
 """Module for Torch-based neural network usage."""
 
-import lutorpy as lua
-import numpy as np
+import atexit
 import binascii
-import cv2
+from subprocess import Popen, PIPE
 import os
-import logging as log
+import os.path
+import sys
 
-torch = lua.require('torch')
-nn = lua.require('nn')
-dpnn = lua.require('dpnn')
-image = lua.require('image')
+import numpy as np
+import cv2
 
 myDir = os.path.dirname(os.path.realpath(__file__))
 
+# Workaround for non-standard terminals, originally reported in
+# https://github.com/cmusatyalab/openface/issues/66
+os.environ['TERM'] = 'linux'
+
 
 class TorchNeuralNet:
-    """Use a `Torch <http://torch.ch>` and `Lutorpy <https://github.com/imodpasteur/lutorpy>`."""
+    """
+    Use a `Torch <http://torch.ch>`_ subprocess for feature extraction.
+
+    It also can be used as context manager using `with` statement.
+
+    .. code:: python
+
+        with TorchNeuralNet(model=model) as net:
+            # code
+
+    or
+
+    .. code:: python
+
+        net = TorchNeuralNet(model=model)
+        with net:
+            # use Torch's neural network
+
+    In this way Torch processes will be closed at the end of the `with` block.
+    `PEP 343 <https://www.python.org/dev/peps/pep-0343/>`_
+    """
 
     #: The default Torch model to use.
-    defaultModel = os.path.join(myDir, '..', 'models', 'openface',
-                                'nn4.small2.v1.t7')
+    defaultModel = os.path.join(myDir, '..', 'models', 'openface', 'nn4.small2.v1.t7')
+
     def __init__(self, model=defaultModel, imgDim=96, cuda=False):
         """__init__(self, model=defaultModel, imgDim=96, cuda=False)
 
         Instantiate a 'TorchNeuralNet' object.
+
+        Starts `openface_server.lua
+        <https://github.com/cmusatyalab/openface/blob/master/openface/openface_server.lua>`_
+        as a subprocess.
 
         :param model: The path to the Torch model to use.
         :type model: str
@@ -57,21 +77,114 @@ class TorchNeuralNet:
         assert imgDim is not None
         assert cuda is not None
 
-        torch.setdefaulttensortype('torch.FloatTensor')
-
-        self._net = torch.load(model)
-        self._net.evaluate(self._net)
-
-        self._tensor = torch.Tensor(1, 3, imgDim, imgDim)
-        self._cuda_tensor = None
+        self.cmd = ['/usr/bin/env', 'th', os.path.join(myDir, 'openface_server.lua'),
+                    '-model', model, '-imgDim', str(imgDim)]
         if cuda:
-            cutorch = lua.require('cutorch')
-            lua.require('cunn')
-            self._net = self._net._cuda()
-            self._cuda_tensor = torch.CudaTensor(1, 3, imgDim, imgDim)
-        self._cuda = cuda
-        self._imgDim = imgDim
-        log.info("run recognize with GPU: {}".format(cuda))
+            self.cmd.append('-cuda')
+        self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0, universal_newlines=True)
+
+        def exitHandler():
+            if self.p.poll() is None:
+                self.p.kill()
+        atexit.register(exitHandler)
+
+    def __enter__(self):
+        """Part of the context manger protocol. See PEP 343"""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Clean up resources when leaves `with` block.
+
+        Kill the Lua subprocess to prevent zombie processes.
+        """
+        if self.p.poll() is None:
+            self.p.kill()
+
+
+    def __del__(self):
+        """
+        Kill the Lua subprocess to prevent zombie processes.
+        """
+        if self.p.poll() is None:
+            self.p.kill()
+
+    def forwardPath(self, imgPath):
+        """
+        Perform a forward network pass of an image on disk.
+
+        :param imgPath: The path to the image.
+        :type imgPath: str
+        :return: Vector of features extracted with the neural network.
+        :rtype: numpy.ndarray
+        """
+        assert imgPath is not None
+
+        rc = self.p.poll()
+        if rc is not None and rc != 0:
+            raise Exception("""
+
+
+OpenFace: `openface_server.lua` subprocess has died.
+
++ Is the Torch command `th` on your PATH? Check with `which th`.
+
++ If `th` is on your PATH, try running `./util/profile-network.lua`
+  to see if Torch can correctly load and run the network.
+
+  + If this gives illegal instruction errors, see the section on
+    this in our FAQ at http://cmusatyalab.github.io/openface/faq/
+
+  + In Docker, use a Bash login shell or source
+     /root/torch/install/bin/torch-activate for the Torch environment.
+
++ See this GitHub issue if you are running on a non-64-bit machine:
+  https://github.com/cmusatyalab/openface/issues/42
+
++ Advanced Users: If you think this problem is caused by
+running Lua as a subprocess, Vitalius Parubochyi has created
+a version of this that uses https://github.com/imodpasteur/lutorpy.
+This file is available at <openface>/openface/torch_neural_net.lutorpy.py
+and our mailing list discussion on this can be found at:
+https://groups.google.com/forum/#!topic/cmu-openface/Jj68LJBdN-Y
+
++ Please post further issues to our mailing list at
+  https://groups.google.com/forum/#!forum/cmu-openface
+
+Diagnostic information:
+
+cmd: {}
+
+============
+
+stdout: {}
+""".format(self.cmd, self.p.stdout.read()))
+
+        self.p.stdin.write(imgPath + '\n')
+        output = self.p.stdout.readline()
+        try:
+            rep = [float(x) for x in output.strip().split(',')]
+            rep = np.array(rep)
+            return rep
+        except Exception as e:
+            self.p.kill()
+            stdout, stderr = self.p.communicate()
+            print("""
+
+
+Error getting result from Torch subprocess.
+
+Line read: {}
+
+Exception:
+
+{}
+
+============
+
+stdout: {}
+""".format(output, str(e), stdout))
+            sys.exit(-1)
 
     def forward(self, rgbImg):
         """
@@ -83,18 +196,11 @@ class TorchNeuralNet:
         :rtype: numpy.ndarray
         """
         assert rgbImg is not None
-        rgbImg_norm = (np.float32(rgbImg)) / 255
-        r, g, b = cv2.split(rgbImg_norm)
 
-        if self._cuda:
-            self._cuda_tensor[0][0] = torch.fromNumpyArray(r)
-            self._cuda_tensor[0][1] = torch.fromNumpyArray(g)
-            self._cuda_tensor[0][2] = torch.fromNumpyArray(b)
-            rep = self._net._forward(self._cuda_tensor)._float()
-        else:
-            self._tensor[0][0] = torch.fromNumpyArray(r)
-            self._tensor[0][1] = torch.fromNumpyArray(g)
-            self._tensor[0][2] = torch.fromNumpyArray(b)
-            rep = self._net.forward(self._net, self._tensor)
-        rep = rep.asNumpyArray().astype(np.float64)
+        t = '/tmp/openface-torchwrap-{}.png'.format(
+            binascii.b2a_hex(os.urandom(8)))
+        bgrImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(t, bgrImg)
+        rep = self.forwardPath(t)
+        os.remove(t)
         return rep
