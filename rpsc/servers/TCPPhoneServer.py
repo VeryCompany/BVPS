@@ -21,10 +21,8 @@ class PhoneHandler(StreamRequestHandler):
                 data = hex_to_byte(self.request.recv(1024).decode())
                 if not data:
                     return
-                print("TCP phone server receive from (%r):%s" % (self.client_address, data))
+                # print("TCP phone server receive from (%r):%s" % (self.client_address, data))
                 self.dataMsg += data
-                print(type(data), data[0])
-                print(self.dataMsg)
                 if len(self.dataMsg) >= 10:
                     if self.dataMsg[0] == 0x7E:
                         cmd = self.dataMsg[1]
@@ -41,8 +39,6 @@ class PhoneHandler(StreamRequestHandler):
                             print("other")
                     else:
                         self.dataMsg = self.dataMsg[1:]
-
-                # self.request.send(b"00")
                 self.wfile.write(b"00")
             except Exception as dataReceiveErr:
                 print(self.client_address, "Tcp Phone Server Error:", dataReceiveErr)
@@ -50,11 +46,11 @@ class PhoneHandler(StreamRequestHandler):
                 break
 
 
-def bytes_to_hex( data_bytes):
+def bytes_to_hex(data_bytes):
     return ''.join(["%02X" % x for x in data_bytes]).strip()
 
 
-def hex_to_byte( data_hex ):
+def hex_to_byte(data_hex):
     return bytes.fromhex(data_hex)
 
 
@@ -65,12 +61,27 @@ class PhoneServer(ThreadingTCPServer):
 
     def add_client(self, client):
         """Register a client with the internal store of clients."""
-        self.clients.add(client)
+        already_add = False
+        for server_id, socket_server in self.clients:
+            if server_id == client[0]:
+                already_add = True
+                break
+        if not already_add:
+            self.clients.add(client)
         print(self.clients)
 
     def remove_client(self, client):
         """Take a client off the register to disable broadcasts to it."""
-        self.clients.remove(client)
+        already_remove = True
+        for server_id, socket_server in self.clients:
+            if server_id == client[0]:
+                already_remove = False
+                break
+        if not already_remove:
+            try:
+                self.clients.remove(client)
+            except Exception as removeClientErr:
+                print("remove client err:", removeClientErr)
 
 
 def start_phone_tcp(asys):
@@ -107,6 +118,6 @@ class PhoneCenter:
     def send_msg(self, phone_id, msg):
         for device_id, socket_ser in self.server.clients:
             print(device_id)
-            if socket_ser is not None:
+            if device_id == "0" + phone_id and socket_ser is not None:
                 print("send msg. ->", msg)
                 socket_ser.wfile.write(msg.encode("ascii"))

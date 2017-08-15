@@ -15,7 +15,7 @@ class CoreActor(ActorTypeDispatcher):
         self.userCameraHistory = dict()
         self.maxCount = 15
         self.clf = RoomClassifier()
-
+        self.print_count = 0
         self.rssis = [[-100] * 5, [-100] * 5, [-99] * 5, [-99] * 5, [-99] * 5, [-99] * 5]
         self.labels = [0, 0, 0, 0, 0, -1]
 
@@ -95,9 +95,12 @@ class CoreActor(ActorTypeDispatcher):
             # print("=" * 7, len(self.userAppHistory), self.userAppHistory)
             if len(self.userAppHistory) > self.maxCount:
                 times = sorted(self.userAppHistory.keys())
-                for locTime in times[self.maxCount:]:
+                for locTime in times[:-self.maxCount]:
                     self.userAppHistory.pop(locTime)
-            print("-" * 7, len(self.userAppHistory))
+            self.print_count += 1
+            if self.print_count >= 50:
+                print("-" * 7, len(self.userAppHistory))
+                self.print_count = 0
 
     def receiveMsg_FindUser(self, message, sender):
         rack_id = message.rackId
@@ -116,17 +119,19 @@ class CoreActor(ActorTypeDispatcher):
                         break
 
             if change_time in self.userAppHistory:
-                users.extend(self.getUsers(change_time, rack_id, rack_locs))
+                users.extend(self.get_users(change_time, rack_id, rack_locs))
 
             if len(users) == 0:
                 per_time = change_time - 1
+                print("前一秒查找..")
                 if per_time in self.userAppHistory:
-                    users.extend(self.getUsers(per_time, rack_id, rack_locs))
+                    users.extend(self.get_users(per_time, rack_id, rack_locs))
 
                 if len(users) == 0:
+                    print("前两秒查找..")
                     per_time1 = per_time - 1
                     if per_time1 in self.userAppHistory:
-                        users.extend(self.getUsers(per_time1, rack_id, rack_locs))
+                        users.extend(self.get_users(per_time1, rack_id, rack_locs))
 
             if len(users) == 0:
                 print("not user found !!!!! warning ....... ")
@@ -173,28 +178,31 @@ class CoreActor(ActorTypeDispatcher):
                 print("save train datas ....... ", sender)
                 self.clf.fit(self.rssis, self.labels)
 
-    def getUsers(self, change_time, rack_id, rack_locs):
+    def get_users(self, change_time, rack_id, rack_locs):
         users = list()
-        userTimeDict = self.userAppHistory[change_time]
-        for user_id, rssis in userTimeDict.items():
+        user_time_dict = self.userAppHistory[change_time]
+        for user_id, rssis in user_time_dict.items():
             locs = self.clf.classifier.predict(np.array(rssis))
-            userloc = max(map(lambda x: (np.sum(locs == x), x), locs))[1]
-            print(user_id, locs, userloc)
-            if rack_id is not None and rack_locs is not None:
-                if userloc in rack_locs:
+            from collections import Counter
+            user_locs = Counter(locs)
+            if len(locs) > 0:
+                userloc = user_locs.most_common(1)[0][0]
+                print(user_id, locs, userloc)
+                if rack_id is not None and rack_locs is not None:
+                    if userloc in rack_locs:
+                        users.append(user_id)
+                else:
                     users.append(user_id)
-            else:
-                users.append(user_id)
         return users
 
 
-class UserEvent():
+class UserEvent:
     def __init__(self, user_id, event):
         self.userId = user_id
         self.event = event
 
 
-class UserLoc():
+class UserLoc:
     def __init__(self, user_id, rssi_time, user_loc, device="camera"):
         self.userId = user_id
         self.rssiTime = rssi_time
@@ -202,20 +210,20 @@ class UserLoc():
         self.device = device
 
 
-class FindUser():
+class FindUser:
     def __init__(self, rack_id, change_time):
         self.rackId = rack_id
         self.changeTime = change_time
 
 
-class FindUserLoc():
+class FindUserLoc:
     def __init__(self, user_id, rssi_time, rssis):
         self.userId = user_id
         self.rssiTime = rssi_time
         self.rssis = rssis
 
 
-class TrainRssis():
+class TrainRssis:
     def __init__(self, train_id, rssis):
         self.trainId = train_id
         self.rssis = rssis

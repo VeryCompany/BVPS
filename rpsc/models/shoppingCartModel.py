@@ -26,13 +26,12 @@ class ShoppingCartProductModel(dict):
 
         product_dict, count = self.get_cart(product.productId)
         if product_dict is None:
-            product_dict = product
             count = 1
             self.count += 1
-            dict.__setitem__(self, product_dict.productId, (product_dict, count))
+            dict.__setitem__(self, product.productId, ("\"productId\":\"" + product.productId + "\"", count))
         else:
             count += 1
-            dict.__setitem__(self, product_dict.productId, (product_dict, count))
+            dict.__setitem__(self, product.productId, ("\"productId\":\"" + product.productId + "\"", count))
             self.count += 1
 
     def remove_product(self, product_id):
@@ -41,7 +40,7 @@ class ShoppingCartProductModel(dict):
         if product_dict is not None:
             if count > 1:
                 count -= 1
-                dict.__setitem__(self, product_dict.productId, (product_dict, count))
+                dict.__setitem__(self, product_id, ("\"productId\":\"" + product_id + "\"", count))
                 self.count -= 1
             elif count == 1:
                 self.pop(product_id)

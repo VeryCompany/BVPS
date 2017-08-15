@@ -30,16 +30,15 @@ def user_come_in(user_id):
 def get_user_cart(user_id):
     print("cart userId -> :", user_id)
 
-    # result = ControlCenter.getHumanCart(str(userId))
-    # return Response(result, mimetype='application/json;charset=utf-8')
-    shopo_cart = []
-    product1 = {"product": {"productId": "1_1"}, "count": 1}
-    product2 = {"product": {"productId": "1_2"}, "count": 2}
-
-    shopo_cart.append(product1)
-    shopo_cart.append(product2)
-    # return json.dumps(result, ensure_ascii=False)
-    return Response(json.dumps(shopo_cart), mimetype='application/json;charset=utf-8')
+    result = ControlCenter.get_human_cart(str(user_id))
+    return Response(result, mimetype='application/json;charset=utf-8')
+    # shopo_cart = []
+    # product1 = {"product": {"productId": "1_1"}, "count": 1}
+    # product2 = {"product": {"productId": "1_2"}, "count": 2}
+    #
+    # shopo_cart.append(product1)
+    # shopo_cart.append(product2)
+    # return Response(json.dumps(shopo_cart), mimetype='application/json;charset=utf-8')
 
 
 @app.route('/comeout/<user_id>')
@@ -180,8 +179,8 @@ def feedback_product_info(user_id):
     print("form->", request.form)
     print("values->", request.values)
     print("json->", request.json)
-    product_msg = eval(request.data,
-                       {"productId": "productId", "productSignId": "productSignId", "userStatus": "userStatus"})
+
+    product_msg = request.values
 
     if "productId" in product_msg:
         product_id = product_msg["productId"]
@@ -191,7 +190,8 @@ def feedback_product_info(user_id):
         user_status = product_msg["userStatus"]
 
     if product_id is not None and product_sign_id is not None and user_status is not None:
-        ControlCenter.update_product_info(user_id, product_id, product_sign_id, user_status)
+        print(user_id, product_id, product_sign_id, user_status)
+        ControlCenter.update_product_info(user_id, product_id, int(product_sign_id), int(user_status))
     return "success"
 
 
@@ -206,4 +206,4 @@ def start_http(asys):
     print('Http Server Start ...')
     global app
 
-    app.run(host='', port='8080')
+    app.run(host='', port='8080',threaded=True)

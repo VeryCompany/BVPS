@@ -4,10 +4,10 @@ from rpsc.actors.core import *
 from rpsc.utils.kalmanFilter import KalmanFilter
 import rpsc.config as rack_config
 
-from bvps.config import cameras
-from bvps.camera.camera import Camera
-from bvps.common import CameraType, TrainingCMD, CameraCmdType
-import time
+# from bvps.config import cameras
+# from bvps.camera.camera import Camera
+# from bvps.common import CameraType, TrainingCMD, CameraCmdType
+# import time
 
 
 class HumanActor(ActorTypeDispatcher):
@@ -31,13 +31,17 @@ class HumanActor(ActorTypeDispatcher):
     def receiveMsg_HumanTakeProduct(self, message, sender):
         product = message.product
         opt = message.opt
+        product_count = message.productCount
+        print("Human Take Product ->:", product_count, type(product_count))
         if opt == "02":
             if self.human is not None:
-                self.human.shoppingCart.add_product(product)
+                for i in range(product_count):
+                    self.human.shoppingCart.add_product(product)
             else:
                 print("用户已经离开")
         elif opt == "01":
-            self.human.shoppingCart.remove_product(product.productId)
+            for i in range(product_count):
+                self.human.shoppingCart.remove_product(product.productId)
         print(self.human, self.human.humanId, product, sender)
 
     def receiveMsg_HumanRssis(self, message, sender):
@@ -54,7 +58,7 @@ class HumanActor(ActorTypeDispatcher):
             else:
                 rssis.append(-100)
 
-        print(human_id, "rssis -> ", rssis)
+        # print(human_id, "rssis -> ", rssis)
 
         if self.lastTime is None or self.filter is None:
             self.init_filter(rssis, rssi_time)
@@ -110,10 +114,10 @@ class HumanActor(ActorTypeDispatcher):
                 print("用户:", human_id, "在[", user_time, "]进入超市", type(human_id), sender)
                 self.send(self.get_core_actor(), UserEvent(human_id, "in"))
 
-                for cam_id, params in cameras.items():
-                    if "cameraType" in params and params["cameraType"] == CameraType.CAPTURE:
-                        cam = self.createActor(Camera, globalName=cam_id)
-                        self.send(cam, TrainingCMD(CameraCmdType.TRAINOR_START, time.time(), human_id))
+                # for cam_id, params in cameras.items():
+                #     if "cameraType" in params and params["cameraType"] == CameraType.CAPTURE:
+                #         cam = self.createActor(Camera, globalName=cam_id)
+                #         self.send(cam, TrainingCMD(CameraCmdType.TRAINOR_START, time.time(), human_id))
 
             else:
                 print("存在用户:", human_id)
@@ -140,9 +144,10 @@ class HumanOut(HumanBase):
 
 
 class HumanTakeProduct:
-    def __init__(self, product, opt):
+    def __init__(self, product, opt, product_count=1):
         self.product = product
         self.opt = opt
+        self.productCount = product_count
 
 
 class HumanOpt(HumanBase):

@@ -63,20 +63,29 @@ def remove_weight_product(rack_id, product_weight):
         return
 
     product = None
+    product_count = 0
     msg = "error"
     try:
         for pro in racks[rack_id].productList:
-            if pro.weight == product_weight:
+            print("product:", pro)
+            if (int(pro.weight) - 10) <= product_weight <= (int(pro.weight) + 10):
                 product = pro
-                racks[rack_id].productList.remove(pro)
+                product_count = 1
+                # racks[rack_id].productList.remove(pro)
                 break
+            else:
+                count = round(int(product_weight) / int(pro.weight))
+                product = pro
+                product_count = int(count)
+                break
+        for ct in range(product_count):
+            racks[rack_id].productList.remove(product)
         msg = "success"
     except Exception as removeProductErr:
-        print(removeProductErr)
+        print("removeProductErr->:", removeProductErr)
         msg = "error"
     finally:
-        # print(racks[rack_id])
-        return msg, product
+        return msg, product, product_count
 
 
 def get_rack(rack_id, loc):
