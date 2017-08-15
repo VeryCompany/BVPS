@@ -17,5 +17,7 @@ class TorchActor(ActorTypeDispatcher):
             imgDim=96,
             cuda=True)
 
-    def receiveMsg_str(self, message, sender):
-        logging.info("received msg {}".format(message))
+    def receiveMsg_tuple(self, message, sender):
+        camId, image = message
+        rep = self.net.forward(image)
+        self.send(sender, rep)
