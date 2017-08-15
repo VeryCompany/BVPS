@@ -41,6 +41,7 @@ class TorchNeuralNet:
     #: The default Torch model to use.
     defaultModel = os.path.join(myDir, '..', 'models', 'openface',
                                 'nn4.small2.v1.t7')
+
     def __init__(self, model=defaultModel, imgDim=96, cuda=False):
         """__init__(self, model=defaultModel, imgDim=96, cuda=False)
 
@@ -56,7 +57,7 @@ class TorchNeuralNet:
         assert model is not None
         assert imgDim is not None
         assert cuda is not None
-
+        torch.setnumthreads(8)
         torch.setdefaulttensortype('torch.FloatTensor')
 
         self._net = torch.load(model)
