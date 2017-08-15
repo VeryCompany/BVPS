@@ -2,8 +2,10 @@ from thespian.actors import *
 import logging
 import os
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
+import thespian.troupe
 
 
+@troupe(max_count=3, idle_count=3)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         fileDir = os.path.dirname(os.path.realpath(__file__))
