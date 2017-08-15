@@ -10,6 +10,8 @@ from bvps.logger import logcfg
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
 from bvps.torch.torch_actor import TorchActor
+from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
+
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
@@ -30,25 +32,26 @@ class SVMRecognizer(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
         self.net = None
-        self.actor_system = ActorSystem(
-            systemBase="multiprocQueueBase", logDefs=logcfg)
+
 
     def whoru(self, human):
-        if self.net is None:
-            self.net = self.camera.createActor(
-                TorchActor,
-                targetActorRequirements=None,
-                globalName="TorchActor",
-                sourceHash=None)
         face = human
-        rep = self.actor_system.ask(self.net, (self.camera.cameraId, face), 5)
-        # rep = net.forward(face)
+        # rep = self.actor_system.ask(self.net, (self.camera.cameraId, face), 5)
+        if self.net is not None:
+            rep = self.net.forward(face)
         identity = None
         if self.model is not None:
             identity = self.model.predict(rep)[0]
         return identity
 
     def run(self):
+        fileDir = os.path.dirname(os.path.realpath(__file__))
+        modelDir = os.path.join(fileDir, '..', 'models')
+        openfaceModelDir = os.path.join(modelDir, 'openface')
+        self.net = TorchNeuralNet(
+            os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
+            imgDim=96,
+            cuda=True)
         while True:
             try:
                 msg = SVMRecognizer.in_queue.get()
