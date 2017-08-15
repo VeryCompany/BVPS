@@ -26,7 +26,7 @@ class ImageHandler(StreamRequestHandler):
     def handle(self):
         while True:
             try:
-                data = self.request.recv(1024 * 1024 * 1024)
+                data = self.request.recv(1024 * 1024 * 1024 * 1024)
                 if not data:
                     return
                 print(data)
