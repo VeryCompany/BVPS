@@ -28,7 +28,7 @@ cameras = {
         "processNum": 4,
         "DProcessNum": 2,
         "RProcessNum": 1,
-        "gpuId": 1,
+        "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
             3: 1280,  # cv2.CAP_PROP_FRAME_WIDTH
@@ -61,7 +61,7 @@ cameras = {
         "processNum": 4,
         "DProcessNum": 2,
         "RProcessNum": 1,
-        "gpuId": 1,
+        "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
             3: 1280,  # cv2.CAP_PROP_FRAME_WIDTH
@@ -93,7 +93,7 @@ cameras = {
         "processNum": 4,
         "DProcessNum": 2,
         "RProcessNum": 1,
-        "gpuId": 1,
+        "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
             3: 1280,  # cv2.CAP_PROP_FRAME_WIDTH
