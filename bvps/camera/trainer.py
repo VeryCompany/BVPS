@@ -44,11 +44,12 @@ class TrainingProcessor(multiprocessing.Process):
     human_map = {}  # 应该持久化的map,持久化后可以使用多线程提高性能
     model_updated = False
 
-    def __init__(self, camera, in_queue, out_queue):
+    def __init__(self, camera, net, in_queue, out_queue):
         multiprocessing.Process.__init__(self, name="training_processor")
         TrainingProcessor.in_queue = in_queue
         TrainingProcessor.out_queue = out_queue
         self.camera = camera
+        self.net = net
 
     def run(self):
         global tc
@@ -130,7 +131,7 @@ class TrainingProcessor(multiprocessing.Process):
             for uid, imgs in hums.items():
                 for img in imgs:
                     # im = img.flatten()
-                    rep = net.forward(img)
+                    rep = self.net.forward(img)
                     images.append(rep)
                 uids.extend([uid for x in range(len(imgs))])
             X = np.vstack(images)

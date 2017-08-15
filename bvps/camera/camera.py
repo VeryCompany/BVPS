@@ -84,8 +84,7 @@ class Camera(ActorTypeDispatcher):
             self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
                                            cmd.values["device"], cmd)
-            self.cct.setDaemon(True)
-            self.cct.start()
+
             """监控视频Web服务器"""
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
@@ -142,7 +141,7 @@ class Camera(ActorTypeDispatcher):
                 """训练器进程启动"""
                 log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
                 for p in range(0, 1, 1):
-                    tps = TrainingProcessor(self, self.training_dset_q,
+                    tps = TrainingProcessor(self, net, self.training_dset_q,
                                             self.training_model_oq)
                     tps.start()
                 log.info(
@@ -167,6 +166,8 @@ class Camera(ActorTypeDispatcher):
                 target=self.queue_monitor, args=(), name="minitor_thread")
             mnt.setDaemon(True)
             mnt.start()
+            self.cct.setDaemon(True)
+            self.cct.start()
             self.send(sender, "camera :{} started!".format(cmd.cameraName))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
