@@ -15,9 +15,10 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 mtnnDir = os.path.join(fileDir, "..", "model")
 align = AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
-
+print("-"*100)
 actor_system = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
-
+print("init actor system...")
+print("-"*100)
 # net = TorchNeuralNet(
 #     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
