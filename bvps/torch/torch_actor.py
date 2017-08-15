@@ -5,7 +5,7 @@ from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 from thespian.troupe import troupe
 
 
-@troupe(max_count=3, idle_count=3)
+@troupe(max_count=10, idle_count=10)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         fileDir = os.path.dirname(os.path.realpath(__file__))
