@@ -3,7 +3,7 @@ import sys
 import os
 import logging as log
 
-from bvps.actor_system import actor_system as asys
+from bvps.system.actor_system import actor_system as asys
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.torch.torch_actor import TorchActor
