@@ -77,8 +77,8 @@ class TrainingProcessor(multiprocessing.Process):
         log.info("receive_samples called!!")
         num = 0
         while num < tc["cap_nums"]:
-            message, t0, sec = TrainingProcessor.in_queue.get()
-            human, roi, px, py = message
+            human, t0, sec, center, size = TrainingProcessor.in_queue.get()
+            px, py = center
             if t0 < start_time or t0 - start_time > 1000000:
                 continue
             if uid not in self.human_map:

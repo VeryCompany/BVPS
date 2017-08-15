@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 import logging as log
 import multiprocessing
-import os, sys, traceback
+import os
+import sys
+import traceback
 
-import numpy as np
-from bvps.camera.camera import clock, StatValue
-from bvps.common import ModelUpdateCmd  # , net
-from sklearn.svm import SVC
-import pickle
-from bvps.torch.torch_neural_net import TorchNeuralNet
-from bvps.common import net
+from bvps.camera.camera import StatValue, clock
+from bvps.common import ModelUpdateCmd
+from bvps.torch.torch_actor import TorchActor
+
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')
 openfaceModelDir = os.path.join(modelDir, 'openface')
-#net = TorchNeuralNet(
+
+# net = TorchNeuralNet(
 #    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 
@@ -31,8 +31,15 @@ class SVMRecognizer(multiprocessing.Process):
     def whoru(self, human):
         if self.model is None:
             return None
+        if self.net is None:
+            self.net = self.camera.createActor(
+                TorchActor,
+                targetActorRequirements=None,
+                globalName="TorchActor",
+                sourceHash=None)
         face = human
-        rep = net.forward(face)
+        rep = self.camera.ask(self.net, (self.camera.cameraId, face), 5)
+        # rep = net.forward(face)
         identity = self.model.predict(rep)[0]
         return identity
 
@@ -43,8 +50,8 @@ class SVMRecognizer(multiprocessing.Process):
                 if isinstance(msg, ModelUpdateCmd):
                     self.model = msg.model
                     continue
-                frame, t0, sec = msg
-                human, roi, px, py = frame
+                human, t0, sec, center, size = msg
+                px, py = center
                 uid = self.whoru(human)
                 if uid is not None:
                     # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
@@ -52,10 +59,6 @@ class SVMRecognizer(multiprocessing.Process):
                         "user:{},px:{},py:{},sec:{}".format(uid, px, py, sec))
                     SVMRecognizer.out_queue.put((self.camera.cameraId, uid,
                                                  (px, py), t0, sec))
-                # log.info(
-                #    "recognizer_{},latency:{:0.1f}ms,process time:{:0.1f} ms".
-                #    format(self.camera.cameraId, self.latency.value * 1000,
-                #           self.frame_interval.value * 1000))
                 t = clock()
                 self.latency.update(t - t0)
                 self.frame_interval.update(t - self.last_frame_time)

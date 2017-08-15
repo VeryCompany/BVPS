@@ -2,21 +2,18 @@
 """camera script."""
 import logging as log
 import multiprocessing
-import os
-
 import cv2
 from bvps.camera.common import StatValue, clock
 from bvps.common import CameraType, mtnnDir
-
-import sys, traceback, time
+import sys
+import traceback
 from multiprocessing.pool import ThreadPool
 from collections import deque
 from bvps.camera.mtcnn import test_net
 
 
-
 class DetectorProcessor(multiprocessing.Process):
-    def __init__(self, camera, frame_in, frame_out, frame_out_2,gpuId):
+    def __init__(self, camera, frame_in, frame_out, frame_out_2, gpuId):
         multiprocessing.Process.__init__(self, name="video_human_detector")
         DetectorProcessor.frame_in = frame_in
         DetectorProcessor.frame_out = frame_out
@@ -66,8 +63,6 @@ class DetectorProcessor(multiprocessing.Process):
                 for b in boxes_c:
                     # cv2.rectangle(draw, (int(b[0]), int(b[1])),
                     #              (int(b[2]), int(b[3])), (0, 255, 255), 1)
-                    # crop image and resize....
-                    # return faces......
                     center_x, center_y = (
                         (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
                         (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
@@ -77,9 +72,17 @@ class DetectorProcessor(multiprocessing.Process):
                             abs(int(b[1]) - int(b[3])) / 2)
                     log.info(
                         "{}->w:{},h:{}".format(self.camera.cameraId, w, h))
+                    # crop image and resize....
+                    face_img = image.copy()[int(b[1]):int(b[3]),
+                                            int(b[0]):int(b[2])]
+                    face_img = cv2.resize(
+                        face_img, (96, 96), interpolation=cv2.INTER_AREA)
+                    validHuman.append((face_img, t0, secs, (center_x,
+                                                            center_y), (w, h)))
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(
                 traceback.format_exception(exc_type, exc_value, exc_traceback))
+            log.error(e)
         finally:
             return validHuman
