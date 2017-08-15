@@ -21,7 +21,7 @@ import time
 import numpy as np
 # from bvps.config import svm_param_grid as spg
 import pickle
-from bvps.common import actor_system as asys
+from bvps.actor_system import actor_system as asys
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
 modelDir = os.path.join(fileDir, '..', 'models')

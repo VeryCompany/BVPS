@@ -10,7 +10,7 @@ from bvps.camera.camera import Camera
 from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
 import time
-from bvps.common import actor_system as asys
+from bvps.actor_system import actor_system as asys
 try:
     # server_start(asys)
     sa = asys.createActor(SystemActor, globalName="SystemActor")

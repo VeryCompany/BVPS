@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import sys
 import traceback
-from bvps.common import actor_system as asys
+from bvps.actor_system import actor_system as asys
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
 from bvps.torch.torch_actor import TorchActor
