@@ -9,7 +9,6 @@ from thespian.actors import ActorSystem
 from bvps.logger import logcfg
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
-from bvps.torch.torch_actor import TorchActor
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 
 
