@@ -33,9 +33,7 @@ try:
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
                        600)
         print("camera:{} result:{}".format(camId, msg))
-    ta = asys.createActor(TorchActor, globalName="TorchActor")
-
-
+    
 except KeyboardInterrupt:
     print('Interrupted')
     try:
