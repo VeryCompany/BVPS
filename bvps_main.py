@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from thespian.actors import ActorSystem
 import sys
 import os
 import logging as log
-from bvps.logger import logcfg
+
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.torch.torch_actor import TorchActor
@@ -11,9 +10,8 @@ from bvps.camera.camera import Camera
 from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
 import time
+from bvps.common import actor_system as asys
 try:
-
-    asys = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
     server_start(asys)
     sa = asys.createActor(
         SystemActor,
@@ -39,7 +37,7 @@ try:
             camId, cama))
         msg = asys.ask(cama,
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
-                       60)
+                       600)
         print("camera:{} result:{}".format(camId, msg))
     ta = asys.createActor(
         TorchActor,

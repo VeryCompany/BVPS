@@ -3,6 +3,8 @@ from enum import Enum
 import os
 from bvps.dlib.align_dlib import AlignDlib
 from bvps.torch.torch_neural_net import TorchNeuralNet
+from thespian.actors import ActorSystem
+from bvps.logger import logcfg
 
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
@@ -14,10 +16,11 @@ mtnnDir = os.path.join(fileDir, "..", "model")
 align = AlignDlib(
     os.path.join(dlibModelDir, "shape_predictor_68_face_landmarks.dat"))
 
+actor_system = ActorSystem(systemBase="multiprocQueueBase", logDefs=logcfg)
 
-#net = TorchNeuralNet(
+# net = TorchNeuralNet(
 #     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
-net=None
+
 
 class CameraCmdType(Enum):
     START_CAPTURE = 1

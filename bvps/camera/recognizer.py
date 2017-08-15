@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import sys
 import traceback
-
+from bvps.common import actor_system as asys
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
 from bvps.torch.torch_actor import TorchActor
@@ -28,6 +28,7 @@ class SVMRecognizer(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
         self.net = None
+
     def whoru(self, human):
         if self.net is None:
             self.net = self.camera.createActor(
@@ -36,7 +37,7 @@ class SVMRecognizer(multiprocessing.Process):
                 globalName="TorchActor",
                 sourceHash=None)
         face = human
-        rep = self.camera.ask(self.net, (self.camera.cameraId, face), 5)
+        rep = asys.ask(self.net, (self.camera.cameraId, face), 5)
         # rep = net.forward(face)
         identity = None
         if self.model is not None:
