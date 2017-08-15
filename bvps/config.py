@@ -25,9 +25,9 @@ cameras = {
         "cameraType": CameraType.POSITION,
         "port": 10004,
         "fourcc": ('M', 'J', 'P', 'G'),
-        "processNum": 2,
+        "processNum": 4,
         "DProcessNum": 3,
-        "RProcessNum": 1,
+        "RProcessNum": 4,
         "gpuId": 1,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
@@ -58,9 +58,9 @@ cameras = {
         "cameraType": CameraType.POSITION,
         "port": 10005,
         "fourcc": ('M', 'J', 'P', 'G'),
-        "processNum": 2,
+        "processNum": 4,
         "DProcessNum": 3,
-        "RProcessNum": 1,
+        "RProcessNum": 4,
         "gpuId": 1,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
@@ -90,9 +90,9 @@ cameras = {
         "cameraType": CameraType.CAPTURE,
         "port": 10006,
         "fourcc": ('M', 'J', 'P', 'G'),
-        "processNum": 2,
-        "DProcessNum": 2,
-        "RProcessNum": 0,
+        "processNum": 4,
+        "DProcessNum": 3,
+        "RProcessNum": 2,
         "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS

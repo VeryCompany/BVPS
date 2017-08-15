@@ -29,8 +29,6 @@ class SVMRecognizer(multiprocessing.Process):
         self.latency = StatValue()
 
     def whoru(self, human):
-        if self.model is None:
-            return None
         if self.net is None:
             self.net = self.camera.createActor(
                 TorchActor,
@@ -40,7 +38,9 @@ class SVMRecognizer(multiprocessing.Process):
         face = human
         rep = self.camera.ask(self.net, (self.camera.cameraId, face), 5)
         # rep = net.forward(face)
-        identity = self.model.predict(rep)[0]
+        identity = None
+        if self.model is not None:
+            identity = self.model.predict(rep)[0]
         return identity
 
     def run(self):

@@ -21,3 +21,5 @@ class TorchActor(ActorTypeDispatcher):
         camId, image = message
         rep = self.net.forward(image)
         self.send(sender, rep)
+        log.info("received identity request from {}, image.shape:{}".format(
+            camId, image.shape))
