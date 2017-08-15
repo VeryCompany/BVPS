@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from bvps.system.actor_system import actor_system as asys
+
 import logging as log
 import multiprocessing
 import os
@@ -38,7 +38,7 @@ class SVMRecognizer(multiprocessing.Process):
                 globalName="TorchActor",
                 sourceHash=None)
         face = human
-
+        from bvps.system.actor_system import actor_system as asys
         rep = asys.ask(self.net, (self.camera.cameraId, face), 5)
         # rep = net.forward(face)
         identity = None
