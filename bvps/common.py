@@ -17,7 +17,7 @@ align = AlignDlib(
 
 #net = TorchNeuralNet(
 #     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
-#net=None
+net=None
 
 class CameraCmdType(Enum):
     START_CAPTURE = 1
