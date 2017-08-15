@@ -29,6 +29,7 @@ class ImageHandler(StreamRequestHandler):
                 data = self.request.recv(30720 * 10000)
                 if not data:
                     return
+                print(data)
                 face = pickle.loads(data)
                 rep = net.forward(face)
                 if not rep:
