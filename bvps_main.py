@@ -11,19 +11,14 @@ from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
 import time
 from bvps.common import actor_system as asys
-print (asys)
 try:
-    #server_start(asys)
+    # server_start(asys)
     sa = asys.createActor(
         SystemActor,
-        targetActorRequirements=None,
-        globalName="SystemActor",
-        sourceHash=None)
+        globalName="SystemActor")
     position = asys.createActor(
         PositionActor,
-        targetActorRequirements=None,
-        globalName="CameraPositionActor",
-        sourceHash=None)
+        globalName="CameraPositionActor")
     # 未来会从数据库或者配置文件中读取
     # 定位摄像头 type == 1
     # 采集摄像头 type == 2
@@ -42,9 +37,7 @@ try:
         print("camera:{} result:{}".format(camId, msg))
     ta = asys.createActor(
         TorchActor,
-        targetActorRequirements=None,
-        globalName="TorchActor",
-        sourceHash=None)
+        globalName="TorchActor")
 except KeyboardInterrupt:
     print('Interrupted')
     try:

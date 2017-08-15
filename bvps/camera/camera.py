@@ -145,9 +145,7 @@ class Camera(ActorTypeDispatcher):
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
                 PositionActor,
-                targetActorRequirements=None,
-                globalName="CameraPositionActor",
-                sourceHash=None)
+                globalName="CameraPositionActor")
             utp = threading.Thread(
                 target=self.process_user,
                 args=(self.recognizer_out_q, ),
