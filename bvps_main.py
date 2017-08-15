@@ -6,6 +6,7 @@ import logging as log
 from bvps.logger import logcfg
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
+from bvps.torch.torch_actor import TorchActor
 from bvps.camera.camera import Camera
 from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
@@ -40,6 +41,11 @@ try:
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
                        60)
         print("camera:{} result:{}".format(camId, msg))
+    ta = asys.createActor(
+        TorchActor,
+        targetActorRequirements=None,
+        globalName="TorchActor",
+        sourceHash=None)
 except KeyboardInterrupt:
     print('Interrupted')
     try:
