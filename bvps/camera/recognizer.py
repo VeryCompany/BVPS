@@ -25,14 +25,19 @@ class SVMRecognizer(multiprocessing.Process):
         self.net = net
 
     def whoru(self, human):
-        face = human
-        # rep = self.actor_system.ask(self.net, (self.camera.cameraId, face), 5)
-        if self.net is not None:
-            rep = self.net.forward(face)
-        identity = None
-        if self.model is not None:
-            identity = self.model.predict(rep)[0]
-        return identity
+        try:
+            face = human
+            # rep = self.actor_system.ask(self.net, (self.camera.cameraId, face), 5)
+            if self.net is not None:
+                rep = self.net.forward(face)
+            identity = None
+            if self.model is not None:
+                identity = self.model.predict(rep)[0]
+            return identity
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
 
     def run(self):
 
