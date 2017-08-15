@@ -6,7 +6,7 @@ import logging as log
 from bvps.system.sysActor import SystemActor
 from bvps.system.position_actor import PositionActor
 from bvps.torch.torch_actor import TorchActor
-from .camera import Camera
+from .camera.camera import Camera
 # from bvps.camera.camera import Camera
 from rpsc.start import server_start
 from bvps.common import CameraCmdType, CameraCmd
