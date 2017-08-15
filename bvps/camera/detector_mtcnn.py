@@ -23,6 +23,9 @@ class DetectorProcessor(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
         self.gpuId = gpuId
+
+
+    def run(self):
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
             self.camera.cameraId))
         self.mtcnn_detector = test_net(self.gpuId)
@@ -30,9 +33,6 @@ class DetectorProcessor(multiprocessing.Process):
         log.info("camera:{}'s' mtcnn detector successfully startup......".
                  format(self.camera.cameraId))
         log.info(self.mtcnn_detector)
-
-    def run(self):
-
         while True:
             try:
                 frame, t0, secs = DetectorProcessor.frame_in.get()
