@@ -19,7 +19,7 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 # net = TorchNeuralNet(
 #    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
-HOST = '192.168.0.122'
+HOST = '192.168.0.163'
 PORT = 8992
 
 class SVMRecognizer(multiprocessing.Process):
