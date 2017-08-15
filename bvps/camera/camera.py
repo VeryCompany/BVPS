@@ -8,7 +8,6 @@ import sys, traceback
 import threading
 import time
 import cv2
-import os
 from bvps.camera.common import StatValue, clock
 from thespian.actors import ActorTypeDispatcher
 from bvps.camera.pre_processor import PreProcessor
@@ -18,7 +17,6 @@ from bvps.camera.recognizer import SVMRecognizer
 from bvps.common import ModelUpdateCmd
 from bvps.common import CameraCmdType, TrainingCMD, CameraType, CameraCmd
 from bvps.config import cameras as cams
-from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 
 
 def Handle_exception(exc_type, exc_value, exc_traceback):
@@ -84,7 +82,8 @@ class Camera(ActorTypeDispatcher):
             self.cameraId = cmd.cameraName
             self.cct = CameraCaptureThread(self, cmd.cameraName,
                                            cmd.values["device"], cmd)
-
+            self.cct.setDaemon(True)
+            self.cct.start()
             """监控视频Web服务器"""
             from bvps.web.server import WebServer
             log.info("启动摄像头web服务器...")
@@ -111,18 +110,12 @@ class Camera(ActorTypeDispatcher):
                 dps.start()
             log.info(
                 "启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, dps_num))
-            fileDir = os.path.dirname(os.path.realpath(__file__))
-            modelDir = os.path.join(fileDir, '..', 'models')
-            openfaceModelDir = os.path.join(modelDir, 'openface')
-            net = TorchNeuralNet(
-                os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
-                imgDim=96,
-                cuda=True)
+                
             """识别器进程启动"""
             srz_num = cmd.values["RProcessNum"]
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
             for p in range(0, srz_num, 1):
-                srz = SVMRecognizer(self, net, self.recognizer_in_q,
+                srz = SVMRecognizer(self, self.recognizer_in_q,
                                     self.recognizer_out_q)
                 srz.start()
             log.info(
@@ -141,7 +134,7 @@ class Camera(ActorTypeDispatcher):
                 """训练器进程启动"""
                 log.info("启动摄像头[{}]图像训练器进程{}个".format(cmd.cameraName, 1))
                 for p in range(0, 1, 1):
-                    tps = TrainingProcessor(self, net, self.training_dset_q,
+                    tps = TrainingProcessor(self, self.training_dset_q,
                                             self.training_model_oq)
                     tps.start()
                 log.info(
@@ -152,7 +145,8 @@ class Camera(ActorTypeDispatcher):
             """
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
-                PositionActor, globalName="CameraPositionActor")
+                PositionActor,
+                globalName="CameraPositionActor")
             utp = threading.Thread(
                 target=self.process_user,
                 args=(self.recognizer_out_q, ),
@@ -166,8 +160,6 @@ class Camera(ActorTypeDispatcher):
                 target=self.queue_monitor, args=(), name="minitor_thread")
             mnt.setDaemon(True)
             mnt.start()
-            self.cct.setDaemon(True)
-            self.cct.start()
             self.send(sender, "camera :{} started!".format(cmd.cameraName))
         elif CameraCmdType.STOP_CAPTURE == cmd.cmdType:
             if self.cct is not None and self.cct.isAlive():
