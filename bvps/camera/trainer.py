@@ -15,7 +15,7 @@ import multiprocessing
 import inspect
 from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
-#from bvps.torch.torch_neural_net import TorchNeuralNet
+from bvps.torch.torch_neural_net import TorchNeuralNet
 from bvps.common import TrainingCMD
 import time
 import numpy as np
