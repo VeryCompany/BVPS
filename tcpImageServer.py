@@ -1,6 +1,15 @@
 from socketserver import ThreadingTCPServer, StreamRequestHandler
-import cv2
 import pickle
+from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
+import os
+
+fileDir = os.path.dirname(os.path.realpath(__file__))
+modelDir = os.path.join(fileDir, 'bvps', 'models')
+openfaceModelDir = os.path.join(modelDir, 'openface')
+
+print("modelDir:{}".format(openfaceModelDir))
+net = TorchNeuralNet(
+    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
 
 class ImageHandler(StreamRequestHandler):
@@ -20,13 +29,11 @@ class ImageHandler(StreamRequestHandler):
                 data = self.request.recv(30720 * 10000)
                 if not data:
                     return
-                print("TCP phone server receive from (%r):%s" % (self.client_address, data))
-                self.dataMsg += data
-                print(self.dataMsg)
-                result = pickle.loads(self.dataMsg)
-                # cv2.imwrite("image.png", result)
-                # print(result, result.shape)
-                self.wfile.write(self.dataMsg)
+                face = pickle.loads(data)
+                rep = net.forward(face)
+                if not rep:
+                    res = pickle.dumps(rep)
+                    self.wfile.wrte(res)
             except Exception as dataReceiveErr:
                 print(self.client_address, "TcpServer Error:", dataReceiveErr)
                 self.request.close()
