@@ -12,7 +12,7 @@ from bvps.common import CameraCmdType, CameraCmd
 import time
 from bvps.common import actor_system as asys
 try:
-    server_start(asys)
+    #server_start(asys)
     sa = asys.createActor(
         SystemActor,
         targetActorRequirements=None,
