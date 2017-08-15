@@ -2,7 +2,7 @@ from thespian.actors import *
 import logging
 import os
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
-import thespian.troupe
+from thespian.troupe import troupe
 
 
 @troupe(max_count=3, idle_count=3)
