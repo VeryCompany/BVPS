@@ -3,13 +3,13 @@
 import logging as log
 import multiprocessing
 import os
-import pickle
 import sys
-import socket
 import traceback
-from time import sleep
+from thespian.actors import ActorSystem
+from bvps.logger import logcfg
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
+from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 
 
 fileDir = os.path.dirname(os.path.realpath(__file__))
@@ -19,8 +19,6 @@ openfaceModelDir = os.path.join(modelDir, 'openface')
 # net = TorchNeuralNet(
 #    os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'), imgDim=96, cuda=True)
 
-HOST = '192.168.0.163'
-PORT = 8992
 
 class SVMRecognizer(multiprocessing.Process):
     def __init__(self, camera, in_queue, out_queue):
@@ -32,35 +30,33 @@ class SVMRecognizer(multiprocessing.Process):
         self.frame_interval = StatValue()
         self.last_frame_time = clock()
         self.latency = StatValue()
-        self.socket_client = None
-        self.do_connect()
+        self.net = None
 
-    def do_connect(self):
-        self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_client.connect((HOST, PORT))
 
     def whoru(self, human):
         face = human
         # rep = self.actor_system.ask(self.net, (self.camera.cameraId, face), 5)
-
-        try:
-            # rep = self.net.forward(face)
-            self.socket_client.sendall(face)
-            receive_data = self.socket_client.recv(4096*1000)
-            rep = pickle.loads(receive_data)
-        except socket.error as tcpConnectErr:
-            print("tcpConnectErr:", tcpConnectErr)
-            sleep(3)
-            self.do_connect()
-        except Exception as tcpReceiveErr:
-            print("tcp Receive Err:", tcpReceiveErr)
+        if self.net is not None:
+            rep = self.net.forward(face)
         identity = None
         if self.model is not None:
             identity = self.model.predict(rep)[0]
         return identity
 
     def run(self):
-
+        try:
+            fileDir = os.path.dirname(os.path.realpath(__file__))
+            modelDir = os.path.join(fileDir, '..', 'models')
+            openfaceModelDir = os.path.join(modelDir, 'openface')
+            self.net = TorchNeuralNet(
+                os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
+                imgDim=96,
+                cuda=True)
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value,
+                                           exc_traceback))
         while True:
             try:
                 msg = SVMRecognizer.in_queue.get()
