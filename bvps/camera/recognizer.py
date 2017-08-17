@@ -46,7 +46,7 @@ class SVMRecognizer(multiprocessing.Process):
             self.ta = self.camera.createActor(
                 "torch.TorchActor",
                 globalName="{}_TorchActor".format(self.cameraId))
-
+                
             while True:
                 try:
                     msg = SVMRecognizer.in_queue.get()
