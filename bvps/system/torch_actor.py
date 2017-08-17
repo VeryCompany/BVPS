@@ -10,6 +10,7 @@ from thespian.actors import requireCapability
 @troupe(max_count=10, idle_count=10)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
+        log.info("ready to init torch actor.....")
         fileDir = os.path.dirname(os.path.realpath(__file__))
         modelDir = os.path.join(fileDir, '..', 'models')
         openfaceModelDir = os.path.join(modelDir, 'openface')
@@ -24,4 +25,4 @@ class TorchActor(ActorTypeDispatcher):
         rep = self.net.forward(human)
         self.send(sender, (cameraId, rep[0], center, t0, sec))
         log.info("received identity request from {}, image.shape:{}".format(
-            camId, image.shape))
+            cameraId, human.shape))
