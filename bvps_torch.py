@@ -7,6 +7,7 @@ capabilities = {
     'Convention Address.IPv4': ('192.168.0.163', 1900),
     'torch': True
 }
-actor_system = ActorSystem(systemBase="multiprocTCPBase", logDefs=logcfg)
+actor_system = ActorSystem(
+    systemBase="multiprocTCPBase", logDefs=logcfg, capabilities)
 print("init actor system:{}".format(actor_system))
 print("-" * 100)
