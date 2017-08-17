@@ -54,9 +54,8 @@ class SVMRecognizer(multiprocessing.Process):
                         self.model = msg.model
                         continue
                     human, t0, sec, center, size = msg
-                    self.camera.send(self.ta,
-                                     (self.cameraId,
-                                      human, t0, sec, center, size))
+                    self.camera.send(self.ta, (self.cameraId, human, t0, sec,
+                                               center, size))
                     # uid = self.whoru(human)
                     # if uid is not None:
                     # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec
@@ -73,7 +72,7 @@ class SVMRecognizer(multiprocessing.Process):
                     log.error(
                         traceback.format_exception(exc_type, exc_value,
                                                    exc_traceback))
-           except Exception as e:
-               exc_type, exc_value, exc_traceback = sys.exc_info()
-               log.error(
-                   traceback.format_exception(exc_type, exc_value, exc_traceback))
+        except Exception as e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            log.error(
+                traceback.format_exception(exc_type, exc_value, exc_traceback))
