@@ -10,7 +10,7 @@ from bvps.logger import logcfg
 from bvps.camera.camera import StatValue, clock
 from bvps.common import ModelUpdateCmd
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
-
+from bvps.camera.system import TorchActor
 
 class SVMRecognizer(multiprocessing.Process):
     def __init__(self, camera, in_queue, out_queue):
@@ -44,9 +44,9 @@ class SVMRecognizer(multiprocessing.Process):
             #     cuda=True)
 
             self.ta = self.camera.createActor(
-                "torch.TorchActor",
+                TorchActor,
                 globalName="{}_TorchActor".format(self.cameraId))
-                
+            log.info("create torch.TorchActor ok.....")
             while True:
                 try:
                     msg = SVMRecognizer.in_queue.get()
