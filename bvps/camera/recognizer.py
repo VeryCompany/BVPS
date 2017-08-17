@@ -73,7 +73,7 @@ class SVMRecognizer(multiprocessing.Process):
                     log.error(
                         traceback.format_exception(exc_type, exc_value,
                                                    exc_traceback))
-       except Exception as e:
-           exc_type, exc_value, exc_traceback = sys.exc_info()
-           log.error(
-               traceback.format_exception(exc_type, exc_value, exc_traceback))
+           except Exception as e:
+               exc_type, exc_value, exc_traceback = sys.exc_info()
+               log.error(
+                   traceback.format_exception(exc_type, exc_value, exc_traceback))
