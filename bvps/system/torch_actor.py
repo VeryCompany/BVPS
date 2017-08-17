@@ -19,9 +19,9 @@ class TorchActor(ActorTypeDispatcher):
             cuda=True)
 
     def receiveMsg_tuple(self, message, sender):
-        camId, image = message
-
-        rep = self.net.forward(image)
-        self.send(sender, rep)
+        cameraId, human, t0, sec, center, size = message
+        px, py = center
+        rep = self.net.forward(human)
+        self.send(sender, (cameraId, rep[0], center, t0, sec))
         log.info("received identity request from {}, image.shape:{}".format(
             camId, image.shape))

@@ -64,6 +64,10 @@ class Camera(ActorTypeDispatcher):
         self.cameraType = None
         log.info("初始化camera完成。")
 
+    def receiveMsg_tuple(self, message, sender):
+        # cameraId, uid, center, t0, sec = message
+        self.recognizer_out_q.put(message)
+
     def receiveMsg_str(self, message, sender):
         log.info("received msg {}".format(message))
         self.send(sender, "ok!")
@@ -110,7 +114,6 @@ class Camera(ActorTypeDispatcher):
                 dps.start()
             log.info(
                 "启动摄像头[{}]图像检测器成功！启动了[{}]个实例.".format(cmd.cameraName, dps_num))
-                
             """识别器进程启动"""
             srz_num = cmd.values["RProcessNum"]
             log.info("启动摄像头[{}]图像识别器进程{}个".format(cmd.cameraName, srz_num))
@@ -145,8 +148,7 @@ class Camera(ActorTypeDispatcher):
             """
             from bvps.system.position_actor import PositionActor
             self.pa = self.createActor(
-                PositionActor,
-                globalName="CameraPositionActor")
+                PositionActor, globalName="CameraPositionActor")
             utp = threading.Thread(
                 target=self.process_user,
                 args=(self.recognizer_out_q, ),
