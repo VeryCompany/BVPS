@@ -34,7 +34,7 @@ class BeaconLocServer(BaseRequestHandler):
                 if "rssis" in user_info:
                     rssis = user_info["rssis"]
                 if train_id is not None and rssis is not None:
-                    if len(rssis) > 5:
+                    if len(rssis) > 6:
                         ControlCenter.train_rssis(train_id, rssis)
                     else:
                         print("train data less . ")

@@ -53,9 +53,14 @@ class RackActor(ActorTypeDispatcher):
                         product_count = 1
                         break
                     else:
-                        count = round(int(weight) / int(prod["weight"]))
+                        print("rack product list prod :", prod["weight"])
+                        count = int(weight) / int(prod["weight"])
+                        if int(prod["weight"]) < 135:
+                            continue
+                        if count <= 0.9:
+                            continue
                         product_id = prod["productId"]
-                        product_count = int(count)
+                        product_count = int(round(count))
                         break
             print("zhongliang ->:", weight, product_count)
             if product_id is not None:
@@ -73,9 +78,14 @@ class RackActor(ActorTypeDispatcher):
                         product_count = 1
                         break
                     else:
-                        count = round(int(weight) / int(prod["weight"]))
+                        print("rack product list prod :", prod["weight"])
+                        count = int(weight) / int(prod["weight"])
+                        if int(prod["weight"]) < 135:
+                            continue
+                        if count <= 0.9:
+                            continue
                         product_id = prod["productId"]
-                        product_count = int(count)
+                        product_count = int(round(count))
                         break
             print("zhongliang ->:", weight, product_count)
             if product_id is not None:

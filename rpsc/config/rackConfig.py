@@ -30,7 +30,10 @@ rackList=[
 # ]
 
 
-"""6921355232226: "烧酸奶", 6925303722562: "冰红茶", 6925303722432:"绿茶", 6903252014266:"方便面" """
+"""
+6921355232226: "烧酸奶", 6925303722562: "冰红茶", 6925303722432:"绿茶", 6903252014266:"方便面"
+69025143: "益达-香浓蜜瓜味", 6923450690703: "绿箭薄荷糖-脆皮软心", 6923450603574: "彩虹糖原果味"
+"""
 productList=[
     {"productId": "6921355232226", "loc": [1, 1], "rackId": "1"},
     {"productId": "6921355232226", "loc": [1, 2], "rackId": "1"},
@@ -50,16 +53,34 @@ productList=[
     {"productId": "6903252014266", "weight": 135, "rackId": "2"},
     {"productId": "6903252014266", "weight": 135, "rackId": "2"},
     {"productId": "6903252014266", "weight": 135, "rackId": "2"},
-    {"productId": "6903252014266", "weight": 135, "rackId": "2"}
+    {"productId": "6903252014266", "weight": 135, "rackId": "2"},
+    {"productId": "6923450603574", "weight": 40, "rackId": "2"},
+    {"productId": "6923450603574", "weight": 40, "rackId": "2"},
+    {"productId": "6923450603574", "weight": 40, "rackId": "2"},
+    {"productId": "6923450603574", "weight": 40, "rackId": "2"},
+    {"productId": "69025143", "weight": 72, "rackId": "2"},
+    {"productId": "69025143", "weight": 72, "rackId": "2"},
+    {"productId": "69025143", "weight": 72, "rackId": "2"},
+    {"productId": "69025143", "weight": 72, "rackId": "2"},
+    {"productId": "6923450690703", "weight": 108, "rackId": "2"},
+    {"productId": "6923450690703", "weight": 108, "rackId": "2"},
+    {"productId": "6923450690703", "weight": 108, "rackId": "2"},
+    {"productId": "6923450690703", "weight": 108, "rackId": "2"}
 ]
 
+# 0x58EF, 0x5959
+
+# beaconList = [
+#     0x5A02, 0x5783, 0x5920, 0x58C3, 0x5967
+# ]
+
 beaconList = [
-    0x5A02, 0x5783, 0x5920, 0x58C3, 0x5967
+    0x5A02, 0x5783, 0x5920, 0x58C3, 0x5967, 0x5959, 0x58EF
 ]
 
 regions = [{"id":"COMFAST", "uuid":"FDA50693-A4E2-4FB1-AFCF-C6EB07647825"}]
 
 rack_loc = [
-    {"rackId":"1", "beaconLoc":[1, 5]},
-    {"rackId":"2", "beaconLoc":[4]}
+    {"rackId":"1", "beaconLoc":[1, 2, 5]},
+    {"rackId":"2", "beaconLoc":[1, 2, 5]}
 ]

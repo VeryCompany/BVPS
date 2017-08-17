@@ -47,6 +47,7 @@ class ControlCenter:
                     product_status["product"] = product
                     product_status["opt"] = opt
                     product_status["productId"] = product.productId
+                    product_status["count"] = 1
                     user_status = dict()
                     for user_ids in range(user_count):
                         human_id = user_list[user_ids]
@@ -83,6 +84,7 @@ class ControlCenter:
                         product_status["product"] = product
                         product_status["opt"] = opt
                         product_status["productId"] = product.productId
+                        product_status["count"] = 1
                         user_status = dict()
                         for user_ids in range(len(has_product_user)):
                             human_id = has_product_user[user_ids]
@@ -125,6 +127,7 @@ class ControlCenter:
                     product_status = dict()
                     product_status["product"] = product
                     product_status["opt"] = opt
+                    product_status["count"] = count
                     product_status["productId"] = product_id
                     user_status = dict()
                     for user_ids in range(user_count):
@@ -162,6 +165,7 @@ class ControlCenter:
                         product_status["product"] = product
                         product_status["opt"] = opt
                         product_status["productId"] = product_id
+                        product_status["count"] = count
                         user_status = dict()
                         for user_ids in range(len(has_product_user)):
                             human_id = has_product_user[user_ids]
@@ -233,7 +237,9 @@ class ControlCenter:
             has_know = False
             product_info = ControlCenter.notSureProduct[product_sign_id]
             product = product_info["product"]
+            count = product_info["count"]
             user_status = product_info["userStatus"]
+            opt = product_info["opt"]
             if user_id in user_status:
                 user_status[user_id] = user_status_code
             print("step 2 notSureProduct :", ControlCenter.notSureProduct)
@@ -249,15 +255,15 @@ class ControlCenter:
 
             print("step 3:", user_status_code == 0)
             if user_status_code == 0:
-                print("{}说是他拿的, 给他加购物车".format(user_id))
+                print("{}说是他操作, 给他加购物车".format(user_id))
                 human = ControlCenter.aSys.createActor(HumanActor, globalName="human-{}".format(user_id))
-                ControlCenter.aSys.tell(human, HumanTakeProduct(product, "02"))
+                ControlCenter.aSys.tell(human, HumanTakeProduct(product, opt, count))
                 ControlCenter.phoneCenter.send_msg2phone(user_id, "2")
                 has_know = True
 
             if finish_feedback and not has_know:
                 # TODO tell the market manager
-                print("没人确认是自己拿的!")
+                print("没人确认是自己操作的!")
 
     @staticmethod
     def test_send():
