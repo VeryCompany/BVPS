@@ -46,7 +46,8 @@ class SVMRecognizer(multiprocessing.Process):
         #     cuda=True)
         log.info("-" * 100)
         self.ta = self.camera.createActor(
-            TorchActor, globalName="{}_TorchActor".format(self.cameraId))
+            TorchActor,
+            globalName="{}_TorchActor".format(self.camera.cameraId))
         log.info("create torch.TorchActor ok.....")
         log.info("-" * 100)
         while True:
@@ -56,7 +57,7 @@ class SVMRecognizer(multiprocessing.Process):
                     self.model = msg.model
                     continue
                 human, t0, sec, center, size = msg
-                self.camera.send(self.ta, (self.cameraId, human, t0, sec,
+                self.camera.send(self.ta, (self.camera.cameraId, human, t0, sec,
                                            center, size))
                 # uid = self.whoru(human)
                 # if uid is not None:
