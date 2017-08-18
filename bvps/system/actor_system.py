@@ -5,6 +5,6 @@ import time
 print("-" * 100)
 capabilities = {'': True, 'torch': None, 'Admin Port': 1900}
 actor_system = ActorSystem(
-    systemBase="multiprocTCPBase", logDefs=logcfg, capabilities=capabilities)
+    systemBase="multiprocQueueBase", logDefs=logcfg, capabilities=capabilities)
 print("init actor system:{}".format(actor_system))
 print("-" * 100)
