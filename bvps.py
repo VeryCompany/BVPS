@@ -8,5 +8,3 @@ actor_system = ActorSystem(
     systemBase="multiprocTCPBase", logDefs=logcfg, capabilities=capabilities)
 print("init actor system:{}".format(actor_system))
 print("-" * 100)
-
-actor_system._systemBase.deRegisterRemoteSystem('192.168.0.172')
