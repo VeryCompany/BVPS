@@ -47,7 +47,7 @@ class SVMRecognizer(multiprocessing.Process):
         log.info("--------------------------------")
         self.ta = self.camera.createActor(
             TorchActor,
-            globalName="{}_TorchActor".format(self.camera.cameraId))
+            globalName="TorchActor".format(self.camera.cameraId))
         log.info("create torch.TorchActor ok.....")
         log.info("--------------------------------")
         while True:
