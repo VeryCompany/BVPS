@@ -9,7 +9,7 @@ from thespian.actors import requireCapability
 
 
 @requireCapability('torch')
-class TorchActor(ActorTypeDispatcher):
+class TorchActor(Actor):
     def __init__(self, *args, **kw):
         log.info("ready to init torch actor.....")
         fileDir = os.path.dirname(os.path.realpath(__file__))
@@ -27,3 +27,6 @@ class TorchActor(ActorTypeDispatcher):
         self.send(sender, (cameraId, rep[0], center, t0, sec))
         log.info("received identity request from {}, image.shape:{}".format(
             cameraId, human.shape))
+
+    def receiveMessage(self, message, sender):
+        pass
