@@ -8,4 +8,3 @@ actor_system = ActorSystem(
     systemBase="multiprocTCPBase", logDefs=logcfg, capabilities=capabilities)
 print("init actor system:{}".format(actor_system))
 print("-" * 100)
-time.sleep(10)

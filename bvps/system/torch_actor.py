@@ -1,4 +1,5 @@
 from thespian.actors import *
+from thespian.actors import ActorTypeDispatcher
 import logging
 import os
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
