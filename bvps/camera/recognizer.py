@@ -53,9 +53,7 @@ class SVMRecognizer(multiprocessing.Process):
         while True:
             try:
                 msg = SVMRecognizer.in_queue.get()
-                log.info("--------------------------------")
-                log.info(msg)
-                log.info("--------------------------------")
+                
                 if isinstance(msg, ModelUpdateCmd):
                     self.model = msg.model
                     continue

@@ -8,7 +8,6 @@ from thespian.actors import requireCapability
 import _thread
 
 
-@troupe(max_count=10, idle_count=10)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         self.net = None
