@@ -1,6 +1,6 @@
 from thespian.actors import *
 from thespian.actors import ActorTypeDispatcher
-import logging
+import logging as log
 import os
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 from thespian.troupe import troupe
