@@ -17,7 +17,7 @@ try:
     sa = asys.createActor(SystemActor, globalName="SystemActor")
     position = asys.createActor(
         PositionActor, globalName="CameraPositionActor")
-    position = asys.createActor(TorchActor, globalName="TorchActor")
+    asys.createActor(TorchActor, globalName="TorchActor")
     # 未来会从数据库或者配置文件中读取
     # 定位摄像头 type == 1
     # 采集摄像头 type == 2
