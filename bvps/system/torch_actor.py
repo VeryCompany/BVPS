@@ -12,7 +12,7 @@ import _thread
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         log.info("ready to init torch actor.....")
-        _thread.start_new_thread(_init_torch, ())
+        _thread.start_new_thread(self._init_torch, ())
 
     def receiveMsg_tuple(self, message, sender):
         cameraId, human, t0, sec, center, size = message
