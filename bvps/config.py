@@ -26,7 +26,7 @@ cameras = {
         "port": 10004,
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
-        "DProcessNum": 3,
+        "DProcessNum": 2,
         "RProcessNum": 4,
         "gpuId": 0,
         "video_properties": {
@@ -59,7 +59,7 @@ cameras = {
         "port": 10005,
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
-        "DProcessNum": 3,
+        "DProcessNum": 2,
         "RProcessNum": 4,
         "gpuId": 0,
         "video_properties": {
@@ -91,7 +91,7 @@ cameras = {
         "port": 10006,
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
-        "DProcessNum": 3,
+        "DProcessNum": 2,
         "RProcessNum": 4,
         "gpuId": 1,
         "video_properties": {
