@@ -257,7 +257,7 @@ class CameraCaptureThread(threading.Thread):
         self.camera = camera
         self.cameraName = cameraName
         self.cameraDevice = cameraDevice
-        self.threadn = cv2.getNumberOfCPUs() * 4
+        self.threadn = cv2.getNumberOfCPUs()
         self.pools = {}
         self.initCmd = initCmd
 
@@ -357,7 +357,7 @@ class CameraCaptureThread(threading.Thread):
                     log.error(
                         traceback.format_exception(exc_type, exc_value,
                                                    exc_traceback))
-                    
+
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log.error(

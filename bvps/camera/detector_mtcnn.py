@@ -24,7 +24,6 @@ class DetectorProcessor(multiprocessing.Process):
         self.latency = StatValue()
         self.gpuId = gpuId
 
-
     def run(self):
         log.info("ready to startup camera:{}'s' mtcnn detector".format(
             self.camera.cameraId))
@@ -38,9 +37,12 @@ class DetectorProcessor(multiprocessing.Process):
                 frame, t0, secs = DetectorProcessor.frame_in.get()
                 humans = self.detect_humans(frame, t0, secs)
                 for human in humans:
-                    DetectorProcessor.frame_out2.put(human)  # for 识别器
+                    if not DetectorProcessor.frame_out2.full():
+                        DetectorProcessor.frame_out2.put(human)  # for 识别器
                     if self.camera.cameraType == CameraType.CAPTURE:
-                        DetectorProcessor.frame_out.put(human)  # for Trainor
+                        if not DetectorProcessor.frame_out.full():
+                            DetectorProcessor.frame_out.put(
+                                human)  # for Trainor
 
             except Exception as e:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -67,8 +69,8 @@ class DetectorProcessor(multiprocessing.Process):
                     center_x, center_y = (
                         (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
                         (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
-                    log.debug("{}->{}:{}".format(self.camera.cameraId, center_x,
-                                                center_y))
+                    log.debug("{}->{}:{}".format(self.camera.cameraId,
+                                                 center_x, center_y))
                     w, h = (abs(int(b[0]) - int(b[2])) / 2,
                             abs(int(b[1]) - int(b[3])) / 2)
                     log.debug(
