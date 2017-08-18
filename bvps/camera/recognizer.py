@@ -23,6 +23,7 @@ class SVMRecognizer(multiprocessing.Process):
         self.last_frame_time = clock()
         self.latency = StatValue()
         self.ta = None
+        log.info("初始化识别器！")
 
     def whoru(self, human):
         face = human
