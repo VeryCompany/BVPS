@@ -53,13 +53,14 @@ class SVMRecognizer(multiprocessing.Process):
         while True:
             try:
                 msg = SVMRecognizer.in_queue.get()
-                
+
                 if isinstance(msg, ModelUpdateCmd):
                     self.model = msg.model
                     continue
                 human, t0, sec, center, size = msg
                 self.camera.send(self.ta, (self.camera.cameraId, human, t0, sec,
                                            center, size))
+                self.camera.send(self.ta, "self.camera.send")
                 # uid = self.whoru(human)
                 # if uid is not None:
                 # 用户uid出现在图片坐标(px,py),精确时间t0,秒时间sec

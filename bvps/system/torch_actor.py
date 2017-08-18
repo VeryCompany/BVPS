@@ -23,6 +23,9 @@ class TorchActor(ActorTypeDispatcher):
             rep = self.net.forward(human)
             self.send(sender, (cameraId, rep[0], center, t0, sec))
 
+    def receiveMsg_str(self, message, sender):
+        log.info("received msg {}".format(message))
+
     def _init_torch(self):
         log.info("ready to lunch torch neura net....")
         fileDir = os.path.dirname(os.path.realpath(__file__))
