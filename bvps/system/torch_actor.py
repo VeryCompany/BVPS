@@ -4,12 +4,14 @@ import os
 from bvps.torch.torch_neural_net_lutorpy import TorchNeuralNet
 from thespian.troupe import troupe
 from thespian.actors import requireCapability
+import _thread
+
 
 @troupe(max_count=10, idle_count=10)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
         log.info("ready to init torch actor.....")
-
+        _thread.start_new_thread(_init_torch, ())
 
     def receiveMsg_tuple(self, message, sender):
         cameraId, human, t0, sec, center, size = message

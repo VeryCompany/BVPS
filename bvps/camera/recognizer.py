@@ -42,11 +42,12 @@ class SVMRecognizer(multiprocessing.Process):
             #     os.path.join(openfaceModelDir, 'nn4.small2.v1.t7'),
             #     imgDim=96,
             #     cuda=True)
-
+            log.info("-"*100)
             self.ta = self.camera.createActor(
                 TorchActor,
                 globalName="{}_TorchActor".format(self.cameraId))
             log.info("create torch.TorchActor ok.....")
+            log.info("-"*100)
             while True:
                 try:
                     msg = SVMRecognizer.in_queue.get()

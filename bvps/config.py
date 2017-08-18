@@ -27,7 +27,7 @@ cameras = {
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
         "DProcessNum": 4,
-        "RProcessNum": 1,
+        "RProcessNum": 4,
         "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
@@ -60,7 +60,7 @@ cameras = {
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
         "DProcessNum": 4,
-        "RProcessNum": 1,
+        "RProcessNum": 4,
         "gpuId": 0,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
@@ -92,7 +92,7 @@ cameras = {
         "fourcc": ('M', 'J', 'P', 'G'),
         "processNum": 4,
         "DProcessNum": 4,
-        "RProcessNum": 1,
+        "RProcessNum": 4,
         "gpuId": 1,
         "video_properties": {
             5: 25,  # cv2.CAP_PROP_FPS
