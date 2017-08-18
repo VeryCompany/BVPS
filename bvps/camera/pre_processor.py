@@ -38,9 +38,9 @@ class PreProcessor(multiprocessing.Process):
                 self.latency.update(t - t0)
                 self.frame_interval.update(t - self.last_frame_time)
                 self.last_frame_time = t
-            log.debug("{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(
-                self.camera.cameraId, self.latency.value * 1000,
-                self.frame_interval.value * 1000))
+            # log.debug("{},latency:{:0.1f}ms,process time:{:0.1f}ms".format(
+            #     self.camera.cameraId, self.latency.value * 1000,
+            #     self.frame_interval.value * 1000))
 
     def resize_frame(self, frame, scale, t0, ts):
         h, w, d = frame.shape
