@@ -34,7 +34,7 @@ try:
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
                        600)
         print("camera:{} result:{}".format(camId, msg))
-    asys.tell(ta, "TorchActor")
+    asys.tell(ta, "TorchActor"*100)
 except KeyboardInterrupt:
     print('Interrupted')
     try:
