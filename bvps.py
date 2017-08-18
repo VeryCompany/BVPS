@@ -9,4 +9,4 @@ actor_system = ActorSystem(
 print("init actor system:{}".format(actor_system))
 print("-" * 100)
 
-actor_system.deRegisterRemoteSystem('192.168.0.172')
+actor_system._systemBase.deRegisterRemoteSystem('192.168.0.172')
