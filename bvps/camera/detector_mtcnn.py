@@ -69,7 +69,7 @@ class DetectorProcessor(multiprocessing.Process):
                     center_x, center_y = (
                         (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
                         (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
-                    log.debug("{}->{}:{}".format(self.camera.cameraId,
+                    log.info("{}->{}:{}".format(self.camera.cameraId,
                                                  center_x, center_y))
                     w, h = (abs(int(b[0]) - int(b[2])) / 2,
                             abs(int(b[1]) - int(b[3])) / 2)

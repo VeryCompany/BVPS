@@ -19,8 +19,9 @@ class TorchActor(ActorTypeDispatcher):
         px, py = center
         log.info("received identity request from {}, image.shape:{}".format(
             cameraId, human.shape))
-        rep = self.net.forward(human)
-        self.send(sender, (cameraId, rep[0], center, t0, sec))
+        if not self.net:
+            rep = self.net.forward(human)
+            self.send(sender, (cameraId, rep[0], center, t0, sec))
 
     def _init_torch(self):
         log.info("ready to lunch torch neura net....")
