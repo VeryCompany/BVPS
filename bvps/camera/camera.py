@@ -44,11 +44,11 @@ class Camera(ActorTypeDispatcher):
         log.info("初始化camera。")
         super(Camera, self).__init__(*args, **kw)
 
-        self.frame_queue = multiprocessing.Queue(16)  #
+        self.frame_queue = multiprocessing.Queue(32)  #
 
-        self.pre_process_queue = multiprocessing.Queue(128)  # 图像预处理Queue
+        self.pre_process_queue = multiprocessing.Queue(32)  # 图像预处理Queue
 
-        self.human_detector_q = multiprocessing.Queue(128)  # 人脸和人体识别器
+        self.human_detector_q = multiprocessing.Queue(64)  # 人脸和人体识别器
 
         self.training_dset_q = multiprocessing.Queue(
             64)  # frame queue for trainer
