@@ -11,6 +11,7 @@ import _thread
 @troupe(max_count=10, idle_count=10)
 class TorchActor(ActorTypeDispatcher):
     def __init__(self, *args, **kw):
+        self.net = None
         log.info("ready to init torch actor.....")
         _thread.start_new_thread(self._init_torch, ())
 
@@ -19,7 +20,7 @@ class TorchActor(ActorTypeDispatcher):
         px, py = center
         log.info("received identity request from {}, image.shape:{}".format(
             cameraId, human.shape))
-        if not self.net:
+        if self.net is not None:
             rep = self.net.forward(human)
             self.send(sender, (cameraId, rep[0], center, t0, sec))
 
