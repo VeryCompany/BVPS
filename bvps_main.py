@@ -17,7 +17,7 @@ try:
     sa = asys.createActor(SystemActor, globalName="SystemActor")
     position = asys.createActor(
         PositionActor, globalName="CameraPositionActor")
-    asys.createActor(TorchActor, globalName="TorchActor")
+    ta = asys.createActor(TorchActor, globalName="TorchActor")
     # 未来会从数据库或者配置文件中读取
     # 定位摄像头 type == 1
     # 采集摄像头 type == 2
@@ -34,7 +34,7 @@ try:
                        CameraCmd(CameraCmdType.START_CAPTURE, camId, params),
                        600)
         print("camera:{} result:{}".format(camId, msg))
-
+    asys.tell(ta, "TorchActor")
 except KeyboardInterrupt:
     print('Interrupted')
     try:
