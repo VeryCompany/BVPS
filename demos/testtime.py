@@ -1,9 +1,6 @@
+import common
 import time
 
-t= time.time()
-
-time.sleep(2)
-
-t1 = time.time()
-
-print t1 -t
+t0 = clock()
+time.sleep(1)
+print(clock() - t0)
