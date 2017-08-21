@@ -13,7 +13,7 @@ from bvps.common import CameraCmdType, CameraCmd
 import time
 
 try:
-    # server_start(asys)
+    server_start(asys)
     sa = asys.createActor(SystemActor, globalName="SystemActor")
     position = asys.createActor(
         PositionActor, globalName="CameraPositionActor")
