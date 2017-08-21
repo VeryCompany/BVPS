@@ -38,7 +38,7 @@ def convert_context(params, ctx):
     for k, v in params.items():
 
         try:
-            log.info("k:{},v:{}".format(k, v))
+            #log.info("k:{},v:{}".format(k, v))
             new_params[k] = v.as_in_context(ctx)
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -63,8 +63,8 @@ def load_param(prefix, epoch, convert=False, ctx=None):
             ctx = mx.cpu()
         arg_params = convert_context(arg_params, ctx)
         aux_params = convert_context(aux_params, ctx)
-    log.info("-" * 100)
-    log.info(arg_params)
-    log.info(aux_params)
-    log.info("-" * 100)
+    #log.info("-" * 100)
+    #log.info(arg_params)
+    #log.info(aux_params)
+    #log.info("-" * 100)
     return arg_params, aux_params
