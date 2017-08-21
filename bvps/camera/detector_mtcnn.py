@@ -62,9 +62,9 @@ class DetectorProcessor(multiprocessing.Process):
                     time_cost = tn - last_info_time
                     last_info_time = tn
                     log.info(
-                        "MTCNN->{},平均帧率:{:0.1f},平均延迟:{:0.1f}s,处理frame:{:0.1f}s,处理人脸:{:0.1f}s".
-                        format(self.camera.cameraId, frame_stat.value /
-                               time_cost, humans_latency_stat.value /
+                        "MTCNN->pid:{},{},平均帧率:{:0.1f}/s,平均延迟:{:0.1f}s,处理frame:{:0.1f}/s,处理人脸:{:0.1f}/s".
+                        format(self.pid, self.camera.cameraId, frame_stat.value
+                               / time_cost, humans_latency_stat.value /
                                time_cost, frame_interval_stat.value /
                                time_cost, humans_stat.value / time_cost))
                     frame_stat.update(0)
