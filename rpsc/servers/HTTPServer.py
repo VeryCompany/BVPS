@@ -206,4 +206,4 @@ def start_http(asys):
     print('Http Server Start ...')
     global app
 
-    app.run(host='', port='8080',threaded=True)
+    app.run(host='0.0.0.0', port='8080',threaded=True)
