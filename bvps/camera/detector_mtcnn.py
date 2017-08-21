@@ -69,11 +69,11 @@ class DetectorProcessor(multiprocessing.Process):
                     center_x, center_y = (
                         (int(b[0]) + abs(int(b[0]) - int(b[2])) / 2),
                         (int(b[1]) + abs(int(b[1]) - int(b[3])) / 2))
-                    log.info("{}->{}:{}".format(self.camera.cameraId, center_x,
-                                                center_y))
+                    log.debug("{}->{}:{}".format(self.camera.cameraId,
+                                                 center_x, center_y))
                     w, h = (abs(int(b[0]) - int(b[2])) / 2,
                             abs(int(b[1]) - int(b[3])) / 2)
-                    log.info(
+                    log.debug(
                         "{}->w:{},h:{}".format(self.camera.cameraId, w, h))
                     # crop image and resize....
                     face_img = image.copy()[int(b[1]):int(b[3]),
