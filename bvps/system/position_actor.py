@@ -71,10 +71,10 @@ class PositionActor(ActorTypeDispatcher):
                 """Xpx,Ypx,centreX,centreY,baseline_mm,pixel_per_mm"""
 
                 for uid, pxy in self.position_cache.items():
-                    for secitem, groups in pxy.items():
-                        if len(groups) > 1 and sec == secitem:
-                            log.info("sec:{},{}".format(secitem, groups))
-                            self.processPosition(uid, secitem, groups)
+                    for sec_item, groups in pxy.items():
+                        if sec == sec_item:
+                            log.info("sec:{},{}".format(sec_item, groups))
+                            self.processPosition(uid, sec_item, groups)
 
                 if len(self.position_cache[uid]) > 10:
                     times = sorted(self.position_cache[uid].keys())
