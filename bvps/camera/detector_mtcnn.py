@@ -54,15 +54,15 @@ class DetectorProcessor(multiprocessing.Process):
                 tn = clock()
                 self.frame_interval.update(tn - self.last_frame_time)
                 self.latency.update(tn - t0)
-                frame_interval_stat.value(frame_interval_stat.value +
-                                          self.frame_interval.value)
-                humans_latency_stat.value(humans_latency_stat.value +
-                                          self.latency.value)
+                frame_interval_stat.update(frame_interval_stat.value +
+                                           self.frame_interval.value)
+                humans_latency_stat.update(humans_latency_stat.value +
+                                           self.latency.value)
                 if tn - last_info_time > stat_time:
                     time_cost = tn - last_info_time
                     last_info_time = tn
                     log.info(
-                        "{}-平均帧率:{:0.1f},平均延迟:{:0.1f}s,处理frame:{:0.1f}s,处理人脸:{:0.1f}s".
+                        "MTCNN->{},平均帧率:{:0.1f},平均延迟:{:0.1f}s,处理frame:{:0.1f}s,处理人脸:{:0.1f}s".
                         format(self.camera.cameraId, frame_stat.value /
                                time_cost, humans_latency_stat.value /
                                time_cost, frame_interval_stat.value /
