@@ -105,7 +105,7 @@ cameras = {
 camera_group = {
     "group_1": {
         "members": ["camera1", "camera2"],
-        "primary": "camera4",
+        "primary": "camera1",
         "baseline_mm": 220,
         "cx": 0,
         "cy": 0
