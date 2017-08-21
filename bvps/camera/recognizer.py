@@ -71,7 +71,7 @@ class SVMRecognizer(multiprocessing.Process):
                     log.info(
                         "user:{},px:{},py:{},sec:{}".format(uid, px, py, sec))
                     SVMRecognizer.out_queue.put((self.camera.cameraId, uid,
-                                                 (px, py), t0, sec))
+                                                 px, py, t0, sec))
                 t = clock()
                 self.latency.update(t - t0)
                 self.frame_interval.update(t - self.last_frame_time)
