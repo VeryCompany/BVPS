@@ -115,7 +115,7 @@ class PositionActor(ActorTypeDispatcher):
     def process_position(self, uid, sec, groups):
         # for uId, datas in self.position_cache:
         #     """发送用户Id，世界坐标x，世界坐标y，位置时间到定位中心"""
-        positions = self.process_user_position(groups)
+        positions = self._locate_user(groups)
         log.info("user:{} sec->:{}".format(uid, sec))
 
     def process_user_position(self, datas):
