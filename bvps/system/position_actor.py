@@ -58,7 +58,7 @@ class PositionActor(ActorTypeDispatcher):
             cx = cg[cgid]["cx"]
             cy = cg[cgid]["cy"]
             try:
-                self.lock.acquire()
+                #self.lock.acquire()
                 if uid not in self.position_cache:
                     self.position_cache[uid] = {}
                 if sec not in self.position_cache[uid]:
@@ -87,8 +87,8 @@ class PositionActor(ActorTypeDispatcher):
                     traceback.format_exception(exc_type, exc_value,
                                                exc_traceback))
             finally:
-                self.lock.release()
-
+                #self.lock.release()
+                pass
                 # """
                 # position_cache = {
                 #     "uid":{
