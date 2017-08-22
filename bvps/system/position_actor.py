@@ -72,7 +72,7 @@ class PositionActor(ActorTypeDispatcher):
 
                 for uid, pxy in self.position_cache.items():
                     for sec_item, groups in pxy.items():
-                        if sec == sec_item:
+                        if sec_item >= sec - 3:
                             log.info("sec:{},{}".format(sec_item, groups))
                             self.processPosition(uid, sec_item, groups)
 
@@ -116,7 +116,7 @@ class PositionActor(ActorTypeDispatcher):
         # for uId, datas in self.position_cache:
         #     """发送用户Id，世界坐标x，世界坐标y，位置时间到定位中心"""
         positions = self.process_user_position(groups)
-        log.info("user:{} sec->:{}  positions->:{}".format(uid, sec, positions))
+        log.info("user:{} sec->:{}".format(uid, sec))
 
     def process_user_position(self, datas):
         pool = ThreadPool(8)
@@ -187,4 +187,5 @@ class PositionActor(ActorTypeDispatcher):
 
             # camere_position = {}
             camere_position[gp] = [X, Y, Z]
+            log.info("position X->:{} Y->:{} Z->:{}".format(X, Y, Z))
         return camere_position
