@@ -74,7 +74,7 @@ class PositionActor(ActorTypeDispatcher):
                     for sec_item, groups in pxy.items():
                         if sec_item >= sec - 3:
                             log.info("sec:{},{}".format(sec, groups))
-                            self.processPosition(uid, sec, groups)
+                            self.process_position(uid, sec, groups)
 
                 if len(self.position_cache[uid]) > 10:
                     times = sorted(self.position_cache[uid].keys())
