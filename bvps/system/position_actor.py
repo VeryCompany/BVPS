@@ -119,7 +119,7 @@ class PositionActor(ActorTypeDispatcher):
         log.info("user:{} sec->:{}".format(uid, sec))
 
     def process_user_position(self, datas):
-        pool = ThreadPool(8)
+        pool = ThreadPool(16)
         # current = int(time.time()) - 1
         # map_in = []
         # for sec, group in datas:
