@@ -28,7 +28,7 @@ class PositionActor(ActorTypeDispatcher):
     def processPosition(self, uid, sec, groups):
         while True:
             try:
-                self.lock.acquire()
+                # self.lock.acquire()
                 log.info("开始处理世界坐标！")
                 self.process_position(uid, sec, groups)
                 log.info("处理世界坐标结束！")
@@ -39,8 +39,8 @@ class PositionActor(ActorTypeDispatcher):
                     traceback.format_exception(exc_type, exc_value,
                                                exc_traceback))
             finally:
-                self.lock.release()
-            time.sleep(1)
+                # self.lock.release()
+                time.sleep(1)
 
     def receiveMsg_tuple(self, message, sender):
         cameraId, uid, px, t0, sec = message
